@@ -1,0 +1,39 @@
+<html>
+<head>
+    <script type="text/javascript">
+        function changeWidth()
+        {
+            document.getElementById("frame1").width="300";
+        }
+    </script>
+</head>
+<body>
+
+<div>
+    <div>
+        <ul>
+            <li>
+                123
+                <ul>
+                    <li>aa</li>
+                </ul>
+            </li>
+            <li>
+                456
+                <ul>
+                    <li>bb</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <iframe src="frame_a.htm" id="frame1" width="200" height="1024"></iframe>
+</div>
+
+
+<br /><br />
+
+<input type="button" onclick="changeWidth()"
+       value="Change size" />
+
+</body>
+</html>

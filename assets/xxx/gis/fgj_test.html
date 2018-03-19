@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>ICS TEST RTDATA</h1>
+<div id="id01"></div>
+<div id="id02"></div>
+<script>
+    window.icsTest = {};
+    var icsTest = window.icsTest;
+
+    icsTest.timeOut = function() {
+        icsTest.req_resp_memu();
+        icsTest.timeOut1000 = window.setTimeout(icsTest.timeOut, 1000);
+    }
+
+    icsTest.timeOut1000 = window.setTimeout(icsTest.timeOut, 1000);
+
+    icsTest.reqData = {
+        "session":"sbid=0001;xxx=adfadsf",
+        "structtype": "rtdata_v101",
+        "params":
+                [
+                    {
+                        "url": "ygct/asm01/fgj01/rfid"
+                    },
+                    {
+                        "url": "ygct/asm01/fgj01/ypmm"
+                    }
+                ]
+    };
+
+    icsTest.req_resp_memu = function() {
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        }
+        else if (window.ActiveXObject)  {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.open("post", "http://10.31.0.15:8821/ics.cgi?fncode=req.rtdata_v101&filetype=json", true);
+        xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
+        xmlhttp.setRequestHeader('Content-Type', 'json');
+        xmlhttp.onreadystatechange = function ()
+        {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                icsTest.dealRespMain(xmlhttp.responseText)
+            }
+        }
+        var r = xmlhttp.send(JSON.stringify(icsTest.reqData));
+        document.getElementById("id02").innerHTML = "send：" + Date() + "  " + r;
+//            return {"r":r,"datetime":Date()}
+    }
+
+    icsTest.dealRespMain =  function (response) {
+        var arr = JSON.parse(response);
+        var measures = arr.data;
+        var i;
+        var out = "<table>";
+        out += "<tr><td>url" +
+                "</td><td>mid" +
+                "</td><td>v" +
+                "</td><td>q" +
+                "</td><td>t" +
+                "</td><td>state" +
+                "</td></tr>";
+
+        for(i = 0; i < measures.length; i++) {
+            var measure = measures[i];
+            out += "<tr><td>" +
+                    measure.url +
+                    "</td><td>" +
+                    measure.mid +
+                    "</td><td>" +
+                    measure.v +
+                    "</td><td>" +
+                    measure.q +
+                    "</td><td>" +
+                    measure.t +
+                    "</td><td>" +
+                    measure.state +
+                    "</td></tr>";
+        }
+        out += "</table>";
+        document.getElementById("id01").innerHTML = out;
+    }
+</script>
+
+</body>
+</html>

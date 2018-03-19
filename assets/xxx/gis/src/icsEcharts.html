@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+
+<div class="container featurette">
+    <div class="row">
+        <div  class="col-md-12">
+            <div  style="height:50px;width:60%"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation" id="head"></div>
+
+<div class="container featurette">
+    <div class="row">
+        <div id="graphic" class="col-md-12">
+            <div id="main" style="height:400px;width:60%;margin-left:50px"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+
+<div class="container featurette">
+    <div class="row">
+        <div  class="col-md-12">
+            <div  style="height:50px;width:60%"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+
+<div class="container featurette">
+    <div class="row">
+        <div id="graphic1" class="col-md-12">
+            <div id="main1" style="height:400px;width:60%;margin-left:50px"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<div class="container featurette">
+    <div class="row">
+        <div  class="col-md-12">
+            <div  style="height:50px;width:60%"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<div class="container featurette">
+    <div class="row">
+        <div id="graphic2" class="col-md-12">
+            <div id="main2" style="height:400px;width:60%;margin-left:50px"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<div class="container featurette">
+    <div class="row">
+        <div  class="col-md-12">
+            <div  style="height:50px;width:60%"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<div class="container featurette">
+    <div class="row">
+        <div id="graphic3" class="col-md-12">
+            <div id="main3" style="height:400px;width:60%;margin-left:50px"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+
+
+<footer id="footer"></footer>
+
+
+<script src="../js/esl/src/esl.js" charset="utf-8"></script>
+<script src="../js/EfileManage.js" charset="utf-8"></script>
+<script src="../js/IcsanimateManage.js" charset="utf-8"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../js/icsEChartsManage.js" charset="utf-8"></script>
+<script src="../js/AjaxServer.js" charset="utf-8"></script>
+
+
+<script>
+    var count = 0;
+    var t = setTimeout("fn_timeOut()", 1000);
+    function fn_timeOut() {
+
+        var str = "<! Code=utf-8 Data=1.0 System=data.ygct.sample.ticket Version=1.0 !>\n"
+                +"<BarChart_Info::BarChart_Info>\n"
+                +"@ F_Session	F_X_Desc F_Y_Desc	 F_Right Top_Text F_Bar_Count\n"
+                +"# 2015011202003	 X单位 重量(吨) 单位(吨) 2\n"
+                +"</BarChart_Info::BarChart_Info>\n"
+                +"<Bar_Info::Bar_Info>\n"
+                +"@	F_Bar_Name\n"
+                +"#	毛重\n"
+                +"#	净重\n"
+                +"</Bar_Info::Bar_Info>\n"
+                +"<T_BarChart_Data::T_BarChart_Data>\n"
+                +"@	F_Name F_Data1 F_Data2\n"
+                +"#	矿点1 8694 3567\n"
+                +"#	矿点2 5649 2089\n"
+                +"#	矿点3 13588 3598\n"
+                +"#	矿点4 9427 2958\n"
+                +"#	矿点5 12868 8888\n"
+                +"#	矿点6 5679 3597\n"
+                +"#	矿点7 19487 10369\n"
+                +"#	矿点8 7497 1589\n"
+                +"</T_BarChart_Data::T_BarChart_Data>";
+
+
+
+
+
+
+        function req_resp_measures(Request){
+
+            var ret_data = Request;
+            var jsonobj=eval('('+ret_data+')');
+            var data = jsonobj.data;
+           var jsonArray = ics_EfileManage.parseJson(data);
+
+            if(jsonArray.length>01||jsonArray != null)
+            {
+
+                config.F_Name = jsonArray.f_name;
+                config.F_X_Desc = jsonArray.x_dec;
+                config.F_mTitle = "2016年3月份存样柜统计数据";
+                config.F_sTitle = "xxx区域";
+                config.F_X_Unit = "日期"
+                config.F_Y_Unit = "个"
+                var op_ =  icsChart.InitHistogramConfig(config);
+                var dataArray = new Array();
+                for(var i=0;i<jsonArray.f_name.length;i++)
+                {
+                    var data = jsonArray.data;
+                    dataArray.push(data[jsonArray.f_name[i]]);
+                }
+
+                icsChart.drawHistogram("0x1111",op_,dataArray);
+
+                require(
+                        [
+                            'echarts',
+                            'echarts/chart/line',
+                            'echarts/chart/bar'
+                        ],
+                        function (ec) {
+                            var myChart = ec.init(document.getElementById('main'));
+                            myChart.setOption(op_);
+                        }
+                )
+            }
+
+        }
+
+        var urls = {
+            sql:"select count(*) as 'data' , F_DT as 'g1', F_TYPE as 'g2' from V_570_LOG_SAMPLE group by F_DT, F_TYPE order by F_DT, F_TYPE"
+        };
+
+        ygct_AccessServer.post(JSON.stringify(urls),req_resp_measures);
+
+
+
+        var efileArray = ics_EfileManage.parseEFile(str);
+
+        require.config({
+            packages: [
+                {
+                    name: 'echarts',
+                    location: '../js/echarts/src',
+                    main: 'echarts'
+                },
+                {
+                    name: 'zrender',
+                    location: 'http://ecomfe.github.io/zrender/src',
+                    //location: '../../../zrender/src',
+                    main: 'zrender'
+                }
+            ]
+        });
+
+        var xArray = new Array();
+        var data1 = new Array();
+        var data2 = new Array();
+
+
+       /* if(efileArray.length>01||efileArray != null)
+        {
+            var config = icsChart.HistogramConfig;
+            config.F_Name = [efileArray[1][1][0],efileArray[1][2][0]];
+
+            for(var i= 1,len=efileArray[2].length;i<len;i++)
+            {
+                xArray.push(efileArray[2][i][0]);
+                data1.push(Number(efileArray[2][i][1]));
+                data2.push(Number(efileArray[2][i][2]));
+            }
+            config.F_X_Desc = xArray;
+            config.F_mTitle = "2015各矿点入煤柱状图";
+            config.F_sTitle = "xxx区域";
+            config.F_X_Unit = "矿点"
+            config.F_Y_Unit = "单位（吨)"
+           var op_ =  icsChart.InitHistogramConfig(config);
+            var data = [data1,data2];
+            icsChart.drawHistogram("0x1111",op_,data);
+
+            require(
+                    [
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar'
+                    ],
+                    function (ec) {
+                        var myChart = ec.init(document.getElementById('main'));
+                        myChart.setOption(op_);
+                    }
+            )
+        }
+*/
+        if(efileArray.length>01||efileArray != null)
+        {
+            var config = icsChart.LineChartConfig;
+            config.F_Name = [efileArray[1][1][0],efileArray[1][2][0]];
+            config.F_X_Desc = xArray;
+            config.F_mTitle = "2015各矿点入煤情况折线图";
+            config.F_sTitle = "xxx区域";
+            config.F_X_Unit = "矿点"
+            config.F_Y_Unit = "单位（吨)"
+            var opline_ =  icsChart.InitLineChartConfig(config);
+            var data = [data1,data2];
+            icsChart.drawLineChart("0x1111",opline_,data);
+
+            require(
+                    [
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar'
+                    ],
+                    function (ec) {
+                        var myChart = ec.init(document.getElementById('main1'));
+                        myChart.setOption(opline_);
+                    }
+            )
+        }
+
+
+
+        if(efileArray.length>01||efileArray != null)
+        {
+
+            var pie_config = icsChart.PieChartConfig;
+            pie_config.F_mTitle = "2015各矿点入煤比例图";
+            pie_config.F_sTitle = "单位（吨）";
+            pie_config.F_Name = xArray;
+            var pie_op = icsChart.InitPieChartConfig(pie_config);
+
+            var op_data = new Array();
+            for(var i=0,len=data2.length;i<len;i++)
+            {
+                var data_config = {};
+                data_config.name = xArray[i];
+                data_config.value = data2[i];
+                op_data.push(data_config);
+            }
+            icsChart.drawPieChart("0x00003",pie_op,op_data);
+
+            require(
+                    [
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/pie'
+                    ],
+                    function (ec) {
+                        var myChart = ec.init(document.getElementById('main2'));
+                        myChart.setOption(pie_op);
+                    }
+            )
+
+        }
+
+
+        if(efileArray.length>01||efileArray != null)
+        {
+            var gauge_config = icsChart.DashboardChartConfig;
+            gauge_config.F_mTitle = "2015入煤完成情况";
+            gauge_config.F_sTitle = "单位（吨）";
+            gauge_config.F_DESC = "完成率";
+            gauge_config.F_Max_CAL = 10000;
+
+            var gauge_op = icsChart.InitDashboardConfig(gauge_config);
+            icsChart.drawDashboardChart("0x00004",gauge_op,8520);
+
+            require(
+                    [
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/gauge'
+                    ],
+                    function (ec) {
+                        var myChart = ec.init(document.getElementById('main3'));
+                        myChart.setOption(gauge_op);
+                    }
+            )
+        }
+
+        fn_timeOut_drawRontainer();
+
+
+    };
+    function fn_timeOut_drawRontainer()
+    {
+        if(count>80)
+        {
+            add = false;
+        }
+        if(count<10)
+        {
+            add = true;
+        }
+        if(add)
+        {
+            count++;
+        }
+        else
+        {
+            count--;
+        }
+
+
+
+        icsChart.drawRontainer("path_svg","path_id",count);
+
+        var randomcount = Math.random()*100;
+        icsChart.drawRontainer("path_svg","path_id",randomcount);
+
+
+        var t = setTimeout("fn_timeOut_drawRontainer()", 50);
+    };
+</script>
+
+<div class="container featurette">
+    <div class="row">
+        <div  class="col-md-12">
+            <div  style="height:100px;width:60%"></div>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+
+<svg id="path_svg" height="300" width="300">
+    <path id="path_id" d="M100 20 L300 20 L250 200 L150 200 Z" fill="none" stroke="steelblue" stroke-width="2"/>
+</svg>
+</body>
+</html>

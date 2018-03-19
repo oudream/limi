@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg>
+    <rect x="15" y="15" width="40" height="40" fill="red">
+        <set attributeName="fill" to="blue" begin="click"/>
+    </rect>
+</svg>
+

@@ -1,0 +1,52 @@
+*{
+	font-family: "microsoft yahei";
+}
+
+body,html{
+	height: 100%;
+	font-family: "microsoft yahei";
+}
+body,html,ul{
+	margin: 0px;padding:0px;
+	overflow: hidden;
+}
+li{
+	list-style: none;
+}
+
+
+.resize-vertical {
+    overflow: hidden;
+    resize:vertical;  
+}  
+.resize-horizontal {
+    overflow: hidden;
+    /*resize:horizontal;*/  
+}
+
+.full-y{
+	height: 100%;
+	box-sizing: border-box;
+}
+.full-x{
+	width: 100%;
+	box-sizing: border-box;
+}
+.scroll_auto{
+	overflow: auto;
+}
+
+.padding_8px{
+	padding:8px;
+}
+.padding_notop{
+	padding-top:0;
+}
+.padding_nobottom{
+	padding-bottom:0;
+}
+.margin_nobottom{
+	margin-bottom:0;
+}
+
+

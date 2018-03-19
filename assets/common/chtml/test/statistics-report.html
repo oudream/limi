@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ICS统计-报表</title>
+</head>
+
+<script src="../js/dlshouwen.grid.v1.2.0/dependents/jquery/jquery.min.js" charset="utf-8"></script>
+<script src="../js/dlshouwen.grid.v1.2.0/dependents/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+<script src="../js/dlshouwen.grid.v1.2.0/dlshouwen.grid.min.js" charset="utf-8"></script>
+<script src="../js/dlshouwen.grid.v1.2.0/i18n/zh-cn.js" charset="utf-8"></script>
+<script src="../js/dlshouwen.grid.v1.2.0/dependents/datePicker/WdatePicker.js" charset="utf-8" defer="defer"></script>
+
+<script src="../js/moment.min.js" charset="utf-8"></script>
+<script src="../js/pikaday.js" charset="utf-8"></script>
+<script src="../cj-ajax.js" charset="utf-8"></script>
+<script src="db-sql-570.js" charset="utf-8"></script>
+<script src="db-descript-570.js" charset="utf-8"></script>
+<script src="datePicker.js" charset="utf-8"></script>
+
+<link rel="stylesheet" type="text/css" href="../js/dlshouwen.grid.v1.2.0/dependents/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../js/dlshouwen.grid.v1.2.0/dependents/fontAwesome/css/font-awesome.min.css" media="all" />
+<link rel="stylesheet" type="text/css" href="../js/dlshouwen.grid.v1.2.0/dlshouwen.grid.min.css" />
+<link rel="stylesheet" type="text/css" href="../js/dlshouwen.grid.v1.2.0/dependents/datePicker/skin/WdatePicker.css" />
+<link rel="stylesheet" type="text/css" href="../js/dlshouwen.grid.v1.2.0/dependents/datePicker/skin/default/datepicker.css" />
+<link href="../css/pikaday.css" rel="stylesheet" type="text/css" />
+
+
+<style>
+    body{ text-align:center}
+    div#conditionQueryWindow{ text-align: left}
+    .div{ margin:0 auto; width:1000px; height:1000px; border:1px solid #F00}
+    /* css注释：为了观察效果设置宽度 边框 高度等样式 */
+</style>
+
+
+<script>
+
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+    }
+
+    function req_resp_measures(Request){
+        var ret_data = Request;
+        var jsonobj=eval('('+ret_data+')');
+        var data = jsonobj.data;
+        if(data.length==0)return;
+
+        var cjDescript570 = window.cjDescript570;
+        var descripts = cjDescript570["t_evt_570"];
+        var keys = Object.keys(data[0]);
+        var dtGridColumns_2_1_1 = new Array();
+        for(var i=0;i<keys.length;i++)
+        {
+            var row = {};
+            var name = "";
+            if (! descripts.hasOwnProperty(keys[i]))
+            {
+                name = keys[i];
+            }else
+            {
+                name = descripts[keys[i]];
+            }
+            row.id = keys[i];
+            row.title = name;
+            row.type = 'string';
+            row.columnClass = 'text-center';
+            row.headerStyle = 'background:#00a2ca;color:white;';
+            dtGridColumns_2_1_1.push(row);
+        }
+        var datas = new Array();
+        for(var i=0; i<data.length; i++){
+            var user = new Object();
+            var newDate = new Date();
+
+            for(var j=0;j<keys.length;j++)
+            {
+                var obj = data[i];
+                var k = keys[j];
+                user[k] = obj[k];
+            }
+            datas.push(user);
+        }
+
+        var dtGridOption_2_1_1 = {
+            lang : 'zh-cn',
+            ajaxLoad : false,
+            exportFileName : '导出的数据文件名',
+            datas : datas,
+            columns : dtGridColumns_2_1_1,
+            gridContainer : 'dtGridContainer_2_1_3',
+            toolbarContainer : 'dtGridToolBarContainer_2_1_3',
+            pageSize : 10,
+            print:false,
+            tools : 'advanceQuery',
+            pageSize : 20,
+            pageSizeLimit : [10, 20, 50]
+        };
+        var grid_2_1_1 = $.fn.dlshouwen.grid.init(dtGridOption_2_1_1);
+        $(function(){
+            grid_2_1_1.load();
+        });
+    }
+
+//    var re_urls = {
+//        sql:"SELECT * FROM T_570_EVT"
+//    };
+  //  re_urls.sql = window.cjSql570.cabinet_log;
+
+//    cjAjax.request({sendData: JSON.stringify(re_urls), url:"http://10.31.16.73:8821/ics/xxx.cgi", urlParams:{fncode:"req.sql."}, callback: req_resp_measures});
+//    cjAjax.request({sendData: JSON.stringify(re_urls), url:"http://10.31.16.253:8821/ics/xxx.cgi", urlParams:{fncode:"req.sql."}, callback: req_resp_measures});
+
+</script>
+
+
+
+<body>
+<div id="conditionQueryWindow"></div>
+
+<div id="dtGridContainer_2_1_3" class="dt-grid-container"></div>
+<div id="dtGridToolBarContainer_2_1_3" class="dt-grid-toolbar-container"></div>
+</body>
+
+<script>
+    DatePicker.init(document.getElementById('conditionQueryWindow'));
+    DatePicker.setOption(
+            {
+                "minDate":"2000-1-1",
+                "maxDate":"2050-12-31",
+                "yearRange":[2000,2050],
+                "buttonText":"查询",
+                "buttonOnClick":function(startDate,endDate){
+
+                    endDate = moment(endDate).add('days',1).format('YYYY-MM-DD');
+                    var sqlCommand = "SELECT F_ID,F_USER_OP,FROM_UNIXTIME(F_DT),F_TYPE,F_ACTION,F_DESC FROM T_570_EVT where FROM_UNIXTIME(F_DT) between '" + startDate + "' and '" + endDate + "'";
+                    var re_urls = {
+                        sql:sqlCommand
+                    };
+
+                    var div = document.getElementById("dtGridContainer_2_1_3");
+                    div.innerHTML = "";
+                    cjAjax.request({sendData: JSON.stringify(re_urls), url:"ics.cgi", urlParams:{fncode:"req.sql."}, callback: req_resp_measures});
+                }
+            }
+    );
+</script>
+
+</html>

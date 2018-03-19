@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-flat-20030114.dtd">
+<!-- Created by SVGDeveloper 1.0 -->
+<svg width="640" height="480" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+	<filter id ="feMophology_A">
+		<feMorphology operator="erode" in="SourceGraphic" radius="2"/>
+	</filter>
+	<filter id ="feMophology_B">
+		<feMorphology operator="dilate" in="SourceGraphic" radius="2"/>
+	</filter>
+</defs>
+
+<g style="font-size:48px;fill:black;stroke-width:5;font-weight:bold">
+	<text x="100" y="100" style="filter:url(#feMophology_A)">I love this game</text>
+	<text x="100" y="150">I love this game</text>
+	<text x="100" y="200" style="filter:url(#feMophology_B)">I love this game</text>	
+</g>
+
+
+</svg>

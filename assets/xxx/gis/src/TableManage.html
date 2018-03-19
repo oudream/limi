@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<style>
+
+
+    #container {
+        width:1280px;
+        margin:0px auto;
+    }
+    /*顶部面板样式*/
+    #header {
+        width:100%;
+        height:30px;
+        border:1px#ADD8E6 solid;
+    }
+    /*中间部分面板样式*/
+    #main {
+        width:100%;
+        height:600px;
+        border:1px#ADD8E6 solid;
+    }
+    /*底部面板样式*/
+    #footer {
+        width:100%;
+        height:100px;
+        border:1px #ADD8E6 solid;
+    }
+
+    .cat {
+        float:left;
+        width:100px;
+        height:100%;
+        solid:#CCC;
+        text-align:right;
+    }
+
+    .sidebar {
+        float:left;
+        width:150px;
+        height:100%;
+    }
+    .content {
+        float:left;
+        width:900px;
+        height:100%;
+        border:1px #ADD8E6 solid;
+    }
+
+    .axis path,
+    .axis line{
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font-family: sans-serif;
+        font-size: 11px;
+    }
+
+    .rectBackground {
+        fill: steelblue;
+    }
+
+    .rectBackground2 {
+        fill:#28ff28 ;
+    }
+
+    .textBackground {
+        fill: white;
+        text-anchor: middle;
+    }
+
+    table.altrowstable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #a9c6c9;
+        border-collapse: collapse;
+    }
+    table.altrowstable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+    }
+    table.altrowstable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+    }
+    .oddrowcolor{
+        background-color:#d4e3e5;
+    }
+    .evenrowcolor{
+        background-color:#c3dde0;
+    }
+
+</style>
+
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../js/EfileManage.js" charset="utf-8"></script>
+
+<body>
+
+
+<script>
+    var t = setTimeout("fn_timeOut()", 1000);
+    var count = 0;
+    function fn_timeOut() {
+
+        var str = "<! Code=utf-8 Data=1.0 System=data.ygct.sample.ticket Version=1.0 !>\n"
+                +"<BarChart_Info::BarChart_Info>\n"
+                +"@ F_Session	F_X_Desc F_Y_Desc	 F_Right Top_Text F_Bar_Count\n"
+                +"# 2015011202003	 X单位 重量(吨) 单位(吨) 2\n"
+                +"</BarChart_Info::BarChart_Info>\n"
+                +"<Bar_Info::Bar_Info>\n"
+                +"@	F_Bar_Name\n"
+                +"#	毛重\n"
+                +"#	净重\n"
+                +"</Bar_Info::Bar_Info>\n"
+                +"<T_BarChart_Data::T_BarChart_Data>\n"
+                +"@	F_Name F_Data1 F_Data2\n"
+                +"#	矿点1 8694 3567\n"
+                +"#	矿点2 5649 2089\n"
+                +"#	矿点3 13588 3598\n"
+                +"#	矿点4 9427 2958\n"
+                +"#	矿点5 12868 8888\n"
+                +"#	矿点6 5679 3597\n"
+                +"#	矿点7 19487 10369\n"
+                +"#	矿点8 7497 1589\n"
+                +"</T_BarChart_Data::T_BarChart_Data>";
+
+        var efileArray = ics_EfileManage.parseEFile(str);
+
+        if(efileArray.length>01||efileArray != null)
+        {
+            draw(efileArray);
+        }
+
+        //	t = setTimeout("fn_timeOut()", 1000);
+    }
+
+</script>
+
+
+
+</body>
+</html>

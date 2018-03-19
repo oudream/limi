@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Hello2</title>
+
+    <style type="text/css">
+        h1 {text-align: center}
+        h2 {text-align: left}
+        h3 {text-align: right}
+    </style>
+
+    <script>
+        var s9 = "i am test9";
+        console.log(s9);
+    </script>
+
+    <script src="./../../3rd/jQuery/jquery-3.1.1.js"></script>
+
+    <script src="./../../3rd/d3/d3.js"></script>
+
+</head>
+<body>
+
+<h1>HELLO SVG!</h1>
+
+<button id="btn" type="button"> Button1</button>
+<div id="ShowSvg" style="width: 800px;">
+    <script>
+        $("#ShowSvg").load("./svg/002.svg");
+    </script>
+</div>
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="1" background="./images/2x2.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+        <td>
+            <input type="button" value="GET1" id="btn1" onclick="btn1_click();" />
+            <input type="button" value="GET2" id="btn2" onclick="btn2_click();" />
+            <input type="button" value="GET3" id="btn3" onclick="btn3_click();" />
+            <br/>
+            <label for="txt_username" style="color:#ff0003"> username:</label>
+            <input type="text" id="txt_username" />
+            <br />
+            <label for="txt_age"> age:</label>
+            <input type="text" id="txt_age" />
+            <br />
+            <label id="outInfoEd"></label>
+            <br />
+            <div id="result"></div>
+            <div id="txtCDInfo"></div>
+
+            <!--    <div id="txtCDInfo">
+                <button onclick="loadXMLDoc('/example/xmle/cd_catalog.xml')">getCDInfo</button>
+                </div>-->
+
+        </td>
+        <td width="1" background="./images/1x2-black.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+    </tr>
+</table>
+
+</body>
+
+    <script src="./main.js"></script>
+
+</html>

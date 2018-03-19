@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实时曲线图</title>
+
+    <script src="./../../../3rd/echarts-3.6.2/echarts.min.js" charset="utf-8"></script>
+    <script src="../cj-chart/cj-charts-1.0.0.js" charset="utf-8"></script>
+    <script src="./../cj-common.js" charset="utf-8"></script>
+    <script src="cj-rtCharts-1.0.0.js" charset="utf-8"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="cj-rtCharts.css">-->
+
+</head>
+<body>
+
+    <div id="main_div">
+        <div></div>
+
+        <div id="graph_panel" style="width: 800px;height: 600px;"></div>
+
+    </div>
+
+<script type="text/javascript" >
+
+
+    //var now = new Date(2016, 1, 1);
+    var now = new Date();
+    var oneDay = 24 * 3600 * 1000;
+
+
+    function randData(count) {
+        var data1 = [];
+        var data2 = [];
+        var data3 = [];
+        var xAxisData = [];
+        var falseFlag = [];
+
+        for (var i = 0; i < count; i++) {
+
+            //now = new Date(+now + oneDay);
+            now = new Date(+now + 1000);
+            var time = now.toLocaleTimeString().replace(/^\D*/,'');
+            //var date = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
+
+            data1.push((Math.random()*10 + 5).toFixed(1));
+            data2.push((Math.random()*10 + 3).toFixed(1));
+            data3.push((Math.random()*10 + 20).toFixed(1));
+            xAxisData.push(time);
+            falseFlag.push(i % 2);
+
+        }
+
+        var cases =
+            [
+                {
+                    name:'图样1',
+                    data:data1,
+                    falseFlag:falseFlag,
+                    xAxisData:xAxisData,
+                    lineColor:'#ff0000'
+                },
+                /*           {
+                 name: '图样2',
+                 data: data2,
+                 falseFlag: falseFlag,
+                 xAxisData: xAxisData,
+                 lineColor: '#00ff00'
+                 },
+                 {
+                 name: '图样3',
+                 data: data3,
+                 falseFlag: falseFlag,
+                 xAxisData: xAxisData,
+                 lineColor: '#0000ff'
+                 }
+                 */
+            ];
+
+        return cases;
+
+    }
+
+    window.onload = function () {
+
+        /**
+
+         var frameWindow = document.getElementById('mainFrame').contentWindow;
+         frameWindow.cjRtCharts.setDataCases()
+
+         */
+
+
+        var rtChart = CjRtCharts.init(document.getElementById('graph_panel'),{mode:0,chartCount:1});
+
+        var param = {
+            'type': 'line',         //图表类型：line,bar,pie
+
+            'title': {
+                'text': '测试用',      //主标题
+                'subtext': '测试子标题'    //子标题
+            },
+
+            //'legendData': ['图样1','图样2'],     //图例标签
+
+            'xAxis': {
+                'type': 'category',      //x轴类型：value，category，time
+                'name': '时间',      //x轴名称
+                'data':[]
+                //'data': ['2016-10-20','2016-10-21','2016-10-22','2016-10-23','2016-10-24','2016-10-25']      //x轴显示数据数组
+            },
+
+            'yAxis': {
+                'type': 'value',      //y轴类型：value，category，time
+                'name': '值',      //y轴名称
+                //'data': ['1A','2A','3A','4A','5A','6A']      //y轴显示数据数组
+            },
+
+            'markPoint': {
+                'show': false      //是否显示标记点
+            },
+
+            'markLine': {
+                'show': false      //是否显示标记线
+            }
+        };
+
+        rtChart.setChartParams(param);
+
+        rtChart.setDataCases(randData(10));
+
+        setInterval(function () {
+
+            if (rtChart.cases.length > 0) {
+
+                var points = [];
+                for (var i = 0; i < rtChart.cases.length; i++) {
+
+                    if (rtChart.cases[i].length > 0) {
+
+                        var _point = rtChart.cases[i].shift();
+
+                    }
+                    else {
+                        var _point = {
+                            falseFlag: 1
+                        }
+
+                    }
+
+                    points.push(_point);
+
+                }
+
+                rtChart.addSerie(points);
+            }
+
+        }, 1000);
+
+        setInterval(function () {
+            /*
+             * [
+             * {
+             *      'name': '',         //数据实例名（要跟图例名对上）
+             *      'data': [],         //数据数组
+             *      'falseFlag': [],    //虚点数组
+             *      'xAxisData': [],    //X轴类目数组
+             *      'lineColor':'#000'  //曲线颜色，可以不设置，有默认
+             *
+             * }
+             * ]
+             *
+             */
+
+            var cases = randData(10);
+
+            rtChart.setDataCases(cases);
+
+        }, 2000);
+
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+.input-group.pick-a-color-markup .editable.pick-a-color{
+	padding: 4px 6px;
+	box-sizing: content-box;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.input-group.pick-a-color-markup .input-group-btn{
+	height: 28px;
+	display: inline-block;
+}
+.input-group.pick-a-color-markup .input-group-btn .color-dropdown{
+	height: 28px;
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
+.input-group-btn.open .color-menu.dropdown-menu{
+	position: fixed;
+	top: auto;
+}

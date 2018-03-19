@@ -1,0 +1,108 @@
+/* ics ics */
+
+.ics.fade.in.modal {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	/*垂直水平居中*/
+	top: -10%;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+.ics.fade.in.modal.drap {
+	top: 50%;
+	left: 50%;
+	right: 0;
+	margin:inherit;
+}
+
+.ics .modal-header .toolbutton {
+	color: #fff;
+    float: right;
+    margin-top: 2px;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+.ics .modal-header .toolbutton:hover,
+.ics .modal-header .toolbutton:focus {
+	opacity: 1;
+	filter: alpha(opacity=100);
+	text-decoration: none;
+}
+
+.ics.modal .modal-header {
+	padding: 0 10px;
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 0px solid #eee;
+	background-color: #3D505C;
+	color: #fff;
+	text-align: left;
+}
+
+.ics.modal .modal-body {
+	position: absolute;
+	/*与.ics.modal .modal-header高度相同*/
+	top: 30px;
+	bottom: 60px;
+	left: 0;
+	right: 0;
+}
+.ics.modal .modal-body.iframe {
+	/*iframe的footer在body内部*/
+	bottom: 0px;
+}
+
+.ics.modal .modal-body iframe {
+	margin: 0px;
+	display: block;
+}
+
+.ics.modal .modal-body.iframe {
+	padding: 0px;
+}
+
+.ics.modal .modal-body.iframe> iframe {
+	border: 0px;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.ics-iframe {
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	top: 10px;
+	bottom: 10px;
+	background: #fff;
+	border-radius: 6px;
+	padding-top: 20px;
+}
+
+.ics-iframe .modal-footer,.ics .modal-footer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.ics.uix_alert {
+	width: 400px;
+	margin-left: -200px;
+}
+
+.ics.uix_alert .modal-body {
+	height: 100px;
+	overflow: auto;
+	font-size: 16px;
+}
+
+.ics.uix_alert .modal-footer {
+	text-align: center;
+}

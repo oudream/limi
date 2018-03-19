@@ -1,0 +1,268 @@
+
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>柱形图</title>
+</head>
+
+<style>
+	.axis path,
+	.axis line{
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+
+	.rectBackground {
+		fill: steelblue;
+	}
+
+	.rectBackground2 {
+		fill:green ;
+	}
+
+	.textBackground {
+		fill: white;
+		text-anchor: middle;
+	}
+</style>
+
+
+<div id="container" style="width:500px">
+	<div>
+		<td colspan="2" style="background-color:#FFA500;">
+			<h1>Main Title of Web Page</h1>
+		</td>
+	</div>
+
+	<div  id="rect" style="height:600px;width:900px;float:left;">
+		<body>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="../js/EfileManage.js" charset="utf-8"></script>
+		<script>
+
+
+
+			var t = setTimeout("fn_timeOut()", 1000);
+			var count = 0;
+			function fn_timeOut() {
+
+				var str = "<! Code=utf-8 Data=1.0 System=data.ygct.sample.ticket Version=1.0 !>\n"
+						+"<BarChart_Info::BarChart_Info>\n"
+						+"@ F_Session	F_X_Desc F_Y_Desc	 F_Right Top_Text F_Bar_Count\n"
+						+"# 2015011202003	 X单位 重量(吨) 单位(吨) 2\n"
+						+"</BarChart_Info::BarChart_Info>\n"
+						+"<Bar_Info::Bar_Info>\n"
+						+"@	F_Bar_Name\n"
+						+"#	毛重\n"
+						+"#	净重\n"
+						+"</Bar_Info::Bar_Info>\n"
+						+"<T_BarChart_Data::T_BarChart_Data>\n"
+						+"@	F_Name F_Data1 F_Data2\n"
+						+"#	矿点1 8694 3567\n"
+						+"#	矿点2 5649 2089\n"
+						+"#	矿点3 13588 3598\n"
+						+"#	矿点4 9427 2958\n"
+						+"#	矿点5 12868 8888\n"
+						+"#	矿点6 5679 3597\n"
+						+"#	矿点7 19487 10369\n"
+						+"#	矿点8 7497 1589\n"
+						+"</T_BarChart_Data::T_BarChart_Data>";
+
+				var efileArray = ics_EfileManage.parseEFile(str);
+
+				if(efileArray.length>01||efileArray != null)
+				{
+					draw(efileArray);
+				}
+
+				//	t = setTimeout("fn_timeOut()", 1000);
+			}
+
+
+			function draw(efileArray)
+			{
+				if(efileArray.length<1)
+				{
+					return;
+				}
+
+				var dataArray1 = new Array();
+				var dataArray2 = new Array();
+
+				for (var i = 1; i < efileArray[2].length; i++) {
+					dataArray1[i-1] = Number(efileArray[2][i][1]);
+					dataArray2[i-1] = Number(efileArray[2][i][2]);
+				}
+
+
+				//画布大小
+				var width = 900;
+				var height = 600;
+
+				//画布周边的空白
+				var padding = {left:100, right:50, top:10, bottom:20};
+				//在 body 里添加一个 SVG 画布
+				var svg = d3.select("body")
+						.append("svg")
+						.attr("width", width)
+						.attr("height", height);
+
+				var xScale = d3.scale.ordinal()
+						.domain(d3.range(dataArray1.length))
+						.rangeRoundBands([0, width - padding.left - padding.right]);
+
+
+				var max1 = d3.max(dataArray1);
+				var max2 = d3.max(dataArray2);
+				var maxY
+				(max1 > max2) ? maxY = max1: maxY = max2;
+				//y轴的比例尺
+
+				var YMaxScal = d3.scale.linear()
+						.domain([0,max1])
+						.range([0,height - padding.top - padding.bottom]);
+
+				var mm = YMaxScal(max1);
+				var yScale = d3.scale.linear()
+						.domain([0,max1])
+						.range([height - padding.top - padding.bottom, 0]);
+
+
+
+				var a = xScale(2);
+				var v = xScale(1);
+				var vs = xScale(0);
+				//定义x轴
+				var xAxis = d3.svg.axis()
+						.scale(xScale)
+						.orient("bottom");
+
+				//定义y轴
+				var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left");
+
+				//矩形之间的空白
+				var rectPadding = 8;
+
+				//添加矩形元素
+				var rects = svg.selectAll(".rectBackground")
+						.data(dataArray1)
+						.enter()
+						.append("rect")
+						.attr("class","rectBackground")
+						.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+						.attr("x", function(d,i){
+							return xScale(i) + rectPadding/2;
+						})
+						.attr("y",function(d){
+							return yScale(d);
+						})
+						.attr("width", (xScale.rangeBand() - rectPadding)/2 )
+						.attr("height", function(d){
+							return height - padding.top - padding.bottom - yScale(d);
+						});
+
+				//添加矩形元素
+				var rects = svg.selectAll(".rectBackground2")
+						.data(dataArray2)
+						.enter()
+						.append("rect")
+						.attr("class","rectBackground")
+						.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+						.attr("x", function(d,i){
+							return xScale(i) + rectPadding/2+(xScale.rangeBand() - rectPadding)/2+1;
+						})
+						.attr("y",function(d){
+							return yScale(d);
+						})
+						.attr("width", (xScale.rangeBand() - rectPadding)/2 )
+						.attr("fill", "red")
+						.attr("height", function(d){
+							return height - padding.top - padding.bottom - yScale(d);
+						});
+
+
+				//添加文字元素
+				var texts = svg.selectAll(".MyText")
+						.data(dataArray2)
+						.enter()
+						.append("text")
+						.attr("class","textBackground")
+						.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+						.attr("x", function(d,i){
+							return xScale(i) + rectPadding/2;
+						} )
+						.attr("y",function(d){
+							return yScale(d);
+						})
+						.attr("dx",function(){
+							return (xScale.rangeBand() - rectPadding)/4+(xScale.rangeBand() - rectPadding)/2+1;
+						})
+						.attr("dy",function(d){
+							return 20;
+						})
+						.text(function(d){
+							return d;
+						});
+
+				//添加文字元素
+				var texts = svg.selectAll(".MyText")
+						.data(dataArray1)
+						.enter()
+						.append("text")
+						.attr("class","textBackground")
+						.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+						.attr("x", function(d,i){
+							return xScale(i) + rectPadding/2;
+						} )
+						.attr("y",function(d){
+							return yScale(d);
+						})
+						.attr("dx",function(){
+							return (xScale.rangeBand() - rectPadding)/4;
+						})
+						.attr("dy",function(d){
+							return 20;
+						})
+						.text(function(d){
+							return d;
+						});
+
+				//添加x轴
+				svg.append("g")
+						.attr("class","axis")
+						.attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+						.call(xAxis);
+
+				//添加y轴
+				svg.append("g")
+						.attr("class","axis")
+						.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+						.call(yAxis);
+			}
+
+
+
+
+
+
+
+
+
+		</script>
+		</body>
+	</div>
+	<div id="content" style="background-color:#EEEEEE;height:200px;width:400px;float:right;">
+		Content goes here</div>
+</div>
+
+
+
+</html>  

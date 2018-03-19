@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script data-main="../../../cjs/web/require/config" src="../../../3rd/require-2.3.3.js"></script>
+    <script type="text/javascript" src="../../../cjs/web/other/c.js"></script>
+    <script type="text/javascript" src="../../../cjs/web/other/app.js"></script>
+
+    <style>
+        .form-inline .form-group{
+            display: inline-block;
+        }
+        .form-group{
+            margin: 10px;
+        }
+        .fuzzyLi:hover {
+            background-color: #1E90FF;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body  ics-code="../../../cjs/web/template/template-single/single-obj.js">
+<div class="uix-layout-container" >
+    <div class="uix-layout-center" id="center" >
+        <!--<div class="uix_box" style="position: relative;">-->
+        <div class="toolbar" id = "operation">
+            <!--<span class="l" id="saveBtn"><i class="icon-th icon-pic saveBtn"></i>保存</span>-->
+            <!--<span class="l" id="addBtn"><i class="icon-th icon-pic addBtn"></i>新建</span>-->
+            <!--<span class="l" id="delete"><i class="icon-th icon-pic delete"></i>删除</span>-->
+            <!--<span class="l" id="quite_btn"><i class="icon-th icon-pic quite"></i>退出</span>-->
+            <!--<span class="r" id="data_record_count_span">共0条记录</span>-->
+        </div>
+        <div class="uix_box" style="background-color: #F6F6F6;padding: 10px;">
+            <form action="" class="form-inline" id="obj_form">
+
+            </form>
+        </div>
+        <div id="pager"></div>
+        <!--</div>-->
+    </div>
+</div>
+</body>
+
+</html>

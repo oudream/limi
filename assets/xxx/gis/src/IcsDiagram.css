@@ -1,0 +1,68 @@
+
+#container {
+    width:1280px;
+    margin:0px auto;
+}
+/*顶部面板样式*/
+#header {
+    width:100%;
+    height:30px;
+    border:1px#ADD8E6 solid;
+}
+/*中间部分面板样式*/
+#main {
+    width:100%;
+    height:600px;
+    border:1px#ADD8E6 solid;
+}
+/*底部面板样式*/
+#footer {
+    width:100%;
+    height:100px;
+    border:1px #ADD8E6 solid;
+}
+
+.cat {
+    float:left;
+    width:100px;
+    height:100%;
+    solid:#CCC;
+    text-align:right;
+}
+
+.sidebar {
+    float:left;
+    width:150px;
+    height:100%;
+}
+.content {
+    float:left;
+    width:900px;
+    height:100%;
+    border:1px #ADD8E6 solid;
+}
+
+.axis path,
+.axis line{
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.rectBackground {
+    fill: steelblue;
+}
+
+.rectBackground2 {
+    fill:#28ff28 ;
+}
+
+.textBackground {
+    fill: white;
+    text-anchor: middle;
+}

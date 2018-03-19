@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<link href="../css/common.css" rel="stylesheet" type="text/css" />
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="itemPane czpPane">
+  <p class="itemTitle">操作票</p>
+<table>
+  <tr>
+    <td width="80%">待执行</td>
+    <td width="20%"><label id="ticket_todo"></label> 张</td>
+  </tr>
+  <tr>
+    <td>正执行</td>
+    <td><label id="ticket_doing"></label> 张</td>
+  </tr>
+  <tr>
+    <td>已执行</td>
+    <td><label id="ticket_done"></label> 张</td>
+  </tr>
+</table>
+  </div>
+
+<div class="itemPane cwqkPane">
+<p class="itemTitle">仓位情况</p>
+<table>
+  <tr>
+    <td width="80%">已使用仓位</td>
+    <td width="20%"><label id="box_used"></label> 个</td>
+  </tr>
+  <tr>
+    <td>未使用仓位</td>
+    <td><label id="box_canuse"></label> 个</td>
+  </tr>
+  <tr>
+    <td>无效仓位</td>
+    <td><label id="box_disable"></label> 个</td>
+  </tr>
+</table>
+</div>
+<script src="cj-common.js"></script>
+<script src="db-sql-570.js"></script>
+<script src="db-descript-570.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>

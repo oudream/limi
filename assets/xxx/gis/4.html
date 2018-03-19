@@ -1,0 +1,155 @@
+
+<script type="text/javascript">
+    function btn_click() {
+
+        var url = "http://localhost/xml.php?type=xml";
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        }
+        else if (window.ActiveXObject)  {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        var username = document.getElementById("txt_username").value;
+        var age = document.getElementById("txt_age").value;
+
+        xmlhttp.open("get", "ics.cgi?username=" + username
+                + "&age=" + age);
+        xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+        xmlhttp.onreadystatechange = function ()
+        {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                txt="<table border='1'><tr><th>ADDRESS</th><th>VALUE</th></tr>";
+                var doc = (new DOMParser()).parseFromString(xmlhttp.response, "text/xml");
+                x=doc.documentElement.getElementsByTagName("RealData9999");
+                for (i=0;i<x.length;i++)
+                {
+                    txt=txt + "<tr>";
+                    xx=x[i].getElementsByTagName("ADDRESS");
+                    {
+                        try
+                        {
+                            txt=txt + "<td>" + xx[0].firstChild.nodeValue + "</td>";
+                        }
+                        catch (er)
+                        {
+                            txt=txt + "<td> </td>";
+                        }
+                    }
+                    xx=x[i].getElementsByTagName("VALUE");
+                    {
+                        try
+                        {
+                            txt=txt + "<td>" + xx[0].firstChild.nodeValue + "</td>";
+                        }
+                        catch (er)
+                        {
+                            txt=txt + "<td> </td>";
+                        }
+                    }
+                    txt=txt + "</tr>";
+                }
+                txt=txt + "</table>";
+                document.getElementById('txtCDInfo').innerHTML=txt;
+            }
+        }
+
+        xmlhttp.send(null);
+    }
+
+    function loadXMLDoc(url)
+    {
+        var xmlhttp;
+        var txt,xx,x,i;
+        if (window.XMLHttpRequest)
+        {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }
+        else
+        {// code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+                txt="<table border='1'><tr><th>Title</th><th>Artist</th></tr>";
+                x=xmlhttp.responseXML.documentElement.getElementsByTagName("CD");
+                for (i=0;i<x.length;i++)
+                {
+                    txt=txt + "<tr>";
+                    xx=x[i].getElementsByTagName("TITLE");
+                    {
+                        try
+                        {
+                            txt=txt + "<td>" + xx[0].firstChild.nodeValue + "</td>";
+                        }
+                        catch (er)
+                        {
+                            txt=txt + "<td> </td>";
+                        }
+                    }
+                    xx=x[i].getElementsByTagName("ARTIST");
+                    {
+                        try
+                        {
+                            txt=txt + "<td>" + xx[0].firstChild.nodeValue + "</td>";
+                        }
+                        catch (er)
+                        {
+                            txt=txt + "<td> </td>";
+                        }
+                    }
+                    txt=txt + "</tr>";
+                }
+                txt=txt + "</table>";
+                document.getElementById('txtCDInfo').innerHTML=txt;
+            }
+        }
+        xmlhttp.open("GET",url,true);
+        xmlhttp.send();
+    }
+</script>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="1" background="./images/2x2.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+        <td><img src="./images/1-x.gif" width="754" height="56"></td>
+        <td width="1" background="./images/1x2-black.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+    </tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="1" background="./images/2x2.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+        <td><img src="./images/11-2.svg" width="754" height="56"></td>
+        <td width="1" background="./images/1x2-black.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+    </tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="1" background="./images/2x2.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+        <td>
+            <label for="txt_username"> username:</label>
+            <input type="text" id="txt_username" />
+            <br />
+            <label for="txt_age"> age:</label>
+            <input type="text" id="txt_age" />
+            <br />
+            <input type="button" value="GET" id="btn" onclick="btn_click();" />
+
+            <div id="result"></div>
+            <div id="txtCDInfo"></div>
+
+            <!--    <div id="txtCDInfo">
+                <button onclick="loadXMLDoc('/example/xmle/cd_catalog.xml')">getCDInfo</button>
+                </div>-->
+
+
+        </td>
+        <td width="1" background="./images/1x2-black.gif"><img src="./images/1x2-black.gif" width="1" height="2"></td>
+    </tr>
+</table>

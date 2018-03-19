@@ -1,0 +1,10 @@
+.uix-layout-container{
+	position: relative;
+	width: 100%;height: 100%;
+}
+.uix-layout-west{
+	 position: absolute;
+}
+.uix-layout-east{
+	 position: absolute;
+}

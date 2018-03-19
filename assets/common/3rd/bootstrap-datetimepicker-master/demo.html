@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script data-main="../../js/config" src="../../lib/require.js"></script>
+		<script type="text/javascript" src="../../js/c.js"></script>
+	</head>
+
+	<body code="demo.js" style="margin-bottom: 80px;">
+		<div class="container">
+			<div class="row">
+				<div class="span3  bs-docs-sidebar">
+					<ul class="nav nav-list bs-docs-sidenav affix">
+						<li class="">
+							<a href="#about"><i class="icon-chevron-right"></i>简介</a>
+						</li>
+						<li>
+							<a href="#demo"><i class="icon-chevron-right"></i>测试</a>
+						</li>
+					</ul>
+				</div>
+				<div class="span9">
+					<section id="about">
+						<div class="page-header">
+							<h1>
+								简介
+							</h1>
+						</div>
+						<p>
+							uixDate是针对bootstrap-datetimpicker.js控件（基于jquery.js）的封装，在原有基础上简化了配置选项。
+						</p>
+					</section>
+					<section id="demo">
+						<div class="page-header">
+							<h1>
+								测试
+							</h1>
+						</div>
+						<form action="" class="form-horizontal">
+							<h3>
+								默认样式
+							</h3>
+							<div class="control-group">
+								<label for="" class="control-label">原生写法：</label>
+								<div class="controls">
+									<div class="input-append date" id="datetimepicker" data-date="12-02-2012" data-date-format="dd-mm-yyyy">
+										<input class="span2" size="16" type="text" value="12-02-2012">
+										<span class="add-on"><i class="icon-th"></i></span>
+									</div>
+									<a class="btn" id="removeDate2">移除</a>
+								</div>
+							</div>
+							<div class="control-group">
+								<label for="" class="control-label">日期：</label>
+								<div class="controls">
+									<input type="hidden" id="dtp_input_date" />
+									<a class="btn" id="removeDate">移除</a>
+								</div>
+							</div>
+							<div class="control-group">
+								<label for="" class="control-label">时间：</label>
+								<div class="controls">
+									<input type="hidden" id="dtp_input_time" />
+								</div>
+							</div>
+							<div class="control-group">
+								<label for="" class="control-label">日期+时间：</label>
+								<div class="controls">
+									<input type="hidden" id="dtp_input_datetime" />
+								</div>
+							</div>
+							<h3>
+								参数
+							</h3>
+							<p>
+								value[string]：默认空；<br /> dateType[string]：默认date，可选form_date/form_datetime/form_time； <br /> readonly[Boolean]：默认false，是否可以手动修改；
+								<br/> startDate[string]：默认无，可选的开始时间
+								<br /> endDate[string]：默认无，可选的结束时间
+								<br /> changeDate[function]：默认无，当选择时间后触发该事件
+							</p>
+							<div class="control-group">
+								<label for="" class="control-label">告警时间：</label>
+								<div class="controls">
+									<input type="hidden" id="dtp_input2" />
+									<input type="hidden" id="dtp_input3" />
+								</div>
+							</div>
+							<h3>
+								其他方法
+							</h3>
+							<p>
+								setStartDate:修改开始时间 <br /> setEndDate(dateVal)：修改结束时间 <br /> setDate(dateVal)：设置时间 <br /> 例：$("#dtp_input3").uixDate("setStartDate","2017-03-21");
+							</p>
+						</form>
+					</section>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-flat-20030114.dtd">
+<!-- Created by SVGDeveloper 1.0 -->
+<svg width="640" height="480" onload="init(evt)">
+<script><![CDATA[
+function alertMsg(evt)
+{
+	objet=evt.target;
+	large=objet.getAttribute("width");	
+	alert("Width of the rectangle is:" + evt.target.getAttribute("width"));
+}
+function init(evt)
+{
+	svgdoc=evt.target.ownerDocument;
+	node=svgdoc.createElement("rect");
+	node.setAttribute("x","50");
+	node.setAttribute("y","50");
+	node.setAttribute("width","100");
+	node.setAttribute("height","50");
+	node.setAttribute("style","fill:red");
+	node.addEventListener("mousemove",alertMsg,false);
+	group=svgdoc.getElementById("group");
+	group.appendChild(node);
+}
+]]></script>
+<g id="group">
+<text x="100" y="20" style="text-anchor:middle;font-size:15;fill:red">Click the rectangle</text>
+</g>
+</svg>

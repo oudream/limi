@@ -1,0 +1,49 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Chai String Assertions Plugin</title>
+    <link rel="stylesheet" href="./../../../3rd/mocha-3.2.0.css" />
+    <style>
+    </style>
+</head>
+
+<body>
+<div id="mocha"></div>
+<script src="./../../../3rd/mocha-3.2.0.js"></script>
+<script src="./../../../3rd/chai-3.5.0.js"></script>
+
+<script>
+    mocha.setup({ui: 'bdd'});
+    var expect = chai.expect;
+</script>
+
+<script src="./../cjcolor.js"></script>
+
+<script>
+    describe("CjColor", function () {
+        beforeEach(function () {
+        });
+        afterEach(function () {
+        });
+
+        it("colorHex", function () {
+            expect(cjs.CjColor.colorHex('RGB(23, 245, 56)')).to.equal('#17f538');
+        });
+
+        it("colorRgb", function () {
+            expect(cjs.CjColor. colorRgb('#34538b')).to.equal('RGB(52,83,139)');
+        });
+
+    });
+</script>
+
+<script>
+    if (window.mochaPhantomJS) {
+        mochaPhantomJS.run();
+    }
+    else {
+        mocha.run();
+    }
+</script>
+</body>
+</html>

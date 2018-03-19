@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<body>
+
+</body>
+
+<script>
+    var test1 = function () {
+//    var s1 = escape("abc123");     // "abc123"
+//    var s2 = escape("äöü");        // "%E4%F6%FC"
+//    var s3 = escape("ć");          // "%u0107"
+//
+//    // special characters
+//    var s4 = escape("@*_+-./");    // "@*_+-./"
+
+        var s1 = encodeURI("http://www.cnblogs.com/season-huang/some other thing");
+        var s2 = encodeURI("http://www.cnblogs.com/season-huang/some other thing");
+        var s3 = encodeURIComponent("http://www.cnblogs.com/season-huang/some other thing");
+        var s4 = encodeURIComponent("http://www.cnblogs.com/season-huang/some other thing");
+
+        var s11 = decodeURI(s1);
+        var s21 = decodeURI(s2);
+        var s31 = decodeURIComponent(s3);
+        var s41 = decodeURIComponent(s4);
+
+        console.log(s11);
+    };
+
+    test1();
+
+</script>
+
+</html>

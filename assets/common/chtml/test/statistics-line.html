@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ICS统计-折线图</title>
+
+    <link href="../css/pikaday.css" rel="stylesheet" type="text/css" />
+</head>
+
+<!-- 引入 ECharts 文件 -->
+<script src="../js/echarts.min.js" charset="utf-8"></script>
+<script src="../js/d3-3.5.11.js" charset="utf-8"></script>
+<script src="../js/moment.min.js" charset="utf-8"></script>
+<script src="../js/pikaday.js" charset="utf-8"></script>
+<script src="statistics-network-parse.js" charset="utf-8"></script>
+<script src="../cj-ajax.js" charset="utf-8"></script>
+<script src="cj-echarts-config.js" charset="utf-8"></script>
+<script src="statistics-common-class.js" charset="utf-8"></script>
+<script src="cj-common.js" charset="utf-8"></script>
+<script src="db-sql-570.js" charset="utf-8"></script>
+<script src="datePicker.js" charset="utf-8"></script>
+<script src="statistics-line.js" charset="utf-8"></script>
+
+<body>
+
+<div id="DateSeletor"></div>
+<br/>
+<br/>
+<!-- 为 ECharts 准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 800px;height:600px;"></div>
+
+<script>
+    DatePicker.init(document.getElementById('DateSeletor'));
+    DatePicker.setOption(datePickerOption);
+    var t = setTimeout("StatisticsLine.start()", 10);
+</script>
+</body>
+</html>

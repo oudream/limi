@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-flat-20030114.dtd">
+<!-- Created by SVGDeveloper 1.0 -->
+<svg width="640" height="480" onload="init(evt)">
+<script><![CDATA[
+function init(evt)
+{
+	svgdoc = evt.target.ownerDocument;
+	root = svgdoc.rootElement;
+}
+function remove(evt)
+{
+	obj = evt.target;
+	root.removeChild(obj);
+}
+function insert(evt)
+{
+	obj = evt.target;
+	node=svgdoc.createElement("rect");
+	node.setAttribute("x",150);
+	node.setAttribute("y",150);
+	node.setAttribute("width","100");
+	node.setAttribute("height","50");
+	node.setAttribute("style","fill:blue");
+	root.insertBefore(node,obj);
+}
+function clone(evt)
+{
+	obj = evt.target;
+	var newNode = obj.cloneNode(true);
+	newNode.setAttribute("y", 300);
+	newNode.setAttribute("style", "fill:blue");
+	root.appendChild(newNode);
+}
+
+]]></script>
+<rect x="50" y="50" width="100" height="50" onclick="remove(evt)"/>
+<rect x="50" y="150" width="100" height="50" onclick="insert(evt)"/>
+<rect x="50" y="250" width="100" height="50" onclick="clone(evt)"/>
+</svg>

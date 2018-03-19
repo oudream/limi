@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg id="root" width="350" height="350" viewBox="-200 -200 1750 1750" onmousemove="info(evt)">
+	<script>
+		<![CDATA[
+		function info(evt)
+		{
+			xm=evt.clientX;ym=evt.clientY;
+			svgdoc=evt.target.ownerDocument;
+			root=svgdoc.getElementById("root");
+			scale=root.currentScale;
+			tx=root.currentTranslate.x;
+			ty=root.currentTranslate.y;
+			xsvg=-200+(xm-tx)*5/scale;
+			ysvg=-200+(ym-ty)*5/scale;
+			svgdoc.getElementById("pos1").firstChild.setData("ClientX clientY: "+xm+" "+ym);
+			svgdoc.getElementById("pos2").firstChild.setData("ViewBox: "+xsvg+" "+ysvg);
+			svgdoc.getElementById("pos3").firstChild.setData("currentTranslate: "+tx+" "+ty);
+			svgdoc.getElementById("pos4").firstChild.setData("currentScale: "+scale);
+		}
+		]]>
+	</script>
+	<rect x="-200" y="-200" width="1750" height="1750" style="stroke-width:1;stroke:black;fill:#999999" />
+	<text id="pos1" x="-180" y="-100" style="font-size:60">
+</text>
+	<text id="pos2" x="-180" y="0" style="font-size:60">ViewBox: </text>
+	<text x="-180" y="100" style="font-size:60">ViewBox: -200 -200 1750 1750</text>
+	<text x="-180" y="200" style="font-size:60">Centre 700 180</text>
+	<circle cx="700" cy="180" r="20" fill="red" />
+	<text id="pos3" x="-180" y="300" style="font-size:60">CurrentTranslate :</text>
+	<text id="pos4" x="-180" y="400" style="font-size:60">CurrentScale :</text>
+</svg>

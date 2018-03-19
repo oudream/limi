@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ICS统计-仪表盘</title>
+</head>
+
+<!-- 引入 ECharts 文件 -->
+<script src="../js/echarts.min.js" charset="utf-8"></script>
+<script src="../js/d3-3.5.11.js" charset="utf-8"></script>
+<script src="statistics-network-parse.js" charset="utf-8"></script>
+<script src="../cj-ajax.js" charset="utf-8"></script>
+<script src="cj-storage.js" charset="utf-8"></script>
+<script src="cj-echarts-config.js" charset="utf-8"></script>
+<script src="statistics-common-class.js" charset="utf-8"></script>
+<script src="cj-common.js" charset="utf-8"></script>
+<script src="db-sql-570.js" charset="utf-8"></script>
+<script src="statistics-dashboard.js" charset="utf-8"></script>
+
+
+<body>
+<!-- 为 ECharts 准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 800px;height:600px;"></div>
+
+
+<script>
+    var t = setTimeout("StatisticsDashBoard.start()", 10);
+</script>
+
+</body>
+</html>

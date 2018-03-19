@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="400" height="400">
+<script><![CDATA[
+function detail(evt)
+{
+	textdoc=evt.target.ownerDocument;
+	textNode=textdoc.getElementById("mtext");
+	number = textNode.getNumberOfChars();
+	len = textNode.getComputedTextLength();
+	textNode.selectSubString(2,3);
+	alert("Total:" + number + "\n"+"Length:" + len);
+}
+]]></script>
+<text onclick="detail(evt)" id="mtext" x="200" y="100" style="text-anchor:middle;font-size:24;font-family:Arial;fill:red">
+Welcome to SVG world!</text>
+</svg>

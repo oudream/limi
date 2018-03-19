@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+
+<script src="../js/jquery.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" media="all" />
+<script src="../js/jquery.dtGrid.js" charset="utf-8"></script>
+<script src="../js/en.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="../css/jquery.dtGrid.css" />
+
+<script type="text/javascript" src="../js/WdatePicker.js" defer="defer"></script>
+<link rel="stylesheet" type="text/css" href="../css/WdatePicker.css" />
+<link rel="stylesheet" type="text/css" href="../css/datepicker.css" />
+<script src="../js/AjaxServer.js" charset="utf-8"></script>
+
+<style>
+    body{ text-align:center}
+    .div{ margin:0 auto; width:1000px; height:1000px; border:1px solid #F00}
+    /* css注释：为了观察效果设置宽度 边框 高度等样式 */
+</style>
+
+
+<script>
+
+
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+    }
+
+    function req_resp_measures(Request){
+        var ret_data = Request;
+        var jsonobj=eval('('+ret_data+')');
+        var data = jsonobj.data;
+
+        var dtGridColumns_2_1_1 = [
+            {id:'F_ID_POS', title:'F_ID_POS', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_ID_M', title:'F_ID_M', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_STATION', title:'F_STATION', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_TYPE', title:'F_TYPE', type:'number', format:'#,###.00', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_TYPE', title:'F_CODE_TYPE', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_1', title:'F_CODE_1', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_2', title:'F_CODE_2', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_3', title:'F_CODE_3', type:'number', format:'#,###.00', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_4', title:'F_CODE_4', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_5', title:'F_CODE_5', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_CODE_6', title:'F_CODE_6', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_USER', title:'F_USER', type:'number', format:'#,###.00', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_DT', title:'F_DT', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_USER_CRT', title:'F_USER_CRT', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_DT_CRT', title:'F_DT_CRT', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_SYN_FLAG', title:'F_SYN_FLAG', type:'number', format:'#,###.00', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_RES0', title:'F_RES0', type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'F_RES1', title:'F_RES1',type:'string', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'},
+            {id:'ID_N', title:'ID_N', type:'number', format:'#,###.00', columnClass:'text-center',headerStyle:'background:#00a2ca;color:white;'}
+        ];
+
+        var datas = new Array();
+        for(var i=0; i<data.length; i++){
+            var user = new Object();
+            var newDate = new Date();
+
+
+            user.F_ID_POS = data[i].F_ID_POS;
+            user.F_ID_M = data[i].F_ID_M;
+            user.F_STATION = data[i].F_STATION;
+            user.F_TYPE = data[i].F_TYPE;
+            user.F_CODE_TYPE = data[i].F_CODE_TYPE;
+
+         //   newDate.setTime(data[i].F_CODE_1*1000);
+        //    var time = newDate.toLocaleDateString();
+            user.F_CODE_1 = data[i].F_CODE_1;
+            user.F_CODE_2 = data[i].F_CODE_2;
+            user.F_CODE_3 = data[i].F_CODE_3;
+            user.F_CODE_4 = data[i].F_CODE_4;
+            user.F_CODE_5 = data[i].F_CODE_5;
+            user.F_CODE_6 = data[i].F_CODE_6;
+            user.F_USER = data[i].F_USER;
+            user.F_DT = data[i].F_DT;
+            user.F_USER_CRT = data[i].F_USER_CRT;
+            user.F_DT_CRT = data[i].F_DT_CRT;
+            user.F_SYN_FLAG = data[i].F_SYN_FLAG;
+            user.F_RES0 = data[i].F_RES0;
+            user.F_RES1 = data[i].F_RES1;
+            user.ID_N = data[i].ID_N;
+
+            datas.push(user);
+        }
+
+        var dtGridOption_2_1_1 = {
+            lang : 'zh-cn',
+            ajaxLoad : false,
+            exportFileName : '用户列表',
+            datas : datas,
+            columns : dtGridColumns_2_1_1,
+            gridContainer : 'dtGridContainer_2_1_3',
+            toolbarContainer : 'dtGridToolBarContainer_2_1_3',
+            pageSize : 10,
+            print:false,
+            tools : '',
+            pageSize : 20,
+            pageSizeLimit : [10, 20, 50]
+        };
+        var grid_2_1_1 = $.fn.DtGrid.init(dtGridOption_2_1_1);
+        $(function(){
+            grid_2_1_1.load();
+        });
+    }
+
+
+    var urls = {
+        sql:"SELECT * FROM YGCT.T_570_LOG_SAMPLE;"
+    };
+
+    ygct_AccessServer.post(JSON.stringify(urls),req_resp_measures);
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<body>
+<div id="dtGridContainer_2_1_3" class="dt-grid-container"></div>
+<div id="dtGridToolBarContainer_2_1_3" class="dt-grid-toolbar-container"></div>
+
+
+</body>
+
+</html>

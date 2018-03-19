@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-flat-20030114.dtd">
+<!-- Created by SVGDeveloper 1.0 -->
+<svg width="640" height="480" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient id="Gradient" gradientUnits="userSpaceOnUse"
+x1="100" y1="0" x2="300" y2="0">
+<stop offset="0" stop-color="#000000" />
+<stop offset=".618" stop-color="#ffffff" />
+<stop offset="1" stop-color="#000000" />
+</linearGradient>
+<filter id="Normal">
+<feBlend mode="normal" in2="BackgroundImage" in="SourceGraphic"/>
+</filter>
+<filter id="Multiply">
+<feBlend mode="multiply" in2="BackgroundImage" in="SourceGraphic"/>
+</filter>
+<filter id="Screen">
+<feBlend mode="screen" in2="BackgroundImage" in="SourceGraphic"/>
+</filter>
+<filter id="Darken">
+<feBlend mode="darken" in2="BackgroundImage" in="SourceGraphic"/>
+</filter>
+<filter id="Lighten">
+<feBlend mode="lighten" in2="BackgroundImage" in="SourceGraphic"/>
+</filter>
+</defs>
+<g enable-background="new" >
+<rect x="100" y="20" width="300" height="460" fill="url(#Gradient)" />
+<g font-family="Verdana" font-size="75" fill="#888888">
+<text x="50" y="90" filter="url(#Normal)" >Normal</text>
+<text x="50" y="180" filter="url(#Multiply)" >Multiply</text>
+<text x="50" y="270" filter="url(#Screen)" >Screen</text>
+<text x="50" y="360" filter="url(#Darken)" >Darken</text>
+<text x="50" y="450" filter="url(#Lighten)" >Lighten</text>
+</g>
+</g>
+</svg>

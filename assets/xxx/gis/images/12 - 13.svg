@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="640" height="480">
+	<script><![CDATA[	
+		function information(evt)
+		{
+			obj   = evt.target;
+			style = obj.getStyle();
+			alert(style.getPropertyValue("fill"));
+		}
+		function changeStyle(evt)
+		{
+			obj   = evt.target;
+			obj.style.setProperty("fill","red");
+			obj.style.setProperty("opacity",1);
+		}
+		]]></script>
+		<rect x="100" y="100" width="150" height="100" style="fill:blue;opacity:0.7" onclick="information(evt)"/>
+		<rect x="100" y="210" width="150" height="100" style="fill:blue;opacity:0.7" onclick="changeStyle(evt)"/>
+</svg>

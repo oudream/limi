@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="500" height="400" onload="init(evt)">
+<script><![CDATA[
+var isMove=false,cible="",xt1=0,yt1=0;
+function init(evt)
+{
+	svgdoc=evt.target.ownerDocument;
+	obj=svgdoc.getElementById("mtext");
+	contour=obj.getBBox();
+	trace="M"+contour.x+" "+contour.y+" l"+contour.width+" 0 0 "+contour.height+" -"+contour.width+" 0z";
+	obj=svgdoc.getElementById("rectBox");
+	obj.setAttribute("d",trace);
+}
+function mouseMove(evt)
+{
+	xm=evt.clientX;ym=evt.clientY;
+	if ((cible=="rectBox")&&(isMove==true))
+	{
+		obj=svgdoc.getElementById("mtext");
+		var xt2=parseInt(obj.getAttribute("x")),yt2=parseInt(obj.getAttribute("y"));
+		var depx=xt2+xm-xt1,depy=yt2+ym-yt1;
+		obj.setAttribute("x",depx);
+		obj.setAttribute("y",depy);
+		contour=obj.getBBox();
+		target=svgdoc.getElementById(cible);
+		trace="M"+contour.x+" "+contour.y+" l"+contour.width+" 0 0 "+contour.height+" -"+contour.width+" 0z";
+		target.setAttribute("d",trace);
+		xt1=xm;yt1=ym;
+	}
+}
+function cancel(evt)
+{
+	isMove=false;
+}
+function moveDown(evt)
+{
+	cible=evt.getTarget().getAttribute("id");
+	if (cible=="rectBox")
+	{
+		isMove=true;
+		xt1=parseInt(evt.clientX);
+		yt1=parseInt(evt.clientY);
+	}
+}
+]]></script>
+<g onmouseup="cancel(evt)">
+	<rect x="0" y="0" width="400" height="400" fill="white"/>
+	<g onmousemove="mouseMove(evt)" onmousedown="moveDown(evt)">
+		<text id="mtext" x="20" y="50" fill="red" font-size="25">SVG</text>
+		<path id="rectBox" d="M0 0" opacity=".2"/>
+	</g>
+</g>
+</svg>

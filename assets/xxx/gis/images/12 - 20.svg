@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg onload="makeShape(evt)">
+    <script><![CDATA[
+        var svgns = "http://www.w3.org/2000/svg";
+        function makeShape(evt) {
+            if ( window.svgDocument == null )
+                svgDoc = evt.target.ownerDocument;
+            
+            var rect = svgDoc.createElementNS(svgns, "rect");
+            rect.setAttributeNS(null, "x", 15);
+            rect.setAttributeNS(null, "y", 15);
+            rect.setAttributeNS(null, "width", 40);
+            rect.setAttributeNS(null, "height", 40);
+            rect.setAttributeNS(null, "fill", "red");
+            
+            rect.addEventListener("click", changeColor, false);
+            
+            svgDoc.documentElement.appendChild(rect);
+        }
+        
+        function changeColor(evt) {
+            var target = evt.target;
+            target.setAttributeNS(null, "fill", "blue");
+        }
+    ]]></script>
+</svg>
+
+
+

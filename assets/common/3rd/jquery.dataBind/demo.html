@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="../../jquery/jquery-1.12.3.min.js"></script>
+		<script src="jquery.dataBind.js"></script>
+		<script>
+			var data = [
+				{name:"name1",age:10,color:"red"},
+				{name:"name2",age:6,},
+				{name:"name3",age:10},
+				{name:"name4",age:8,color:"#ff6600"},
+				{name:"name5",age:7},
+				{name:"name6",age:10}
+			]
+			$(function(){
+				$("#ul1").dataBind(data);
+				
+				$("#ul2").dataBind(data,{
+					filter:function(item){
+						return item.age>=10;
+					}
+				});
+				
+				$("#ul3").dataBind(data,{
+					itemBindCallBack:function(viewItem,item,index){
+						if(item.age>=10){
+							viewItem.css("background","#008000");
+						}
+					},
+					computes:{
+						color:{
+							view:function($ele,value){
+								value&&$ele.css("background",value);
+							}
+						}
+					}
+				});
+				
+				$("#tb1").dataBind(data);
+			})
+		</script>
+		
+	</head>
+	<body>
+		all
+		<ul id="ul1">
+			<li class="template">
+				<input dataField="name" />
+				<input dataField="age" />
+			</li>
+		</ul>
+		
+		age>=10
+		<ul id="ul2">
+			<li class="template">
+				<input dataField="name" />
+				<input dataField="age" />
+			</li>
+		</ul>
+		
+		age>=10 green
+		<ul id="ul3">
+			<li class="template">
+				<input dataField="name" />
+				<input dataField="age" />
+				<input dataField="color" />
+			</li>
+		</ul>
+		table
+		<table id="tb1">
+			<thead>
+				<tr>
+					<th>name</th>
+					<th>age</th>
+					<th>color</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="template">
+					<td dataField="name" />
+					<td dataField="age" />
+					<td dataField="color" />
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>
