@@ -1,8 +1,5 @@
-/**
- * Created by liuchaoyu on 2017-04-25.
- */
-
 'use strict'
+
 const path = require('path')
 const glob = require('glob')
 const fs = require('fs')
