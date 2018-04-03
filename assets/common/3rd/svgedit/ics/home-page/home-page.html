@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge, chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>首页</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../EasyUI/themes/material/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../../EasyUI/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../../zTree_v3-3.5.26/css/zTreeStyle/zTreeStyle.css">
+    <link rel="stylesheet" href="home-page.css" type="text/css"/>
+
+    <script type="text/javascript" src="../../../EasyUI/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../EasyUI/plugins/jquery.parser.js"></script>
+    <script type="text/javascript" src="../../../EasyUI/plugins/jquery.panel.js"></script>
+    <script type="text/javascript" src="../../../EasyUI/plugins/jquery.linkbutton.js"></script>
+    <script type="text/javascript" src="../../../EasyUI/plugins/jquery.tabs.js"></script>
+
+    <script type="text/javascript" src="../../../zTree_v3-3.5.26/js/jquery.ztree.all.min.js"></script>
+
+    <script src="../../../../cjs/html/cj-common.js" charset="utf-8"></script>
+    <script src="../../../../cjs/html/cj-string.js" charset="utf-8"></script>
+    <script src="../../../../cjs/html/cj-storage.js" charset="utf-8"></script>
+    <script src="../../../../cjs/html/cj-network.js" charset="utf-8"></script>
+    <script src="../../../../cjs/html/cj-time.js" charset="utf-8"></script>
+    <script src="../../../../cjs/html/cj-ajax.js" charset="utf-8"></script>
+
+    <script src="../config.js" charset="utf-8"></script>
+    <script src="../data-structure.js" charset="utf-8"></script>
+    <script src="../data-interaction.js" charset="utf-8"></script>
+    <script src="../data-process.js" charset="utf-8"></script>
+
+    <script src="home-page.js" charset="utf-8"></script>
+
+
+
+</head>
+<body>
+<div id="mainDiv" >
+    <div id="main-tabs" class="easyui-tabs" style="width: inherit; height: 416px">
+        <div title="新建项目" id="new_proj">
+            <table id="new_proj_layout_table" class="layout_table">
+                <tr>
+                    <td>
+                        <label id="new_proj_name_label">新建项目名 : </label>
+                    </td>
+                    <td>
+                        <input id="new_proj_name_input">
+                    </td>
+                    <td>
+                        <label id="new_proj_prompt_bar"></label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div title="打开项目" id="open_proj">
+            <div style="">
+                <ul id="projTree" class="ztree" style=" height: 380px"></ul>
+            </div>
+        </div>
+        <div title="导入项目" id="input_proj"></div>
+    </div>
+
+    <div id="button_bar">
+        <input type="button" id="editor_open_btn" class="tool_button" value="Editor打开">
+        <input type="button" id="viewer_open_btn" class="tool_button" value="Viewer打开">
+        <input type="button" id="cancel_btn" class="tool_button" value="取消">
+    </div>
+
+</div>
+
+</body>
+</html>

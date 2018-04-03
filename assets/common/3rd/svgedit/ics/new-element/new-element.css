@@ -1,0 +1,25 @@
+#option_table{
+    border-spacing: 14px;
+    -webkit-border-horizontal-spacing: 20px;
+    -webkit-border-vertical-spacing: 12px;
+}
+
+.option_block{
+
+}
+
+.label_text,
+.prompt_bar,
+.select_button,
+.input_button{
+    font-size: 14px;
+    font-family: "microsoft yahei";
+}
+
+.prompt_bar{
+    font-size: 12px;
+}
+
+/*#parent_select_option{*/
+    /*display: none;*/
+/*}*/

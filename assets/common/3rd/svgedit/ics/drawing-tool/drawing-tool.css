@@ -1,0 +1,205 @@
+#main_div{
+    /*display: inline-block;*/
+    /*position:absolute;*/
+    /*top: 1px;*/
+    /*bottom: 1px;*/
+    /*right: 1px;*/
+    /*left: 1px;*/
+}
+
+#top_tools {
+    /*!*position: absolute;*!*/
+    /*!*left: 2px;*!*/
+    /*!*right: 2px;*!*/
+    /*!*top: 2px;*!*/
+    /*width: 100%;*/
+    height: 40px;
+    /*border-bottom: none;*/
+    /*overflow: auto;*/
+    /*text-align: center;*/
+    display: table-cell;
+    vertical-align: middle;
+
+}
+
+#top_tools > div > * {
+    float: left;
+    margin-right: 2px;
+}
+
+#top_tools > div, #top_tools {
+    line-height: 26px;
+}
+
+#top_tools .tool_bar_panel {
+    height: 34px;
+    float: left;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.tool_sep {
+    margin-top: 5px;
+}
+
+/*-----------------------------------*/
+
+#left_tools {
+    /*display: block;*/
+    /*float: left;*/
+    width: 200px;
+    /*background-color: #fff;*/
+    /*height: 93%;*/
+    /*border: 1px solid #000;*/
+    /*margin: 1px;*/
+    /*margin-bottom: 0px;*/
+}
+
+#left_top_tools {
+    width: auto;
+    height: 49%;
+    /*background-color: #fff;*/
+    border-bottom: 1px solid #000;
+    padding: 3px;
+}
+
+#pageTree {
+    /*background-color: #fff;*/
+}
+
+
+#left_bot_tools {
+    /*border: 1px solid #000;*/
+    width: auto;
+    height: 49%;
+    /*background-color: #fff;*/
+}
+
+
+/*---------------------------------*/
+#right_tools{
+    width: 200px;
+}
+
+#lib_accordion{
+}
+
+.accordion_panel{
+    overflow:auto;
+    padding:2px;
+}
+
+
+
+/*---------------------------------*/
+#work_area{
+    /*border: 1px solid #000;*/
+    display: block;
+    width: auto;
+    height: 95%;
+    overflow: hidden;
+    margin: 1px;
+    margin-bottom: 0px;
+}
+
+
+/*-------------------------------*/
+.frame_panel{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: none;
+}
+
+.panel-body{
+    overflow: hidden;
+    height: auto;
+}
+
+.tools_panel,
+.panel-body:not(.dynamic_panel)
+{
+    background-color: #D0D0D0;
+}
+
+#list_tabs .panel-body,
+#property_panel .panel-body,
+#lib_accordion .panel-body
+{
+    background-color: #fff;
+    overflow: auto;
+}
+
+
+/* 图标
+--------------------------*/
+.lib_shape{
+    width: 78px;
+    height: 78px;
+    float: left;
+    padding: 5px;
+    margin: 2px;
+    border-radius: 8px;
+}
+
+.lib_shape_no_press{
+    background-color: #E8E8E8;
+    -webkit-box-shadow: inset 2px 2px 3px white, 2px 2px 3px rgba(0,0,0,0.3);
+    moz-box-shadow: inset 2px 2px 3px white, 2px 2px 3px rgba(0,0,0,0.3);
+    box-shadow: inset 2px 2px 3px white, 2px 2px 3px rgba(0,0,0,0.3);
+}
+
+.lib_shape_press{
+    background-color: #f4e284 !important;
+    -webkit-box-shadow: inset 2px 2px 3px rgba(0,0,0,0.4), 2px 2px  0 white  !important;
+    -moz-box-shadow: inset 2px 2px 3px rgba(0,0,0,0.4), 2px 2px  0 white  !important;
+    box-shadow: inset 2px 2px 3px rgba(0,0,0,0.4), 2px 2px  0 white  !important;
+}
+
+.lib_shape:hover{
+    background-color: #D0D0D0;
+}
+
+.btn-icon{
+    width: 24px;
+    height: 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.icon-new{
+    background-image:url('../image/icons/new.png');
+}
+
+.icon-save{
+    background-image:url('../image/icons/save.png');
+}
+
+.icon-open{
+    background-image:url('../image/icons/folder.png');
+}
+
+.icon-select{
+    background-image:url('../image/icons/select.png');
+}
+
+.icon-delete{
+    background-image:url('../image/icons/delete.png');
+}
+
+.icon-copy{
+    background-image:url('../image/icons/copy.png');
+}
+
+.icon-paste{
+    background-image:url('../image/icons/paste.png');
+}
+
+.icon-undo{
+    background-image:url('../image/icons/undo.png');
+}
+
+.icon-redo{
+    background-image:url('../image/icons/redo.png');
+}
