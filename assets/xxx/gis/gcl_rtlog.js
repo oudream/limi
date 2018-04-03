@@ -1,5 +1,77 @@
 /*!
  *
+
+
+
+// GCL实时点的历史实时数据请求的 json格式：支持散列请求：rtlog_v101；数组请求是：rtlog_v102；返回时都统一用：rtlog_v001
+// url 是全局统一资源名（可以通用在容器对象或实体对象中）
+// mid 是实时库的实时点全局唯一id
+// url和mid可以只有一个，两个同时都有时以mid为准
+// http://10.31.0.15:8821/ics.cgi?fncode=req.rtlog_v101&filetype=json
+
+// 散列请求：rtlog_v101
+fncode = req.rtlog_v101
+filetype = json
+
+{
+  "session":"sbid=0001;xxx=adfadsf",
+  "structtype": "rtlog_v101",
+  "params":
+  [
+    {
+    "url": "/fp/zyj/fgj01/rfid",
+    "mid": 33556644,
+    "dtday": "20180329",
+    "dtbegin": 31343242341,
+    "dtend": 23413241234
+    },
+    {
+    "url": "/fp/zyj/fgj01/ypmm",
+    "mid": 33556645,
+    "dtday": "20180329",
+    "dtbegin": 31343242341,
+    "dtend": 23413241234
+    }
+  ]
+}
+
+
+// ics.json返回时都统一用：rtlog_v001
+// "v": 数值；数组形式
+// "q": 值的质量；数组形式
+// "t": 值的时间,unix时间戳（1970到目前的毫秒数，服务器的当地时间）；数组形式
+// "s": 实时数据信息来源的源ID,ChangedSourceId；数组形式
+// "u": 实时数据信息来源的源url,ChangedSourceId；数组形式
+// "r": ChangedReasonId；数组形式
+// 可选属性"state":状态码，无或0时表示成功，其它值看具体数据字典
+{
+  "session":"sbid=0001;xxx=adfadsf",
+  "structtype":"rtdata_v001",
+  "data":[
+    {
+    "url":"/fp/zyj/fgj01/rfid",
+    "mid":33556644,
+    "dtday": "20180329",
+    "dtbegin": 31343242341,
+    "dtend": 23413241234,
+    "log": "#logfile.text",
+    "state":0
+    },
+    {
+    "url":"/fp/zyj/fgj01/ypmm",
+    "mid":33556645,
+    "dtday": "20180329",
+    "dtbegin": 31343242341,
+    "dtend": 23413241234,
+    "log": "#logfile.text",
+    "state":0
+    }
+  ]
+}
+
+
+
+
  */
 (function () {
 

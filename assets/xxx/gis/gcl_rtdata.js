@@ -45,14 +45,15 @@
                 ;
 
                 var sMids = "";
-                var svgMid = d3.select("svg").selectAll("[id]");
-                svgMid.each(function (d, i) {
+                var svgMids = $("text[id^='mid-']");
+                svgMids.each(function () {
                     var name = this.id;
                     var index = name.indexOf("mid-");
                     if (index >= 0) {
                         sMids += name.substring(index + 4) + ",";
                     }
                 });
+
                 if (sMids.length > 0) {
                     CS_req_measure_body = CS_req_measure_body.replace(/%1/, sMids);
                     return CS_req_measure_head + CS_req_measure_body + CS_req_measure_foot;
@@ -75,10 +76,7 @@
                 else if (window.ActiveXObject) {
                     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                 }
-                var username = document.getElementById("txt_username").value;
-                var age = document.getElementById("txt_age").value;
-                xmlhttp.open("post", "ics.cgi?username=" + username
-                    + "&age=" + age, true);
+                xmlhttp.open("post", "ics.cgi", true);
                 xmlhttp.setRequestHeader('Content-Type', 'text/xml');
                 xmlhttp.onreadystatechange = function () {
                     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
