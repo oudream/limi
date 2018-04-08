@@ -11,5 +11,7 @@ function testMeta1() {
     var str2 = String(str1);
     console.log(typeof str1);
     console.log(typeof str2);
+    console.log(true > 0);
+
 }
 testMeta1();

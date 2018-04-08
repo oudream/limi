@@ -6,18 +6,38 @@
     window.gcl = window.gcl || {};
     window.gcl.rtdb = window.gcl.rtdb || {};
 
-    var rtdb = window.gcl.rtdb;
-    if (rtdb.MeasureBase) return;
+    let rtdb = window.gcl.rtdb;
+    if (rtdb.debug) return;
 
+    rtdb.debug = function () {
+        console.log.apply(null, arguments);
+    };
+    
     rtdb.MeasureBase = function MeasureBase( ) {
-        var iMeasureId = 0;
+        let iId = 0;
+        let sUrl = '';
         if (arguments.length > 0) {
-            var arg0 = arguments[0];
+            let arg0 = arguments[0];
             if (typeof arg0 === 'number') {
-                iMeasureId = arg0;
+                iId = arg0;
+                if (arguments.length > 1) {
+                    let arg1 = arguments[1];
+                    if (typeof arg0 === 'string') {
+                        sUrl = arg1;
+                    }
+                }
+            } else if (typeof arg0 === 'string') {
+                sUrl = arg0;
+                if (arguments.length > 1) {
+                    let arg1 = arguments[1];
+                    if (typeof arg0 === 'number') {
+                        iId = arg1;
+                    }
+                }
             } else if ( arg0 !== null && typeof value === 'object') {
                 return {
-                    // newMeasure.measureId        = measure.measureId ? : 0;
+                    // newMeasure.id               = measure.id              ? measure.id              : iId,
+                    // newMeasure.url              = measure.url             ? measure.url             : sUrl,
                     // newMeasure.value            = measure.value           ? measure.value           : null;
                     // newMeasure.quality          = measure.quality         ? measure.quality         : 0;
                     // newMeasure.refreshTime      = measure.refreshTime     ? measure.refreshTime     : Date();
@@ -27,7 +47,9 @@
                     // newMeasure.refreshReasonId  = measure.refreshReasonId ? measure.refreshReasonId : 0;
                     // newMeasure.changedReasonId  = measure.changedReasonId ? measure.changedReasonId : 0;
                     // newMeasure.equalStrategyId  = measure.equalStrategyId ? measure.equalStrategyId : 0;
-                    // newMeasure.res              = measure.res             ? measure.res             : 0;                   measureId        : arg0.measureId       ? arg0.measureId       : 0,
+                    // newMeasure.res              = measure.res             ? measure.res             : 0;              
+                    id               : arg0.id              ? arg0.id              : iId,
+                    url              : arg0.url             ? arg0.url             : sUrl,
                     value            : arg0.value           ? arg0.value           : null,
                     quality          : arg0.quality         ? arg0.quality         : 0,
                     refreshTime      : arg0.refreshTime     ? arg0.refreshTime     : Date(),
@@ -42,7 +64,8 @@
             }
         }
         return {
-            measureId: iMeasureId,
+            id: iId,
+            url: sUrl,
             value: null,
             quality: 0,
             refreshTime: Date(),
@@ -57,17 +80,54 @@
     };
 
     rtdb.MeasureManagerBase = function MeasureManagerBase() {
-        var manager = {
+        let manager = {
             measures: [],
-            measureClass: MeasureBase
+            measureClass: MeasureBase,
         };
         return manager;
     };
 
+    rtdb.MeasureManagerBase.prototype.findById = function findById(iId=0) {
+        let measures = this.measures;
+        for (let i = 0; i < measures.length; i++) {
+            let measure = measures[i];
+            if (measure.id === iId) {
+                return measure;
+            }
+        }
+        return null;
+    };
+
+    rtdb.MeasureManagerBase.prototype.findByUrl = function findById(sUrl='') {
+        let measures = this.measures;
+        for (let i = 0; i < measures.length; i++) {
+            let measure = measures[i];
+            if (measure.url === sUrl) {
+                return measure;
+            }
+        }
+        return null;
+    };
+
     rtdb.MeasureManagerBase.prototype.append = function append(measure) {
-        if (measure && measure.measureId && measure.measureId > 0 && findById(measure.measureId ) !== null) {
-            let measure = new this.measureClass(measure);
-            this.measures.push();
+        if (measure) {
+            let bId =  (typeof measure.id === 'number' && measure.id > 0 && this.findById(measure.id ) === null);
+            let bUrl =  (typeof measure.url === 'string' && this.findByUrl(measure.url ) === null);
+            if (bId || bUrl) {
+                let measure = new this.measureClass(measure);
+                this.measures.push(measure);
+                return true;
+            }
+        }
+        else {
+            return false;
+        }
+    };
+
+    rtdb.MeasureManagerBase.prototype.appendById = function appendById(iId) {
+        if (typeof iId === 'number' && iId > 0 && this.findById(iId ) === null) {
+            let measure = new this.measureClass(iId);
+            this.measures.push(measure);
             return true;
         }
         else {
@@ -75,51 +135,106 @@
         }
     };
 
-    rtdb.MeasureManagerBase.prototype.findById = function findById(iMeasureId=0) {
+    rtdb.MeasureManagerBase.prototype.appendByUrl = function appendByUrl(sUrl) {
+        if (typeof sUrl === 'string' && this.findByUrl(sUrl ) === null) {
+            let measure = new this.measureClass(sUrl);
+            this.measures.push(measure);
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
+    rtdb.MeasureManagerBase.prototype.remove = function remove(measure) {
+        let r = 0;
+        if (measure) {
+            let bId =  (typeof measure.id === 'number' && measure.id > 0) ;
+            let bUrl =  (typeof measure.url === 'string');
+            if (bId) r = this.removeById(measure.id);
+            if (bUrl) r += this.removeByUrl(measure.url);
+        }
+        return r;
+    };
+
+    rtdb.MeasureManagerBase.prototype.removeById = function removeById(iId) {
+        let r = 0;
+        if (typeof iId === 'number') {
+            let measures = this.measures;
+            for (let i = measures.length-1; i >= 0; i--) {
+                let measure = measures[i];
+                if (measure.id === iId) {
+                    measures.splice(i, 1);
+                    r++;
+                }
+            }
+        }
+        return r;
+    };
+
+    rtdb.MeasureManagerBase.prototype.removeByUrl = function removeByUrl(sUrl) {
+        let r = 0;
+        if (typeof sUrl === 'string') {
+            let measures = this.measures;
+            for (let i = measures.length-1; i >= 0; i--) {
+                let measure = measures[i];
+                if (measure.url === sUrl) {
+                    measures.splice(i, 1);
+                    r++;
+                }
+            }
+        }
+        return r;
+    };
+
+    rtdb.MeasureManagerBase.prototype.getReqMeasures = function getReqMeasures() {
+        let r = [];
         let measures = this.measures;
         for (let i = 0; i < measures.length; i++) {
             let measure = measures[i];
-            if (measure.measureId === iMeasureId) {
-                return measure;
-            }
+            let reqMeasure = {
+                mid: measure.id,
+                url: measure.url
+            };
+            r.push(reqMeasure);
         }
-        return null;
+        return r;
     };
 
     rtdb.MonsbMeasure = function MonsbMeasure() {
-        var monsb = new MeasureBase();
+        let monsb = new MeasureBase();
         monsb.value = -1;
         return monsb;
     };
 
     rtdb.MonsbManager = function MonsbManager() {
-        var manager = new MeasureManagerBase();
-        manager.mmonsbs = manager.measures;
-        manager.mmeasureClass = MonsbMeasure;
+        let manager = new MeasureManagerBase();
+        manager.monsbs = manager.measures;
+        manager.measureClass = MonsbMeasure;
         return manager;
     };
 
     rtdb.YcaddMeasure = function YcaddMeasure() {
-        var ycadd = new MeasureBase();
+        let ycadd = new MeasureBase();
         ycadd.value = -1;
         return ycadd;
     };
 
     rtdb.YcaddManager = function YcaddManager() {
-        var manager = new MeasureManagerBase();
+        let manager = new MeasureManagerBase();
         manager.ycadds = manager.measures;
-        manager.mmeasureClass = YcaddMeasure;
+        manager.measureClass = YcaddMeasure;
         return manager;
     };
 
     rtdb.StrawMeasure = function StrawMeasure() {
-        var straw = new MeasureBase();
+        let straw = new MeasureBase();
         straw.value = -1;
         return straw;
     };
 
     rtdb.StrawManager = function StrawManager() {
-        var manager = new MeasureManagerBase();
+        let manager = new MeasureManagerBase();
         manager.straws = manager.measures;
         manager.measureClass = StrawMeasure;
         return manager;
@@ -129,56 +244,52 @@
     rtdb.ycaddManager = new YcaddManager();
     rtdb.strawManager = new StrawManager();
 
-    rtdb.rtdataStartRefresh = function () {
-        var csRrtdataUiPrefix = 'show-rtdata-';
+    rtdb.getReqMeasuresJson = function getReqMeasuresJson() {
+        return JSON.stringify( {
+            session: '',
+            structtype: 'rtdata_v101',
+            params: (((monsbManager.getReqMeasures()).concat(ycaddManager.getReqMeasures())).concat(strawManager.getReqMeasures()))
+        });
+    };
 
-        var sReqMeasureStringXML = function getReqMeasureStringXML() {
-            var CS_req_measure_head =
-                '<?xml version="1.0" encoding="utf-8"?>' +
-                '<YGCT>' +
-                '<HEAD>' +
-                '<VERSION>1.0</VERSION>' +
-                '<SRC>1200000003</SRC>' +
-                '<DES>1200000003</DES>' +
-                '<MsgNo>9991</MsgNo>' +
-                '<MsgId>91d9e512-3695-4796-b063-306544be6f1f</MsgId>' +
-                '<MsgRef/>' +
-                '<TransDate>20151215094317</TransDate>' +
-                '<Reserve/>' +
-                '</HEAD>' +
-                '<MSG>'
-            ;
+    rtdb.retReqMeasuresJson = '';
 
-            var CS_req_measure_body =
-                '<RealData9991>' +
-                '<ADDRESSES>%1</ADDRESSES>' +
-                '</RealData9991>'
-            ;
-
-            var CS_req_measure_foot =
-                '</MSG>' +
-                '</YGCT>'
-            ;
-
-            var sMids = "";
-            var svgMids = $("text[id^='" + csRrtdataUiPrefix + "']");
-            svgMids.each(function () {
-                var name = this.id;
-                var index = name.indexOf(csRrtdataUiPrefix);
-                if (index >= 0) {
-                    sMids += name.substring(index + 12) + ",";
-                }
-            });
-
-            if (sMids.length > 0) {
-                CS_req_measure_body = CS_req_measure_body.replace(/%1/, sMids);
-                return CS_req_measure_head + CS_req_measure_body + CS_req_measure_foot;
+    rtdb.dealRespMeasures =  function (response) {
+        let arr = JSON.parse(response);
+        let measures = arr.data;
+        for(let i = 0; i < measures.length; i++) {
+            let measure = measures[i];
+            let iId = measure.mid;
+            let myMeasure = null;
+            if (iId >= 0x01000000 && iId < 0x02000000) {
+                myMeasure = this.monsbManager.findById(iId);
+            } else if (iId >= 0x02000000 && iId < 0x03000000) {
+                myMeasure = this.ycaddManager.findById(iId);
+            } else if (iId >= 0x03000000 && iId < 0x04000000) {
+                myMeasure = this.strawManager.findById(iId);
             }
-            return "";
-        }();
-
-        var req_resp_rtdatas = function () {
-            var xmlhttp;
+            if (myMeasure !== null) {
+                if (myMeasure.value !== measure.v) {
+                    myMeasure.value = measure.v;
+                }
+                if (myMeasure.quality !== measure.q) {
+                    myMeasure.quality = measure.q;
+                }
+                if (myMeasure.changedTime !== measure.t) {
+                    myMeasure.changedTime = measure.t;
+                }
+                if (myMeasure.quality !== measure.q) {
+                    myMeasure.quality = measure.q;
+                }
+            }
+        }
+    };
+    
+    rtdb.startReqMeasuresTimeOut = function () {
+        rtdb.retReqMeasuresJson = getReqMeasuresJson();
+        
+        let req_resp_rtdatas = function () {
+            let xmlhttp;
             if (window.XMLHttpRequest) {
                 xmlhttp = new XMLHttpRequest();
             }
@@ -188,78 +299,23 @@
             xmlhttp.open("post", "ics.cgi", true);
             xmlhttp.setRequestHeader('Content-Type', 'text/xml');
             xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    var svgOutInfo = d3.select("text[id=sys-recved-time]");
-                    svgOutInfo.text("接收：" + Date() + "  " + xmlhttp.response.length);
-                    var doc = (new DOMParser()).parseFromString(xmlhttp.response, "text/xml");
-                    var x = doc.documentElement.getElementsByTagName("RealData9999");
-                    for (var i = 0; i < x.length; i++) {
-                        try {
-                            var xx1 = x[i].getElementsByTagName("ADDRESS");
-                            var sMid = xx1[0].textContent;
-                            var iMid = Number(sMid);
-                            var xx2 = x[i].getElementsByTagName("VALUE");
-                            var sValue = xx2[0].textContent;
-                            var svgMeasure = d3.select("[id=" + csRrtdataUiPrefix + sMid + "]");
-                            if (iMid >= 0x01000000 && iMid < 0x02000000) {
-                                var iState = Number(sValue);
-                                if (iMid == 16777231 || iMid == 16777235) {
-                                    var iX = 0 + (iState % 1000);
-                                    var iY = 0 + (iState % 10);
-                                    if (iMid == 16777235) {
-                                        iX = 0 + (iState % 10);
-                                        iY = 0 + (iState % 600);
-                                    }
-                                    var lable = d3.select("[id=outInfoEd]");
-                                    var sTransform = "translate(" + iX + "," + iY + ")";
-                                    if (iMid == 16777231) {
-                                        sTransform += " rotate(90 110,700) "
-                                    }
-                                    lable.text("transform=" + sTransform);
-                                    svgMeasure.attr("transform", sTransform);
-//                                    var svg_1 = d3.select("[id=show-rtdata-16777235]");
-//                                    svg_1.attr("transform", "translate("+(count*10)+","+(480+count%10)+")");
-                                    continue;
-                                }
-                                var iRemain = iState % 3;
-                                if (iRemain == 0)
-                                    svgMeasure.attr("fill", "#ff0000");
-                                else if (iRemain == 1)
-                                    svgMeasure.attr("fill", "#00ff00");
-                                else
-                                    svgMeasure.attr("fill", "#0000ff");
-                            }
-                            else if (iMid >= 0x02000000 && iMid < 0x03000000) {
-                                svgMeasure.text(sValue);
-                            }
-                            else if (iMid >= 0x03000000 && iMid < 0x04000000) {
-                                svgMeasure.text(sValue);
-                            }
-                        }
-                        catch (er) {
-                            var body = d3.selectAll("body");
-                            var lable = body.append("lable");
-                            lable.text("接收到实时数据，但解释异常：" + er.message);
-                        }
-                    }
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    rtdb.debug('接收：RespMeasures - ' + Date() + ' ' + xmlhttp.response.length);
+                    rtdb.dealRespMeasures(xmlhttp.responseText)
                 }
-            }
-            var reqMeasureXml = getReqMeasureStringXML();
-            var r = xmlhttp.send(reqMeasureXml);
-            var svgOutInfo = d3.select("text[id=sys-send-time]");
-            svgOutInfo.text("发送：" + Date() + "  " + r);
-//            return {"r":r,"datetime":Date()}
+            };
+            let r = xmlhttp.send(retReqMeasuresJson);
+            rtdb.debug('发送：ReqMeasures - ' + Date() + ' ' + r);
         };
 
-        if (sReqMeasureStringXML.length > 0) {
+        if (retReqMeasuresJson.length > 0) {
             setInterval(req_resp_rtdatas, 1000);
             return true;
-        }
-        else {
-            console.log('!!! warnning: ' + csRrtdataUiPrefix + ' is empty!!!')
+        } else {
+            console.log('!!! warnning: retReqMeasuresJson is empty!!!')
             return false;
         }
     };
 
-    rtdb.rtdataStartRefresh();
+    rtdb.startReqMeasuresTimeOut();
 })(typeof window !== "undefined" ? window : this);
