@@ -9,9 +9,40 @@
     var rtdb = window.gcl.rtdb;
     if (rtdb.MeasureBase) return;
 
-    rtdb.MeasureBase = function MeasureBase( iMeasureId = 0 ) {
-        var measure = {
-            measureId: 0,
+    rtdb.MeasureBase = function MeasureBase( ) {
+        var iMeasureId = 0;
+        if (arguments.length > 0) {
+            var arg0 = arguments[0];
+            if (typeof arg0 === 'number') {
+                iMeasureId = arg0;
+            } else if ( arg0 !== null && typeof value === 'object') {
+                return {
+                    // newMeasure.measureId        = measure.measureId ? : 0;
+                    // newMeasure.value            = measure.value           ? measure.value           : null;
+                    // newMeasure.quality          = measure.quality         ? measure.quality         : 0;
+                    // newMeasure.refreshTime      = measure.refreshTime     ? measure.refreshTime     : Date();
+                    // newMeasure.changedTime      = measure.changedTime     ? measure.changedTime     : Date();
+                    // newMeasure.refreshSourceId  = measure.refreshSourceId ? measure.refreshSourceId : 0;
+                    // newMeasure.changedSourceId  = measure.changedSourceId ? measure.changedSourceId : 0;
+                    // newMeasure.refreshReasonId  = measure.refreshReasonId ? measure.refreshReasonId : 0;
+                    // newMeasure.changedReasonId  = measure.changedReasonId ? measure.changedReasonId : 0;
+                    // newMeasure.equalStrategyId  = measure.equalStrategyId ? measure.equalStrategyId : 0;
+                    // newMeasure.res              = measure.res             ? measure.res             : 0;                   measureId        : arg0.measureId       ? arg0.measureId       : 0,
+                    value            : arg0.value           ? arg0.value           : null,
+                    quality          : arg0.quality         ? arg0.quality         : 0,
+                    refreshTime      : arg0.refreshTime     ? arg0.refreshTime     : Date(),
+                    changedTime      : arg0.changedTime     ? arg0.changedTime     : Date(),
+                    refreshSourceId  : arg0.refreshSourceId ? arg0.refreshSourceId : 0,
+                    changedSourceId  : arg0.changedSourceId ? arg0.changedSourceId : 0,
+                    refreshReasonId  : arg0.refreshReasonId ? arg0.refreshReasonId : 0,
+                    changedReasonId  : arg0.changedReasonId ? arg0.changedReasonId : 0,
+                    equalStrategyId  : arg0.equalStrategyId ? arg0.equalStrategyId : 0,
+                    res              : arg0.res             ? arg0.res             : 0         
+                };
+            }
+        }
+        return {
+            measureId: iMeasureId,
             value: null,
             quality: 0,
             refreshTime: Date(),
@@ -23,7 +54,6 @@
             equalStrategyId: 0,
             res: 0
         };
-        return measure;
     };
 
     rtdb.MeasureManagerBase = function MeasureManagerBase() {
@@ -35,35 +65,25 @@
     };
 
     rtdb.MeasureManagerBase.prototype.append = function append(measure) {
-        if (measure && measure.measureId && measure.measureId > 0) {
-            var newMeasure = new this.measureClass();
-            // newMeasure.measureId = measure.measureId ? : 0;
-            // newMeasure.value            = measure.value           ? measure.value           : null;
-            // newMeasure.quality          = measure.quality         ? measure.quality         : 0;
-            // newMeasure.refreshTime      = measure.refreshTime     ? measure.refreshTime     : Date();
-            // newMeasure.changedTime      = measure.changedTime     ? measure.changedTime     : Date();
-            // newMeasure.refreshSourceId  = measure.refreshSourceId ? measure.refreshSourceId : 0;
-            // newMeasure.changedSourceId  = measure.changedSourceId ? measure.changedSourceId : 0;
-            // newMeasure.refreshReasonId  = measure.refreshReasonId ? measure.refreshReasonId : 0;
-            // newMeasure.changedReasonId  = measure.changedReasonId ? measure.changedReasonId : 0;
-            // newMeasure.equalStrategyId  = measure.equalStrategyId ? measure.equalStrategyId : 0;
-            // newMeasure.res              = measure.res             ? measure.res             : 0;
-            newMeasure.measureId = measure.measureId;
-            newMeasure.value = measure.value ? measure.value : null;
-            newMeasure.quality = measure.quality ? measure.quality : 0;
-            newMeasure.refreshTime = measure.refreshTime ? measure.refreshTime : Date();
-            newMeasure.changedTime = measure.changedTime ? measure.changedTime : Date();
-            newMeasure.refreshSourceId = measure.refreshSourceId ? measure.refreshSourceId : 0;
-            newMeasure.changedSourceId = measure.changedSourceId ? measure.changedSourceId : 0;
-            newMeasure.refreshReasonId = measure.refreshReasonId ? measure.refreshReasonId : 0;
-            newMeasure.changedReasonId = measure.changedReasonId ? measure.changedReasonId : 0;
-            newMeasure.equalStrategyId = measure.equalStrategyId ? measure.equalStrategyId : 0;
-            newMeasure.res = measure.res ? measure.res : 0;
+        if (measure && measure.measureId && measure.measureId > 0 && findById(measure.measureId ) !== null) {
+            let measure = new this.measureClass(measure);
+            this.measures.push();
             return true;
         }
         else {
             return false;
         }
+    };
+
+    rtdb.MeasureManagerBase.prototype.findById = function findById(iMeasureId=0) {
+        let measures = this.measures;
+        for (let i = 0; i < measures.length; i++) {
+            let measure = measures[i];
+            if (measure.measureId === iMeasureId) {
+                return measure;
+            }
+        }
+        return null;
     };
 
     rtdb.MonsbMeasure = function MonsbMeasure() {
@@ -74,7 +94,7 @@
 
     rtdb.MonsbManager = function MonsbManager() {
         var manager = new MeasureManagerBase();
-        manager.mmonsbs = manager.mmeasures;
+        manager.mmonsbs = manager.measures;
         manager.mmeasureClass = MonsbMeasure;
         return manager;
     };
@@ -87,7 +107,7 @@
 
     rtdb.YcaddManager = function YcaddManager() {
         var manager = new MeasureManagerBase();
-        manager.ycadds = manager.mmeasures;
+        manager.ycadds = manager.measures;
         manager.mmeasureClass = YcaddMeasure;
         return manager;
     };
@@ -100,7 +120,7 @@
 
     rtdb.StrawManager = function StrawManager() {
         var manager = new MeasureManagerBase();
-        manager.straws = manager.mmeasures;
+        manager.straws = manager.measures;
         manager.measureClass = StrawMeasure;
         return manager;
     };

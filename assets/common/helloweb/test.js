@@ -11,7 +11,7 @@ console.log(path.dirname(sPath))
 // require('./test3');
 // require('./test4');
 // require('./test5');
-require('./test_http1');
+// require('./test_http1');
 // require('./test_mysql1');
 // require('./test_fs1');
 // require('./test_timeout1');
@@ -49,6 +49,7 @@ require('./test_http1');
 
 // require('./test_class2')
 
+require('./test_meta1');
 
 console.log(' --- --- --- ')
 console.log(__filename)
