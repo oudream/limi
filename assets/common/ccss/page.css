@@ -136,6 +136,12 @@ h4 {
 	background-color: #F6F6F6;
 	border-left: #ddd solid 1px;
 }
+.fix-right3 {
+	width: 850px;
+	padding: 0;
+	background-color: #F6F6F6;
+	border-left: #ddd solid 1px;
+}
 
 .tree-body{
 	width: 200px;

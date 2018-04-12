@@ -86,8 +86,8 @@ define(['jquery', 'async', 'global', 'panelConfig', 'jqGrid', 'jqGridConfig', 'a
           groupChild = data.groupChild
         }
       }
-      jqGridExtend.pageBtn(loadSql, tableName, sort, 40)
-      jqGridExtend.pageBtn(loadSqlChild, tableName, sort, 40)
+      jqGridExtend.pageBtn(loadSql, tableName, sort, 40, 'pager', 'data_record_count_span')
+      jqGridExtend.pageBtn(loadSqlChild, tableName, sort, 40, 'pager', 'data_record_count_span')
       if (arrs[1] === undefined) {
         loadPropertyDef(gDb, loadSql, loadSqlChild)
       } else {
@@ -214,9 +214,9 @@ define(['jquery', 'async', 'global', 'panelConfig', 'jqGrid', 'jqGridConfig', 'a
           defChild.push(define)
         }
       }
-      jqGridConfig.tableInit(tbID, def, '#pager', child)
+      jqGridConfig.tableInit(tbID, def, 'pager', child)
       uiResizeListener()
-      jqGridConfig.tableInit(tbIDChild, defChild, '#pager_c')
+      jqGridConfig.tableInit(tbIDChild, defChild, 'pager_c')
       uiResizeListenerChild()
       loadTBData(tbName[0], loadSql, filter)
     }, reqParam)

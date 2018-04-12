@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script data-main="../../../cjs/web/require/config" src="../../../3rd/require-2.3.3.js"></script>
+    <script type="text/javascript" src="../../../cjs/web/other/c.js"></script>
+    <script type="text/javascript" src="../../../cjs/web/other/app.js"></script>
+
+    <style>
+        .form-inline .form-group{
+            display: inline-block;
+        }
+        .form-group{
+            margin: 10px;
+        }
+        .fuzzyLi:hover {
+            background-color: #1E90FF;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body  ics-code="../../../cjs/web/template/upload/upload.js">
+<div class="ics-iframe">
+    <form class="form-horizontal text-left" id="upload">
+        <div class="control-group span4">
+            <div class="controls">
+                <input type="file" id="name" name="csvfile"/>
+            </div>
+        </div>
+    </form>
+    <div style="text-align: center; padding-top: 20px;">
+        <button id="save" data-dismiss="modal">导入</button>
+    </div>
+</div>
+<div id="loading_ui" class="mask_hide mask">
+    <div class="sk-fading-circle">
+        <div class="sk-circle1 sk-circle"></div>
+        <div class="sk-circle2 sk-circle"></div>
+        <div class="sk-circle3 sk-circle"></div>
+        <div class="sk-circle4 sk-circle"></div>
+        <div class="sk-circle5 sk-circle"></div>
+        <div class="sk-circle6 sk-circle"></div>
+        <div class="sk-circle7 sk-circle"></div>
+        <div class="sk-circle8 sk-circle"></div>
+        <div class="sk-circle9 sk-circle"></div>
+        <div class="sk-circle10 sk-circle"></div>
+        <div class="sk-circle11 sk-circle"></div>
+        <div class="sk-circle12 sk-circle"></div>
+    </div>
+</div>
+</body>
+<link rel="stylesheet" type="text/css" href="../../../../common/ccss/default.css"/>
+</html>

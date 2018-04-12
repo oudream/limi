@@ -23,7 +23,7 @@ console.log(path.dirname(sPath))
 // require('./test_check_sum1');
 // require('./test_tcpclient1');
 // require('./test_buffer1');
-// require('./test_function1');
+require('./test_function1');
 // require('./test_path1');
 // require('./test_argument1');
 
@@ -48,11 +48,14 @@ console.log(path.dirname(sPath))
 // require('./test_promise1')
 
 // require('./test_class2')
+// require('./test_object3')
 
-require('./test_meta1');
+// require('./test_meta1');
 
 console.log(' --- --- --- ')
 console.log(__filename)
 console.log(__dirname)
 console.log(path.normalize(path.join(__dirname, '..')))
 console.log(path.normalize('D:\\ICS4000\\deploy/win32/b\\win32/bin_qt/./../bi\\bin_d/ha.exe'))
+
+console.log('111', 222, '333', Date());

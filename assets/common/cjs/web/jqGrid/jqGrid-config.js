@@ -6,7 +6,7 @@
 let jqGridConfig = {
 
 }
-define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function ($) {
+define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], function ($) {
     /**
      * 初始化单表
      * @param tbID : num 单表 id
@@ -60,7 +60,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         type = 'select'
         let localValue = def[i].valueScopes
         let exteriorValue = def[i].foreignKey
-        if (localValue !== '') {
+        if (localValue !== '' && localValue !== null && localValue !== undefined) {
           aSelect = localValue.split(',')
           if (aSelect[0] === '1') {
             for (let n = 0; n < aSelect.length - 1; n++) {
@@ -92,7 +92,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         type = 'select'
         let localValue = def[i].valueScopes
         let exteriorValue = def[i].foreignKey
-        if (localValue !== '') {
+        if (localValue !== '' && localValue !== null && localValue !== undefined) {
           aSelect = localValue.split(',')
           for (let n = 0; n < aSelect.length; n++) {
             oSelect[aSelect[n]] = aSelect[n]
@@ -126,6 +126,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         }
         aValue.push(oSelect)
         aName.push(def[i].colName)
+        aSelect = []
+        oSelect = {}
+      } else if (def[i].propType === 10) {
+        type = 'select'
+        let localValue = def[i].valueScopes
+        let valueObj = utils.dataProcess.kvStrToObj(localValue)
+
+        aName.push(def[i].colName)
+        aValue.push(valueObj)
+
         aSelect = []
         oSelect = {}
       } else {
@@ -163,7 +173,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       shrinkToFit: true,
       colNames: colNames,
       colModel: colModel,
-      pager: pager,
+      pager: '#' + pager,
       // rowList: [5, 10, 20],
             // multiPageSelection: true,
       rowNum: 20,
@@ -204,11 +214,11 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         }
 
         if (selFunc) {
-          selFunc.selFunc()
+          selFunc.selFunc(id)
         }
       },
       onPaging: function (pgButton) {
-        $(document).trigger('jqGrid_gird_page', [pgButton])
+        $(document).trigger('jqGrid_gird_' + pager, [pgButton])
       }
     })
     for (let i = 0; i < aName.length; i++) {
@@ -339,6 +349,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         }
         aValue.push(oSelect)
         aName.push(def[i].colName)
+        aSelect = []
+        oSelect = {}
+      } else if (def[i].propType === 10) {
+        type = 'select'
+        let localValue = def[i].valueScopes
+        let valueObj = utils.dataProcess.kvStrToObj(localValue)
+
+        aName.push(def[i].colName)
+        aValue.push(valueObj)
+
         aSelect = []
         oSelect = {}
       } else {
@@ -553,6 +573,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         }
         aValue.push(oSelect)
         aName.push(def[i].colName)
+        aSelect = []
+        oSelect = {}
+      } else if (def[i].propType === 10) {
+        type = 'select'
+        let localValue = def[i].valueScopes
+        let valueObj = utils.dataProcess.kvStrToObj(localValue)
+
+        aName.push(def[i].colName)
+        aValue.push(valueObj)
+
         aSelect = []
         oSelect = {}
       } else {

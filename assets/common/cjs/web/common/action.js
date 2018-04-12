@@ -7,16 +7,31 @@
 let action = {
 
 }
-define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], function ($) {
+define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension'], function ($, async) {
+  let doc = window.top.$(window.top.document)
   action.register = function (data, tbID, tbName, def, g, copyData) {
     switch (data.action) {
       case 'newAction':addAction(tbID, def, tbName, g)
         break
-      case 'omcAddAction':omcAddAction(def, tbName, g)
+      case 'omcAddAction':omcAddAction(def, tbName, data.assistAction, data.reload, data.para, g)
         break
       case 'delAction': delAction(tbID, tbName, def)
         break
+      case 'omcCommunicationUpdateAction': omcCommunicationUpdateAction(data, tbID, def)
+        break
+      case 'omcCommunicationDelAction': omcCommunicationDelAction(data, tbID)
+        break
+      case 'omcSubscribeDelAction': omcSubscribeDelAction(tbID)
+        break
       case 'saveAction': saveAction(tbID, tbName, def, copyData)
+        break
+      case 'saveOmcSubsAction': saveOmcSubsAction(tbID, tbName, def, copyData, g)
+        break
+      case 'saveOmcCommunicationPropAction': saveOmcCommunicationPropAction(tbID, tbName, def, copyData)
+        break
+      case 'saveOmcCommunicationOtherAction': saveOmcCommunicationOtherAction(tbID, tbName, def, copyData)
+        break
+      case 'addOmcCommunicationTreeNodeAction': addOmcCommunicationTreeNodeAction()
         break
       case 'saveSetAction': saveSetAction(tbID, tbName, def, copyData)
         break
@@ -26,7 +41,15 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
         break
       case 'saveObjAction': saveObjAction(tbID, tbName, def)
         break
+      case 'saveOmcObjAction': saveOmcObjAction(data, tbID, tbName, def, g)
+        break
       case 'saveAddAction': saveAddAction(tbID, tbName, def)
+        break
+      case 'omcCommunicationSaveTermAction': omcCommunicationSaveTermAction(tbID, tbName, def)
+        break
+      case 'saveOmcCommunicationAction': saveOmcCommunicationAction(tbID, tbName, def)
+        break
+      case 'subscribeAction': subscribeAction(tbID, tbName, def)
         break
       case 'saveSetObjAction': saveSetObjAction(tbID, tbName, def)
         break
@@ -55,6 +78,8 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
       case 'downAction':downAction(tbID, tbName, data)
         break
       case 'foreMostAction':foremostAction(tbID, tbName, data)
+        break
+      case 'uploadAction':uploadAction(g, data)
         break
     }
   }
@@ -203,10 +228,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
    * omc添加操作(未使用json文件配置)
    * @param def : obj 表定义表中配置
    * @param tableName : string 数据库表名
+   * @param action : string action名
    * @param g : obj 全局对象
    */
-  function omcAddAction (def, tableName, g) {
-    let config = JSON.stringify(def)
+  function omcAddAction (def, tableName, action, reload, para, g) {
+    let obj = {}
+    obj.defConfig = def
+    obj.action = action
+    obj.reload = reload
+    obj.para = para
+    let config = JSON.stringify(obj)
     sessionStorage.setItem('addConfig', config)
     sessionStorage.setItem('tbName', tableName)
     let u = 'common/chtml/template/single/add-single-obj.html'
@@ -252,6 +283,89 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     propConfGrid.jqGrid('delRowData', selectedId)
 
     let deleteSql = 'DELETE FROM ' + tableName + ' WHERE ID = ' + '\'' + del + '\''
+    if (window.confirm('确认删除？')) {
+      executeSql(deleteSql, log)
+    }
+  }
+
+  function omcCommunicationUpdateAction (data, tbID, def) {
+    for (let i = 0; i < def.length; i++) {
+      tbID.setColProp(def[i].colName, {editoptions: {value: false}})
+    }
+    tbID.editRow(1, true)
+  }
+  /**
+   * 删除操作
+   * @param tbID : num 单表id
+   */
+  function omcCommunicationDelAction (data, tbID) {
+    let propConfGrid = tbID
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    let deleteSql = ''
+    let log = '删除:'
+    tbID.jqGrid('saveRow', selectedId)
+    let col = 'F_ID'
+    let del = propConfGrid.jqGrid('getCell', selectedId, col)
+    if (!del) {
+      window.alert('请选择删除的行！')
+      return
+    }
+    propConfGrid.jqGrid('delRowData', selectedId)
+    let querySql = 'select F_V,F_URI from omc_vxd_prop where F_PID = ' + '\'' + del + '\'' + ';'
+    let queryAppSql = 'select F_V from omc_vxd_prop where F_PID = ' + '\'' + data.appID + '\'' + ';'
+    let vals
+    let app
+    async.series({
+      a: function (callBack) {
+        loadSql(querySql, function (v) {
+          callBack(null, v)
+        })
+      },
+      b: function (callBack) {
+        loadSql(queryAppSql, function (v) {
+          callBack(null, v)
+        })
+      }
+    }, function (error, value) {
+      vals = value.a
+      app = value.b[0].F_V.split(',')
+      for (let i = 0; i < vals.length; i++) {
+        if (vals[i].F_URI !== 'TerminalId') {
+          deleteSql = deleteSql + 'delete from omc_vxd_obj where F_ID = ' + '\'' + vals[i].F_V + '\'' + ';delete from omc_vxd_prop where F_PID = ' + '\'' + vals[i].F_V + '\'' + ';'
+        } else {
+          deleteSql = deleteSql + 'delete from omc_vxd_obj where F_ID = ' + '\'' + del + '\'' + ';delete from omc_vxd_prop where F_PID = ' + '\'' + del + '\'' + ';'
+        }
+      }
+      if (app.length > 1) {
+        for (let j = 0; j < app.length; j++) {
+          if (app[j] === del) {
+            app.splice(j, 1)
+          }
+        }
+        deleteSql = deleteSql + 'update omc_vxd_prop set F_V = ' + '\'' + app + '\'' + ' where F_PID = ' + '\'' + data.appID + '\'' + ';'
+      } else {
+        deleteSql = deleteSql + 'delete from omc_vxd_prop where F_PID = ' + '\'' + data.appID + '\'' + ';'
+      }
+      if (window.confirm('确认删除？')) {
+        executeSql(deleteSql)
+      }
+    })
+  }
+
+  /**
+   * 删除操作
+   * @param tbID : num 单表id
+   */
+  function omcSubscribeDelAction (tbID) {
+    let propConfGrid = tbID
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    let deleteSql = ''
+    let log = '删除:'
+    tbID.jqGrid('saveRow', selectedId)
+    let col = 'GroupFlag'
+    let del = propConfGrid.jqGrid('getCell', selectedId, col)
+    propConfGrid.jqGrid('delRowData', selectedId)
+    deleteSql = deleteSql + 'delete from omc_rtsubscribe where GroupFlag = ' + '\'' + del + '\'' + ';'
     if (window.confirm('确认删除？')) {
       executeSql(deleteSql, log)
     }
@@ -348,6 +462,219 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     executeSql(sql, log)
   }
 
+  /**
+   * 保存omc通信配置-订阅配置操作
+   * @param tbId : num 单表id
+   * @param def : obj 表定义表中配置
+   * @param tableName : string 数据库表名
+   * @param copyData : obj 表格更改前数据
+   */
+  function saveOmcSubsAction (tbId, tableName, def, copyData, g) {
+    let propConfGrid = tbId
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    propConfGrid.jqGrid('saveRow', selectedId)
+    let updateSql = ''
+    let querySql = ''
+    let log = ''
+    let colName = []
+    let propName = []
+    let aValue = []
+    let oValue = {}
+    let data = getJQAllData(tbId)
+    for (let j = 1; j < def.length; j++) {
+      colName.push(def[j].colName)
+      propName.push(def[j].propName)
+    }
+    for (let len = 0; len < data.length; len++) {
+      if (data[len].oldTag === 'old') {
+        let arr = data[len]
+        let copyArr = copyData[len]
+        // let copyArr = copyData[len]
+        log = log + '更新：'
+        if (checkChange(arr, copyArr, colName)) {
+          querySql = querySql + 'select ID,AppID from omc_rtsubscribe where GroupFlag = ' + '\'' + arr.GroupFlag + '\'' + ';'
+          oValue = {
+            IP: arr.IP,
+            Port: arr.Port,
+            AppID: arr.AppID
+          }
+          aValue.push(oValue)
+          oValue = {}
+        }
+      }
+    }
+    async.auto({
+      a: function (callBack) {
+        loadSql(querySql, function (v) {
+          callBack(null, v)
+        })
+      },
+      b: ['a', function (value, callBack) {
+        for (let i = 0; i < aValue.length; i++) {
+          if (value.a[i] instanceof Array) {
+            for (let j = 0; j < value.a[i].length; j++) {
+              updateSql = updateSql + 'update omc_rtsubscribe set IP = ' + '\'' + aValue[i].IP + '\'' + ',Port = ' + '\'' + aValue[i].Port + '\'' +
+                ',GroupFlag = ' + '\'' + aValue[i].AppID + aValue[i].IP + aValue[i].Port + '\'' + ' where ID = ' + value.a[i][j].ID + ';'
+            }
+          } else {
+            for (let j = 0; j < value.a.length; j++) {
+              updateSql = updateSql + 'update omc_rtsubscribe set IP = ' + '\'' + aValue[i].IP + '\'' + ',Port = ' + '\'' + aValue[i].Port + '\'' +
+                ',GroupFlag = ' + '\'' + aValue[i].AppID + aValue[i].IP + aValue[i].Port + '\'' + ' where ID = ' + value.a[j].ID + ';'
+            }
+          }
+        }
+        loadSql(updateSql, function (v) {
+          callBack(null, v)
+        })
+      }]
+    }, function (err, value) {
+      if (err) {
+        g.alert('保存失败！' + err)
+      } else {
+        g.alert('保存成功！')
+      }
+    })
+  }
+
+  /**
+   * 保存omc通信设置属性操作
+   * @param tbId : num 单表id
+   * @param def : obj 表定义表中配置
+   * @param tableName : string 数据库表名
+   * @param copyData : obj 表格更改前数据
+   */
+  function saveOmcCommunicationPropAction (tbId, tableName, def, copyData) {
+    let propConfGrid = tbId
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    propConfGrid.jqGrid('saveRow', selectedId)
+    let insertSql = ''
+    let delSql = ''
+    let queryPropMSql = ''
+    let colName = []
+    let propName = []
+    let sql
+    let dataStorage = []
+    let obj = {}
+    let data = getJQAllData(tbId)
+    for (let j = 1; j < def.length; j++) {
+      colName.push(def[j].colName)
+      propName.push(def[j].propName)
+    }
+    for (let len = 0; len < data.length; len++) {
+      if (data[len].oldTag === 'old') {
+        let arr = data[len]
+        let copyArr = copyData[len]
+        if (checkChange(arr, copyArr, colName)) {
+          if (arr.F_URI !== 'TerminalId') {
+            let arrs = arr.F_URI.split('_')
+            delSql = delSql + 'delete from omc_vxd_obj where F_ID = ' + '\'' + arr.pName + '\'' + ';' +
+              'delete from omc_vxd_prop where F_PID = ' + '\'' + arr.pName + '\'' + ';'
+            insertSql = insertSql + 'insert into omc_vxd_obj (F_ID,F_CLASS,F_V,F_URI,F_NAME,F_TYPE,F_LEN,F_SYN_FLAG,F_DT_FLAG,F_ST_FLAG) values' +
+              ' (' + '\'' + arr.pName + '\'' + ',' + '\'' + arrs[0].toUpperCase() + '\'' + ',' + '\'' + arr.F_V + '\'' + ',' + '\'' + arr.uri + '\'' + ',' + '\'' + arr.name + '\'' +
+              ',' + '\'' + 1 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 1 + '\'' + ');'
+            queryPropMSql = queryPropMSql + 'select F_URI,F_NAME,F_V,F_TYPE from omc_vxd_prop_m where F_PID = ' + '\'' + arr.F_V + '\'' + ';'
+            obj['pName'] = arr.pName
+            obj['class'] = arrs[0]
+            dataStorage.push(obj)
+            obj = {}
+          }
+        }
+      }
+    }
+    let vals
+    async.series({
+      a: function (callBack) {
+        loadSql(queryPropMSql, function (v) {
+          callBack(null, v)
+        })
+      }
+    }, function (error, value) {
+      // console.log(dataStorage)
+      let obj = {}
+      vals = value.a
+      for (let i = 0; i < vals.length; i++) {
+        for (let j = 0; j < vals[i].length; j++) {
+          if (vals[i][j].F_TYPE === 10) {
+            obj = utils.dataProcess.kvStrToObj(vals[i][j].F_V)
+          } else if (vals[i][j].F_TYPE === 20) {
+            obj = JSON.parse(vals[i][j].F_V)
+          } else if (vals[i][j].F_TYPE === 1) {
+            obj.defaultValue = vals[i][j].F_V
+          } else {
+            obj.defaultValue = ''
+          }
+          insertSql = insertSql + 'insert into omc_vxd_prop (F_ID,F_PID,F_URI,F_CLASS,F_TYPE,F_LEN,F_SYN_FLAG,F_DT_FLAG,F_ST_FLAG,F_V) values(' + '\'' + dataStorage[i].pName + '_000' + Number(j + 1) + '\'' + ',' +
+            '\'' + dataStorage[i].pName + '\'' + ',' + '\'' + vals[i][j].F_URI + '\'' + ',' + '\'' + dataStorage[i].class.toUpperCase() + '\'' + ',' + '\'' + 1 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 1 + '\'' + ',' + '\'' + obj.defaultValue + '\'' + ');'
+          obj = {}
+        }
+      }
+      sql = delSql + insertSql
+      // console.log(sql)
+      executeSql(sql)
+    })
+  }
+
+  /**
+   * 保存omc终端属性操作
+   * @param tbId : num 单表id
+   * @param def : obj 表定义表中配置
+   * @param tableName : string 数据库表名
+   * @param copyData : obj 表格更改前数据
+   */
+  function omcCommunicationSaveTermAction (tbId, tableName, def, copyData) {
+    let propConfGrid = tbId
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    propConfGrid.jqGrid('saveRow', selectedId)
+    let updateSql = ''
+    let data = getJQAllData(tbId)
+    updateSql = updateSql + 'update omc_vxd_obj set F_URI = ' + '\'' + data[0].F_URI + '\'' + ', F_NAME = ' + '\'' + data[0].F_NAME + '\'' + ',F_DESC = ' + '\'' + data[0].F_DESC + '\'' +
+        'where F_ID = ' + '\'' + data[0].F_ID + '\'' + ';' +
+        'update omc_vxd_prop set F_V = ' + '\'' + data[0].termID + '\'' + 'where F_PID = ' + '\'' + data[0].F_ID + '\'' + 'and F_URI = ' +'\'' + 'TerminalId' + '\'' + ';'
+    executeSql(updateSql)
+  }
+
+  /**
+   * 保存omc通信设置链路、协议操作
+   * @param tbId : num 单表id
+   * @param def : obj 表定义表中配置
+   * @param tableName : string 数据库表名
+   * @param copyData : obj 表格更改前数据
+   */
+  function saveOmcCommunicationOtherAction (tbId, tableName, def, copyData) {
+    let propConfGrid = tbId
+    let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow')
+    propConfGrid.jqGrid('saveRow', selectedId)
+    let updateSql = ''
+    let colName = []
+    let propName = []
+    let sql
+    let data = getJQAllData(tbId)
+    for (let j = 1; j < def.length; j++) {
+      colName.push(def[j].colName)
+      propName.push(def[j].propName)
+    }
+    for (let len = 0; len < data.length; len++) {
+      if (data[len].oldTag === 'old') {
+        let arr = data[len]
+        let copyArr = copyData[len]
+        if (checkChange(arr, copyArr, colName)) {
+          updateSql = updateSql + 'update omc_vxd_prop set F_V = ' + '\'' + arr.F_V + '\'' + ' where ID = ' + arr.ID + ';'
+        }
+      }
+    }
+    sql = updateSql
+    // console.log(sql)
+    executeSql(sql)
+  }
+
+  function addOmcCommunicationTreeNodeAction () {
+    let value = $('#treeNodeType_select').val()
+    if (value !== 'subs' && value !== '') {
+      saveOmcCommunicationAction('obj_form', 'omc_vxd_obj')
+    } else if (value === 'subs') {
+      subscribeAction('obj_form', 'omc_rtsubscribe')
+    }
+  }
   /**
    * 保存系统参数操作
    * @param tbId : num 单表id
@@ -722,6 +1049,51 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
   }
 
   /**
+   * 保存单对象操作
+   * @param formID : num 单对象form的id
+   * @param tbName : string 数据库名
+   * @param def : obj 表定义表中配置
+   */
+  function saveOmcObjAction (cfg, formID, tbName, def, g) {
+    let data = getFormData(formID)
+    let insData = []
+    let insCol = []
+    let propName = []
+    let ins = ''
+    let insertSql = ''
+    let log = '新增:'
+    for (let i = 0; i < data.length; i++) {
+      insCol.push(data[i].name)
+      insData.push(data[i].value)
+      propName.push(def[i].propName)
+      let arr = data[i]
+      if (checkObjLimit(arr, def)) {
+        if (i < data.length - 1) {
+          if (insData[i] === '') {
+            ins = ins + null + ','
+          } else {
+            ins = ins + '\'' + insData[i] + '\'' + ','
+          }
+        }
+        if (i === data.length - 1) {
+          ins = ins + '\'' + insData[i] + '\''
+        }
+      } else {
+        return
+      }
+    }
+    for (let j = 0; j < propName.length - 2; j++) {
+      log = log + propName[j + 1] + ':' + insData[j] + ','
+    }
+    insertSql = insertSql + 'insert into ' + tbName + '(' + insCol + ')' +
+      ' values' + '(' + ins + ')' + ';'
+    $('.modal', window.parent.document).hide()
+    $('.modal-backdrop', window.parent.document).remove()
+    executeSql(insertSql, g, cfg)
+    // $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+  }
+
+  /**
    * 新增操作
    * @param formID : num 单对象form的id
    * @param tbName : string 数据库名
@@ -786,6 +1158,211 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
   }
 
   /**
+   * omc通信配置新增操作
+   * @param formID : num 单对象form的id
+   * @param tbName : string 数据库名
+   * @param def : obj 表定义表中配置
+   */
+  function saveOmcCommunicationAction (formID, tbName, def) {
+    let db = window.top.cjDb
+    let serverInfo = cacheOpt.get('server-config')
+    let reqHost = serverInfo['server']['ipAddress']
+    let reqPort = serverInfo['server']['httpPort']
+    let reqParam = {
+      reqHost: reqHost,
+      reqPort: reqPort
+    }
+    let data = getFormData(formID)
+    let insData = []
+    let insCol = []
+    // let propName = []
+    let selectID = 'select ID from ' + tbName + ' order by ID asc'
+    let ins = ''
+    let insertSql = ''
+    let updateSql = ''
+    let log = '新增:'
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].name === 'AppID' || data[i].name === 'F_V') {
+        continue
+      }
+      insCol.push(data[i].name)
+      insData.push(data[i].value)
+    }
+    for (let j = 0; j < insCol.length; j++) {
+      if (j < insCol.length - 1) {
+        if (insData[j - 1] === '') {
+          ins = ins + null + ','
+        } else {
+          ins = ins + '\'' + insData[j] + '\'' + ','
+        }
+      }
+      if (j === insCol.length - 1) {
+        ins = ins + '\'' + insData[j] + '\''
+      }
+    }
+    let arr = data[1].value
+    let arrs = arr.split('TERM')
+    let terminal = data[0].value
+    let tName = $('#treeNodeType_select').find('option:selected').text()
+    let tV = data[0].value
+    // for (let j = 0; j < propName.length; j++) {
+    //   log = log + propName[j] + ':' + insData[j] + ','
+    // }
+    db.load(selectID, function f (e, v) {
+      if (e) {
+        console.log(e)
+      } else {
+        let maxID
+        if (v.length === 0) {
+          maxID = 1
+        } else {
+          maxID = parseInt(v[v.length - 1].ID) + 1
+        }
+        let queryModelSql = 'select F_URI from omc_vxd_prop_m where F_PID = ' + '\'' + terminal + '\''
+        insertSql = insertSql + 'insert into ' + tbName + '(' + 'ID,' + insCol + ',F_CLASS,F_TYPE,F_LEN,F_V,F_SYN_FLAG,F_DT_FLAG,F_ST_FLAG)' +
+          ' values' + '(' + maxID + ',' + ins + ',' + '\'' + 'TERM' + '\'' + ',1,0,' + '\'' + tV + '\'' + ',0,0,1' + ');'
+        db.load(queryModelSql, function (e, v) {
+          if (e) {
+            console.log(e)
+          } else {
+            for (let n = 0; n < v.length; n++) {
+              let type = v[n].F_URI.split('_')
+              if (v[n].F_URI !== 'TerminalId') {
+                insertSql = insertSql + 'insert into omc_vxd_prop (F_ID,F_PID,F_URI,F_CLASS,F_V,F_TYPE,F_LEN,F_SYN_FLAG,F_DT_FLAG,F_ST_FLAG) ' +
+                  'values(' + '\'' + arr + '_000' + Number(n + 1) + '\'' + ',' + '\'' + arr + '\'' + ',' + '\'' + v[n].F_URI + '\'' + ',' + '\'' + 'TERM' + '\'' + ',' + '\'' + arrs[0] + type[0].toUpperCase() + arrs[1] + '\'' + ',' + '\'' + 1 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 1 + '\'' + ');'
+              } else {
+                insertSql = insertSql + 'insert into omc_vxd_prop (F_ID,F_PID,F_URI,F_CLASS,F_V,F_TYPE,F_LEN,F_SYN_FLAG,F_DT_FLAG,F_ST_FLAG) ' +
+                  'values(' + '\'' + arr + '_000' + Number(n + 1) + '\'' + ',' + '\'' + arr + '\'' + ',' + '\'' + v[n].F_URI + '\'' + ',' + '\'' + 'TERM' + '\'' + ',' + '\'' + data[3].value + '\'' + ',' + '\'' + 1 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 0 + '\'' + ',' + '\'' + 1 + '\'' + ');'
+              }
+            }
+            let queryAppSql = 'select F_V from omc_vxd_prop where F_PID = ' + '\'' + data[2].value + '\''
+            let selectMaxApp = 'select F_ID from omc_vxd_prop where F_CLASS = ' + '\'' + 'APP' + '\'' + 'order by ID asc'
+
+            async.auto({
+              a: function (callBack) {
+                loadSql(queryAppSql, function (v) {
+                  callBack(null, v)
+                })
+              },
+              b: ['a', function (value, callBack) {
+                if (value.a.length === 0) {
+                  loadSql(selectMaxApp, function (v) {
+                    callBack(null, v)
+                  })
+                } else {
+                  updateSql = updateSql + 'update omc_vxd_prop set F_V = ' + '\'' + value.a[0].F_V + ',' + data[1].value + '\'' + ' where F_PID = ' + '\'' + data[2].value + '\'' + ';'
+                  insertSql = insertSql + updateSql
+                  $('.modal', window.parent.document).hide()
+                  $('.modal-backdrop', window.parent.document).remove()
+                  executeSql(insertSql, log)
+                  $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+                }
+              }]
+            }, function (error, value) {
+              console.log(value)
+              let maxDbNum
+              let maxNum
+              if (value.b.length === 0) {
+                maxDbNum = 0
+              } else {
+                maxDbNum = value.b[value.b.length - 1]
+                maxDbNum = maxDbNum['F_ID'].substr(maxDbNum['F_ID'].length - Number(4))
+              }
+              maxNum = Number(maxDbNum) + 1
+              if (maxNum.toString().length !== Number(4)) {
+                let len = Number(4) - maxNum.toString().length
+                for (let k = 0; k < len; k++) {
+                  maxNum = '0' + maxNum
+                }
+              }
+              insertSql = insertSql + 'insert into omc_vxd_prop(F_ID,F_PID,F_URI,F_CLASS,F_TYPE,F_V) values' +
+                '(' + '\'' + 'YGCT_APP_' + maxNum + '\'' + ',' + '\'' + data[2].value + '\'' + ',' + '\'' + 'App_' + maxNum + '\'' + ',' + '\'' + 'APP' + '\'' + ',1,' + '\'' + data[1].value + '\'' + ');'
+              $('.modal', window.parent.document).hide()
+              $('.modal-backdrop', window.parent.document).remove()
+              executeSql(insertSql, log)
+              // $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+              // $('#tbList4').trigger('reloadGrid')
+            })
+          }
+        }, reqParam)
+      }
+    }, reqParam)
+  }
+
+  /**
+   * omc三遥订阅配置新增操作
+   * @param formID : num 单对象form的id
+   * @param tbName : string 数据库名
+   * @param def : obj 表定义表中配置
+   */
+  function subscribeAction (formID, tbName, def) {
+    let db = window.top.cjDb
+    let serverInfo = cacheOpt.get('server-config')
+    let reqHost = serverInfo['server']['ipAddress']
+    let reqPort = serverInfo['server']['httpPort']
+    let reqParam = {
+      reqHost: reqHost,
+      reqPort: reqPort
+    }
+    let data = getFormData(formID)
+    let insData = []
+    let insCol = []
+    // let propName = []
+    let selectID = 'select ID from ' + tbName + ' order by ID asc'
+    let ins = ''
+    let insertSql = ''
+    let arr = []
+    let str = ''
+    for (let i = 2; i < data.length; i++) {
+      insCol.push(data[i].name)
+      insData.push(data[i].value)
+      // propName.push(def[i + 1].propName)
+      let arr = data[i]
+      // if (checkObjLimit(arr, def)) {
+      if (i < data.length - 1) {
+        if (insData[i - 2] === '') {
+          ins = ins + null + ','
+        } else {
+          ins = ins + '\'' + insData[i - 2] + '\'' + ','
+          str = str + insData[i - 2]
+        }
+      }
+      if (i === data.length - 1) {
+        ins = ins + '\'' + insData[i - 2] + '\''
+        str = str + insData[i - 2]
+      }
+      // }
+    }
+    db.load(selectID, function f (e, v) {
+      if (e) {
+        console.log(e)
+      } else {
+        let maxID
+        if (v.length === 0) {
+          maxID = 1
+        } else {
+          maxID = parseInt(v[v.length - 1].ID) + 1
+        }
+        let queryModelSql = 'select F_V from omc_vxd_cst where F_CLASS = ' + '\'' + 'SUBS' + '\''
+        db.load(queryModelSql, function (e, v) {
+          if (e) {
+            console.log(e)
+          } else {
+            for (let n = 0; n < v.length; n++) {
+              insertSql = insertSql + 'insert into ' + tbName + '(' + 'ID,' + insCol + ',TableName,StartID,EndID,GroupFlag)' +
+                ' values' + '(' + Number(maxID + n) + ',' + ins + ',' + '\'' + v[n].F_V + '\'' + ',0,0,' + '\'' + str + '\'' + ');'
+            }
+            $('.modal', window.parent.document).hide()
+            $('.modal-backdrop', window.parent.document).remove()
+            executeSql(insertSql)
+            $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+          }
+        }, reqParam)
+      }
+    }, reqParam)
+  }
+
+  /**
    * 保存系统参数单对象操作
    * @param formID : num 单对象form的id
    * @param tbName : string 数据库名
@@ -820,7 +1397,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     for (let j = 0; j < propName.length; j++) {
       log = log + propName[j] + ':' + insData[j] + ','
     }
-    insertSql = insertSql + 'update ' + tbName + ' set F_WGCS = ' + ins + ' where F_SETTYPE = ' + '\'' + 'ruleLimit' + '\';'
+    insertSql = insertSql + 'update ' + tbName + ' set F_SCALE = ' + ins + ' where F_SETTYPE = ' + '\'' + 'scale' + '\';'
     // alert(insertSql)
     executeSql(insertSql, log)
   }
@@ -1405,6 +1982,23 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     executeSql(sql, log)
   }
 
+  function uploadAction (g, data) {
+    let targetDB = data.targetDB
+    sessionStorage.setItem('targetDB', targetDB)
+    let u = 'common/chtml/template/upload/upload.html'
+    g.iframe({
+      title: '上传',
+      ajaxWindow: false,
+      show: true,
+      // backdrop: true,
+      type: 'iframe', // iframe / html / alert / confirm
+      width: 680,
+      height: 200,
+      footerButtonAlign: 'right',
+      url: g.url(u)
+    })
+  }
+
   /* 获取表中所有数据 */
   function getJQAllData (tbID) {
     let o = tbID
@@ -1602,7 +2196,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     }, reqParam)
   }
 
-  function executeSql (sql, log) {
+  function executeSql (sql, g, reload) {
     let db = window.top.cjDb
     let serverInfo = cacheOpt.get('server-config')
     let reqHost = serverInfo['server']['ipAddress']
@@ -1614,14 +2208,41 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     db.loadT(sql, function fn (err, vals) {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
-          alert('数据重复，请重新添加')
+          g.alert('数据重复，请重新添加')
         }
         console.log(err)
       } else {
-        // recordLog(log)
-        // alert('保存成功！')
-        window.location.reload()
+        if (reload) {
+          switch (reload.reload) {
+            case 'YX': doc.trigger('reload-yx')
+              break
+            case 'YC': doc.trigger('reload-yc')
+              break
+            case 'YW': doc.trigger('reload-yw')
+              break
+            case 'SUBS': doc.trigger('reload-subs')
+              break
+            default:
+              break
+          }
+        } else {
+          window.location.reload()
+        }
       }
+    }, reqParam)
+  }
+
+  function loadSql (sql, callBack) {
+    let db = window.top.cjDb
+    let serverInfo = cacheOpt.get('server-config')
+    let reqHost = serverInfo['server']['ipAddress']
+    let reqPort = serverInfo['server']['httpPort']
+    let reqParam = {
+      reqHost: reqHost,
+      reqPort: reqPort
+    }
+    db.load(sql, function (e, v) {
+      callBack(v)
     }, reqParam)
   }
 
@@ -1661,4 +2282,5 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     }
     return pwd
   }
+
 })

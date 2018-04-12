@@ -219,3 +219,19 @@ utils.dataProcess.getId = function (highOrder, lowOrder) {
     'idHex': idHex
   }
 }
+
+/**
+ * k-v键值对的字符串转化为对象
+ * @param str string k-v键值对的字符串
+ */
+utils.dataProcess.kvStrToObj = function (str) {
+  let arr = str.split(';')
+  let obj = {}
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] !== '') {
+      let arrs = arr[i].split('=')
+      obj[arrs[0]] = arrs[1]
+    }
+  }
+  return obj
+}

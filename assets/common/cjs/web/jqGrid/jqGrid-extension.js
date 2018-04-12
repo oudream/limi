@@ -2,13 +2,13 @@
  * Created by liuchaoyu on 2017-0num-2num.
  */
 
-"use strict";
+'use strict'
 
 var jqGridExtend = {
-    version: '1.0.0'
-};
+  version: '1.0.0'
+}
 
-define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function ($) {
+define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], function ($) {
   let totalPage
   let PageIndex = 0
   let sql1 = ''
@@ -20,27 +20,27 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
    */
   jqGridExtend.createJsonData = function (param) {
     let jsonData = {
-      "page": param.curPage,
-      "total": param.pageTotal,
-      "records": param.records,
-      "rows": []
+      'page': param.curPage,
+      'total': param.pageTotal,
+      'records': param.records,
+      'rows': []
       // {"invid" : "1","invdate":"cell11", "amount" :"cell12", "tax" :"cell13", "total" :"1234", "note" :"somenote"}, // 数据中需要各列的name，但是可以不按列的顺序
       // {"invid" : "2","invdate":"cell21", "amount" :"cell22", "tax" :"cell23", "total" :"234num", "note" :"some note"},
-    };
+    }
 
-    jsonData.rows = param.data;
+    jsonData.rows = param.data
 
-    return JSON.parse(JSON.stringify(jsonData));
+    return JSON.parse(JSON.stringify(jsonData))
   }
 
   /**
    * jqGrid分页键启用
    */
-  jqGridExtend.pagerEnable = function () {
-    $('#pager #first_pager').removeClass('ui-state-disabled');
-    $('#pager #prev_pager').removeClass('ui-state-disabled');
-    $('#pager #next_pager').removeClass('ui-state-disabled');
-    $('#pager #last_pager').removeClass('ui-state-disabled');
+  jqGridExtend.pagerEnable = function (ID) {
+    $('#first_' + ID).removeClass('ui-state-disabled')
+    $('#prev_' + ID).removeClass('ui-state-disabled')
+    $('#next_' + ID).removeClass('ui-state-disabled')
+    $('#last_' + ID).removeClass('ui-state-disabled')
   }
 
   /**
@@ -49,10 +49,10 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
    * @param filter : string 过滤条件
    * @param tableName : string 表名
    * @param group : string 分组信息
-   * @param PageIndex : num 分页索引
    * @param num : num 分页数
+   * @param recordID :string 显示页数的标签ID
    */
-  jqGridExtend.countNum = function (loadSql, filter, tableName, group, PageIndex, num) {
+  jqGridExtend.countNum = function (loadSql, filter, tableName, group, num, recordID) {
     let db = window.top.cjDb
     let serverInfo = cacheOpt.get('server-config')
     let reqHost = serverInfo['server']['ipAddress']
@@ -62,7 +62,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       reqPort: reqPort
     }
     let sql = 'select count(1) as total from ' + tableName
-    let recordCountSpan = $('#data_record_count_span')
+    let recordCountSpan = $('#' + recordID) || $('#data_record_count_span')
     let string = 'where'
     if (loadSql !== '') {
       let arr = loadSql.split(' where ')
@@ -90,7 +90,11 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       if (err) {
         console.log(err)
       } else {
-        totalPage = val[0].total
+        if (val.length > 1) {
+          totalPage = val.length
+        } else {
+          totalPage = val[0].total
+        }
         let tot
         if ((totalPage % num) === 0) {
           tot = parseInt(totalPage / num) - 1
@@ -100,7 +104,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         if (parseInt(tot + 1) === 0) {
           recordCountSpan.text('无查询数据')
         } else {
-          recordCountSpan.text('当前第' + parseInt(PageIndex + 1) + '页,共' + parseInt(tot + 1) + '页')
+          recordCountSpan.text('当前第1页,共' + parseInt(tot + 1) + '页')
         }
       }
     }, reqParam)
@@ -108,14 +112,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
 
   /**
    * jqGrid分页
+   * @param tbID : string tableID
    * @param loadSql : string 初始sql语句
    * @param filter : string 过滤条件
    * @param tableName : string 表名
    * @param group : string 分组信息
    * @param sort : string 排序索引
    * @param num : num 分页数
+   * @param pagerID : string pagerID
    */
-  jqGridExtend.paging = function (loadSql, filter, tableName, group, sort, num) {
+  jqGridExtend.paging = function (tbID, loadSql, filter, tableName, group, sort, num, pagerID) {
     let sql = ''
     let string = 'where'
     if (loadSql !== '') {
@@ -163,23 +169,27 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         sql = sql + ' order by ' + queryIndex[1] + ' desc'
       }
     }
-    if (PageIndex === 0) {
-      sql1 = sql
-      sql = sql + ' limit ' + PageIndex * num + ',' + num + ';'
-    }
-    selID(sql, loadSql, selectID, tableName, sort)
+    // if (PageIndex === 0) {
+    sql1 = sql
+    sql = sql + ' limit ' + PageIndex * num + ',' + num + ';'
+    // }
+    selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID)
   }
 
   /**
    * jqGrid分页按钮实现
+   * @param tbID : string tableID
    * @param loadSql : string 初始sql语句
    * @param tableName : string 表名
    * @param sort : string 排序索引
    * @param num : num 分页数
+   * @param pagerID : string pager的ID
+   * @param recordID :string 显示页数的标签ID
    */
-  jqGridExtend.pageBtn = function (loadSql, tableName, sort, num) {
-    $(document).on('jqGrid_gird_page', function (evt, pgBtn) {
-      let recordCountSpan = $('#data_record_count_span')
+  jqGridExtend.pageBtn = function (tbID, loadSql, tableName, sort, num, pagerID, recordID) {
+    PageIndex = 0
+    $(document).on('jqGrid_gird_' + pagerID, function (evt, pgBtn) {
+      let recordCountSpan = $('#' + recordID) || $('#data_record_count_span')
       let sql = ''
       let lastPage
       if ((totalPage % num) === 0) {
@@ -187,18 +197,18 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       } else {
         lastPage = parseInt(totalPage / num)
       }
-      if (pgBtn === 'first_pager') {
+      if (pgBtn === 'first_' + pagerID) {
         PageIndex = 0
         sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';'
-      } else if (pgBtn === 'last_pager') {
+      } else if (pgBtn === 'last_' + pagerID) {
         PageIndex = lastPage
         sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';'
-      } else if (pgBtn === 'prev_pager') {
+      } else if (pgBtn === 'prev_' + pagerID) {
         if (PageIndex > 0) {
           PageIndex--
         }
         sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';'
-      } else if (pgBtn === 'next_pager') {
+      } else if (pgBtn === 'next_' + pagerID) {
         if (PageIndex === lastPage) {
           PageIndex = lastPage
         } else {
@@ -211,11 +221,11 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       } else {
         recordCountSpan.text('当前第' + parseInt(PageIndex + 1) + '页,共' + parseInt(lastPage + 1) + '页')
       }
-      selID(sql, loadSql, selectID, tableName, sort)
+      selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID)
     })
   }
 
-  function selID (sql, loadSql, colName, tableName, sort) {
+  function selID (tbID, sql, loadSql, colName, tableName, sort, pagerID) {
     let db = window.top.cjDb
     let serverInfo = cacheOpt.get('server-config')
     let reqHost = serverInfo['server']['ipAddress']
@@ -243,7 +253,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
         console.log(e)
       } else {
         if (v.length === 0) {
-          $('#tbList').jqGrid('clearGridData', false)
+          tbID.jqGrid('clearGridData', false)
           return
         } else {
           fSql = fSql + ' where '
@@ -268,12 +278,12 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
             }
           }
         }
-        loadTBData(fSql)
+        loadTBData(fSql, tbID, pagerID)
       }
     }, reqParam)
   }
 
-  function loadTBData (sql) {
+  function loadTBData (sql, tbID, pagerID) {
     let db = window.top.cjDb
     let serverInfo = cacheOpt.get('server-config')
     let reqHost = serverInfo['server']['ipAddress']
@@ -282,7 +292,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
       reqHost: reqHost,
       reqPort: reqPort
     }
-    let jqGridTable = $('#tbList')
+    let jqGridTable = tbID
     jqGridTable.jqGrid('clearGridData', false)
     db.load(sql, function fn (err, vals) {
       if (err) {
@@ -298,6 +308,16 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
               vals[i].F_T = utils.time.utc2Locale(vals[i].F_T)
             }
           }
+          if (vals[i].F_TYPE !== undefined && vals[i].F_V !== undefined) {
+            if (vals[i].F_TYPE === 10) {
+              let obj = utils.dataProcess.kvStrToObj(vals[i].F_V)
+              vals[i].F_V = obj.value
+            }
+            if (vals[i].F_TYPE === 20) {
+              let obj = JSON.parse(vals[i].F_V)
+              vals[i].F_V = obj.value
+            }
+          }
           let aGroup = vals[i]
           jqGridTable.jqGrid('addRowData', i + 1, aGroup)
           jqGridTable.jqGrid('setCell', i + 1, 'rowID', i + 1)
@@ -306,7 +326,9 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache'], function (
           jqGridTable.jqGrid('setCell', i, 'rowID', i)
         }
       }
-      jqGridExtend.pagerEnable()
+      jqGridExtend.pagerEnable(pagerID)
+      let priData = tbID.jqGrid('getRowData')
+      sessionStorage.setItem('tablePriData', JSON.stringify(priData))
     }, reqParam)
   }
 })

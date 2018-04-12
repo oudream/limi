@@ -10,7 +10,6 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
   let tableName // 表名
   let multi
   let loadSql = ''
-  let PageIndex = 0
   let sort = null
   let group = null
   let copyData // 表格原始数据
@@ -48,6 +47,7 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
       tableName = data.tbName
       queryCfg = data.queryPanel.items
       multi = data.multi
+      def = data.def
       if (data.operationPanel !== undefined) {
         operationData = data.operationPanel.items
         if (operationData !== null) {
@@ -66,11 +66,10 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
           group = data.group
         }
       }
-      jqGridExtend.pageBtn(loadSql, tableName, sort, 40)
+      jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span')
       $('#queryBtn').click(function () {
-        PageIndex = 0
-        jqGridExtend.countNum(loadSql, action.queryAction(formID), tableName, group, PageIndex, 40)
-        jqGridExtend.paging(loadSql, action.queryAction(formID), tableName, group, sort, 40)
+        jqGridExtend.countNum(loadSql, action.queryAction(formID), tableName, group, 40, 'data_record_count_span')
+        jqGridExtend.paging(tbID, loadSql, action.queryAction(formID), tableName, group, sort, 40, 'pager')
       })
       if (arrs[1] === undefined) {
         loadPropertyDef(gDb, loadSql)
@@ -100,45 +99,45 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
   }
 
   function loadPropertyDef (db, loadSql, filter) {
-    let serverInfo = cacheOpt.get('server-config')
-    let reqHost = serverInfo['server']['ipAddress']
-    let reqPort = serverInfo['server']['httpPort']
-    let reqParam = {
-      reqHost: reqHost,
-      reqPort: reqPort
-    }
-    let sql = 'select * from qms_propertydef'
-    db.load(sql, function (err, vals) {
-      let sNeType
-      for (let i = 0; i < vals.length; i++) {
-        let val = vals[i]
-        sNeType = val.NeType
-        if (sNeType === netype) {
-          let define = {
-            propName: vals[i].PropName,
-            colName: vals[i].ColumnName,
-            visible: vals[i].Visible,
-            propType: vals[i].PropType,
-            unique: vals[i].Unique,
-            required: vals[i].Required,
-            readOnly: vals[i].ReadOnly,
-            defaultValue: vals[i].DefaultValue,
-            valueScopes: vals[i].ValueScopes,
-            foreignKey: vals[i].ForeignKey,
-            width: vals[i].DisplayWidth
-          }
-          def.push(define)
-        }
-      }
+    // let serverInfo = cacheOpt.get('server-config')
+    // let reqHost = serverInfo['server']['ipAddress']
+    // let reqPort = serverInfo['server']['httpPort']
+    // let reqParam = {
+    //   reqHost: reqHost,
+    //   reqPort: reqPort
+    // }
+    // let sql = 'select * from qms_propertydef'
+    // db.load(sql, function (err, vals) {
+    //   let sNeType
+    //   for (let i = 0; i < vals.length; i++) {
+    //     let val = vals[i]
+    //     sNeType = val.NeType
+    //     if (sNeType === netype) {
+    //       let define = {
+    //         propName: vals[i].PropName,
+    //         colName: vals[i].ColumnName,
+    //         visible: vals[i].Visible,
+    //         propType: vals[i].PropType,
+    //         unique: vals[i].Unique,
+    //         required: vals[i].Required,
+    //         readOnly: vals[i].ReadOnly,
+    //         defaultValue: vals[i].DefaultValue,
+    //         valueScopes: vals[i].ValueScopes,
+    //         foreignKey: vals[i].ForeignKey,
+    //         width: vals[i].DisplayWidth
+    //       }
+    //       def.push(define)
+    //     }
+    //   }
       if (multi) {
         jqGridConfig.multiSelectTableInit(tbID, def, '#pager')
       } else {
-        jqGridConfig.tableInit(tbID, def, '#pager')
+        jqGridConfig.tableInit(tbID, def, 'pager')
       }
       uiResizeListener()
-      jqGridExtend.countNum(loadSql, filter, tableName, group, PageIndex, 40)
-      jqGridExtend.paging(loadSql, filter, tableName, group, sort, 40)
-    }, reqParam)
+      jqGridExtend.countNum(loadSql, filter, tableName, group, 40, 'data_record_count_span')
+      jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 40, 'pager')
+    // }, reqParam)
   }
 
   function uiResizeListener () {
@@ -161,7 +160,7 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
     for (let i = 0; i < data.length; i++) {
       $('#' + data[i].id).unbind('click')
       $('#' + data[i].id).click(function () {
-        copyData = tbID.jqGrid('getRowData')
+        copyData = JSON.parse(sessionStorage.getItem('tablePriData'))
         action.register(data[i], tbID, tableName, def, g, copyData)
       })
     }

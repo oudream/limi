@@ -43,6 +43,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
       localData = data.localData
       tableName = data.tbName
       operationData = data.operationPanel.items
+      def = data.def
       loadPropertyDef(gDb)
       if (operationData !== null) {
         panelConfig.operationInit('operation', operationData)
@@ -52,33 +53,33 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
   }
 
   function loadPropertyDef (db, callback) {
-    let sql = 'select * from qms_propertydef'
-    db.load(sql, function (err, vals) {
-      let sNeType
-      for (let i = 0; i < vals.length; i++) {
-        let val = vals[i]
-        sNeType = val.NeType
-        if (sNeType === netype) {
-          let define = {
-            propName: vals[i].PropName,
-            colName: vals[i].ColumnName,
-            visible: vals[i].Visible,
-            propType: vals[i].PropType,
-            unique: vals[i].Unique,
-            required: vals[i].Required,
-            readOnly: vals[i].ReadOnly,
-            defaultValue: vals[i].DefaultValue,
-            valueScopes: vals[i].ValueScopes,
-            foreignKey: vals[i].ForeignKey,
-            width: vals[i].DisplayWidth,
-            regularExpression: vals[i].RegularExpression
-          }
-          def.push(define)
-        }
-      }
+    // let sql = 'select * from qms_propertydef'
+    // db.load(sql, function (err, vals) {
+    //   let sNeType
+    //   for (let i = 0; i < vals.length; i++) {
+    //     let val = vals[i]
+    //     sNeType = val.NeType
+    //     if (sNeType === netype) {
+    //       let define = {
+    //         propName: vals[i].PropName,
+    //         colName: vals[i].ColumnName,
+    //         visible: vals[i].Visible,
+    //         propType: vals[i].PropType,
+    //         unique: vals[i].Unique,
+    //         required: vals[i].Required,
+    //         readOnly: vals[i].ReadOnly,
+    //         defaultValue: vals[i].DefaultValue,
+    //         valueScopes: vals[i].ValueScopes,
+    //         foreignKey: vals[i].ForeignKey,
+    //         width: vals[i].DisplayWidth,
+    //         regularExpression: vals[i].RegularExpression
+    //       }
+    //       def.push(define)
+    //     }
+    //   }
       panelConfig.objInit(formID, def, tableName)
       registerListener.listener()
-    }, gReqParam)
+    // }, gReqParam)
   }
 
   function btnBind (data) {

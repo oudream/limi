@@ -15,7 +15,7 @@
     };
 
     gis.rtdataStartRefresh = function () {
-        let csRrtdataUiPrefix = 'show-rtdata-';
+        let csRtdataUiPrefix = 'show-rtdata-';
         let rtdb = gcl.rtdb;
         let monsbManager = rtdb.monsbManager;
         let monsbs = monsbManager.monsbs;
@@ -24,10 +24,10 @@
         let strawManager = rtdb.strawManager;
         let straws = strawManager.straws;
 
-        let svgMids = $("text[id^='"+csRrtdataUiPrefix+"']");
+        let svgMids = $("text[id^='"+csRtdataUiPrefix+"']");
         svgMids.each(function () {
             let name = this.id;
-            let index = name.indexOf(csRrtdataUiPrefix);
+            let index = name.indexOf(csRtdataUiPrefix);
             if (index >= 0) {
                 let sMid = name.substring(index + 12);
                 let iId = Number(sMid);
@@ -47,7 +47,7 @@
                 let monsb = monsbs[i];
                 let iMid = monsb.id;
                 let sMid = string(iMid);
-                let svgMeasure = d3.select("[id=" + csRrtdataUiPrefix + sMid + "]");
+                let svgMeasure = d3.select("[id=" + csRtdataUiPrefix + sMid + "]");
                 if (svgMeasure !== null) {
                     let iRemain = monsb.value % 3;
                     if (iRemain === 0)
@@ -63,7 +63,7 @@
                 let ycadd = ycadds[i];
                 let iMid = ycadd.id;
                 let sMid = string(iMid);
-                let svgMeasure = d3.select("[id=" + csRrtdataUiPrefix + sMid + "]");
+                let svgMeasure = d3.select("[id=" + csRtdataUiPrefix + sMid + "]");
                 if (svgMeasure !== null) {
                     svgMeasure.text(sValue);
                 }
@@ -73,7 +73,7 @@
                 let straw = straws[i];
                 let iMid = straw.id;
                 let sMid = string(iMid);
-                let svgMeasure = d3.select("[id=" + csRrtdataUiPrefix + sMid + "]");
+                let svgMeasure = d3.select("[id=" + csRtdataUiPrefix + sMid + "]");
                 if (svgMeasure !== null) {
                     svgMeasure.text(sValue);
                 }

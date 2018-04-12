@@ -44,7 +44,11 @@ var config = {
     'vfs_fonts': 'common/3rd/vfs_fonts',
     // 'bootstrap-select': 'lib/bootstrap-select/js/bootstrap-select',
     'contextMenu': 'common/cjs/web/contextmenu/contextmenu',
-    'pickcolor': 'common/3rd/pick-a-color-master/src/js/pick-a-color'
+    'pickcolor': 'common/3rd/pick-a-color-master/src/js/pick-a-color',
+    'papaparse': 'common/3rd/importCSV/papaparse',
+    'jschardet': 'common/3rd/importCSV/jschardet',
+    'base64': 'common/3rd/importCSV/base64',
+    'ipmortCSV': 'common/3rd/importCSV/csv2arr'
   },
   shim: {
     'bs.ics.modal': {

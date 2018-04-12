@@ -84,6 +84,7 @@ FileServer.prototype.dispatch = function (request, response) {
   response.setHeader('Server', 'HttpFileServer-Node')
   response.setHeader('Accept-Ranges', 'bytes')
   var pathname = url.parse(request.url).pathname
+  console.log(pathname)
   if (pathname.slice(-1) === '/') {
     pathname = pathname + config.homePage
   }
