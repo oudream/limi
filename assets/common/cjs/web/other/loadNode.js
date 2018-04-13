@@ -1,7 +1,7 @@
 /**
  * Created by liuchaoyu on 2017-03-15.
  */
-"use strict";
+'use strict';
 
 let electron = null;
 let ipc = null;

@@ -1,7 +1,7 @@
 /* Extend function. */
 
 function extend(subClass, superClass) {
-    var F = function() {};
+    let F = function() {};
     F.prototype = superClass.prototype;
     subClass.prototype = new F();
     subClass.prototype.constructor = subClass;
@@ -16,7 +16,7 @@ function Person(name) {
 
 Person.prototype.getName = function() {
     return this.name;
-}
+};
 
 /* Class Author. */
 
@@ -31,17 +31,16 @@ Author.prototype.getBooks = function() {
 };
 
 
-
 /* Extend function, improved. */
 
 function extend(subClass, superClass) {
-    var F = function() {};
+    let F = function() {};
     F.prototype = superClass.prototype;
     subClass.prototype = new F();
     subClass.prototype.constructor = subClass;
 
     subClass.superclass = superClass.prototype;
-    if(superClass.prototype.constructor == Object.prototype.constructor) {
+    if (superClass.prototype.constructor == Object.prototype.constructor) {
         superClass.prototype.constructor = superClass;
     }
 }
@@ -60,7 +59,7 @@ Author.prototype.getBooks = function() {
 };
 
 Author.prototype.getName = function() {
-    var name = Author.superclass.getName.call(this);
+    let name = Author.superclass.getName.call(this);
     return name + ', Author of ' + this.getBooks().join(', ');
 };
 

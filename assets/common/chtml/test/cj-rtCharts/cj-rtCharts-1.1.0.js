@@ -4,8 +4,8 @@
  * cj-rtCharts.js
  */
 
-var CjRtCharts = {
-    version: "1.1.0",
+let CjRtCharts = {
+    version: '1.1.0',
 };
 
 
@@ -18,14 +18,13 @@ var CjRtCharts = {
  * }
  * @return rtChart : Object 实时图表对象
  */
-CjRtCharts.init = function (dom,showParam) {
-
-    var rtChart = {
+CjRtCharts.init = function(dom, showParam) {
+    let rtChart = {
         chartCount: 0,
         chart: null,
         // cases:[],
-        option:null,
-        isFirstTime:true,
+        option: null,
+        isFirstTime: true,
     };
 
     rtChart.setChartParams = setChartParams;
@@ -34,10 +33,10 @@ CjRtCharts.init = function (dom,showParam) {
     rtChart.addSerie = addSerie;
     // rtChart.addDataOfToBeShow = addDataOfToBeShow;
 
-    setDispalyParams(rtChart,showParam);
+    setDispalyParams(rtChart, showParam);
 
-    var _chart = CjCharts.init(dom);
-    //charts.chart.showLoading();
+    let _chart = CjCharts.init(dom);
+    // charts.chart.showLoading();
     rtChart.chart = _chart;
     _chart = null;
 
@@ -49,14 +48,12 @@ CjRtCharts.init = function (dom,showParam) {
  * @param rtChart : Object 目标对象
  * @param isDispose : Boolean 是否销毁实例
  */
-CjRtCharts.clear = function (rtChart,isDispose) {
-
-    var t = null;
+CjRtCharts.clear = function(rtChart, isDispose) {
+    let t = null;
     for (t in rtChart) {
-
         if (t === 'chart') {
-            var _cjCharts = rtChart[t];
-            CjCharts.clear(_cjCharts,isDispose);
+            let _cjCharts = rtChart[t];
+            CjCharts.clear(_cjCharts, isDispose);
             _cjCharts = null;
         }
 
@@ -64,7 +61,6 @@ CjRtCharts.clear = function (rtChart,isDispose) {
     }
 
     rtChart = null;
-
 };
 
 /**
@@ -103,42 +99,38 @@ CjRtCharts.clear = function (rtChart,isDispose) {
         }
     }
  */
-function setChartParams (paramObj) {
+function setChartParams(paramObj) {
+    let option = CjCharts.getCjOption(paramObj);
 
-    var option = CjCharts.getCjOption(paramObj);
-
-    option.toolbox = {'show':false};
+    option.toolbox = {'show': false};
 
     this.option = option;
 
-    this.chart.setCjOption(option,true);
+    this.chart.setCjOption(option, true);
 
     option = null;
-
 }
 
 /**
  * 设置数据实例数组
  * @param cases : 数据实例数组
  */
-function setDataCases (cases) {
-
-    var _caseLength = cases.length;
-    var _curCase = null;
-    var series = null;
-    var _serie = null;
-    var _param = null;
-    var _caseDataLength = null;
-    var _option = null;
-    var option = null;
+function setDataCases(cases) {
+    let _caseLength = cases.length;
+    let _curCase = null;
+    let series = null;
+    let _serie = null;
+    let _param = null;
+    let _caseDataLength = null;
+    let _option = null;
+    let option = null;
 
     if (this.isFirstTime) {
         this.isFirstTime = false;
 
         series = [];
-        var legendData = [];
-        for (var i = 0; i < _caseLength; i++) {
-
+        let legendData = [];
+        for (let i = 0; i < _caseLength; i++) {
             _curCase = cases[i];
             _param = {
                 type: this.option.cjChart.type,
@@ -147,7 +139,7 @@ function setDataCases (cases) {
                 xAxisData: _curCase.xAxisData,
                 lineColor: _curCase.lineColor,
                 needMarkPoint: false,
-                needMarkLine: false
+                needMarkLine: false,
             };
 
             _serie = CjCharts.getSerie(_param);
@@ -155,17 +147,14 @@ function setDataCases (cases) {
             _param = null;
 
             _caseDataLength = _curCase.falseFlag.length;
-            for (var j = 0; j < _caseDataLength; j++) {
+            for (let j = 0; j < _caseDataLength; j++) {
                 if (_curCase.falseFlag[j] != 1) {
-
                     _serie.data[j].itemStyle = {
                         normal: {
-                            color: '#ccc'
-                        }
-                    }
-
+                            color: '#ccc',
+                        },
+                    };
                 }
-
             }
 
             series.push(_serie);
@@ -175,7 +164,7 @@ function setDataCases (cases) {
 
         option = {
             legend: {
-                data : legendData,
+                data: legendData,
             },
             xAxis: {
                 data: cases[0].xAxisData,
@@ -187,17 +176,17 @@ function setDataCases (cases) {
         // this.option.xAxis.data = cases[0].xAxisData;
         // this.option.series = series;
 
-        var _newOption = Object.assign({}, this.option, option);
+        let _newOption = Object.assign({}, this.option, option);
         this.option = null;
 
-        var newOption = JSON.parse(JSON.stringify(_newOption));
+        let newOption = JSON.parse(JSON.stringify(_newOption));
 
         this.option = newOption;
 
         _newOption = null;
         newOption = null;
-        
-        var optionStr = JSON.stringify(option);
+
+        let optionStr = JSON.stringify(option);
         _option = JSON.parse(optionStr);
         optionStr = null;
         legendData = null;
@@ -206,14 +195,11 @@ function setDataCases (cases) {
 
         this.chart.setCjOption(_option);
         _option = null;
-
-    }
-    else {
+    } else {
 
         // this.addDataOfToBeShow(cases);
 
     }
-
 }
 
 /**
@@ -222,83 +208,71 @@ function setDataCases (cases) {
  * @return {Array}
  */
 function getDataCases() {
-
-    var points = [];
-    var caseLength = this.cases.length;
-    for (var i = 0; i < caseLength; i++) {
-
-        var _case = this.cases[i];
-        var _point = null;
+    let points = [];
+    let caseLength = this.cases.length;
+    for (let i = 0; i < caseLength; i++) {
+        let _case = this.cases[i];
+        let _point = null;
         if (_case.length > 0) {
-
             _point = _case.shift();
-
         } else {
             _point = {
-                falseFlag: 1
-            }
+                falseFlag: 1,
+            };
         }
 
         points.push(_point);
         _point = null;
-
     }
 
     return points;
-
 }
-
 
 
 /**
  * 添加数据序列
  * @param cases : 同一时刻所有曲线的一个数据点对象所组成的数组
  */
-function addSerie (cases) {
-
-    var caseCount = cases.length;
+function addSerie(cases) {
+    let caseCount = cases.length;
     // var _this = this;
-    var _delData = null;
-    var _firstCase = cases[0];
-    var _curCase = null;
-    var _curPoint = null;
-    var _seriesData = null;
-    var _tmpDataObj = null;
-    var _option = null;
-    var _optionStr = null;
+    let _delData = null;
+    let _firstCase = cases[0];
+    let _curCase = null;
+    let _curPoint = null;
+    let _seriesData = null;
+    let _tmpDataObj = null;
+    let _option = null;
+    let _optionStr = null;
 
     _delData = this.option.xAxis.data.shift();
     _delData = null;
 
     if (_firstCase.xAxisData) {
-
-        var _newData = this.option.xAxis.data.concat(_firstCase.xAxisData);
-        var newData = JSON.parse(JSON.stringify(_newData));
+        let _newData = this.option.xAxis.data.concat(_firstCase.xAxisData);
+        let newData = JSON.parse(JSON.stringify(_newData));
         this.option.xAxis.data = null;
         _newData = null;
 
         this.option.xAxis.data = newData;
-
     } else {
-        console.log("没有找到X轴的类目数组");
+        console.log('没有找到X轴的类目数组');
     }
 
-    for (var i = 0; i < caseCount; i++) {
-
+    for (let i = 0; i < caseCount; i++) {
         _delData = this.option.series[i].data.shift();
         _delData = null;
 
         _curCase = cases[i];
         if (_curCase.data) {
-
-            for (var j = 0; j < _curCase.data.length; j++) {
+            for (let j = 0; j < _curCase.data.length; j++) {
                 _tmpDataObj = {};
 
                 _tmpDataObj.value = _curCase.data[j];
                 _tmpDataObj.itemStyle = {
                     normal: {
                         color: _curCase.lineColor,
-                    }
+                    },
                 };
 
                 if (_curCase.falseFlag != 1) {
@@ -308,11 +282,9 @@ function addSerie (cases) {
                 this.option.series[i].data.push(_tmpDataObj);
                 _tmpDataObj = null;
             }
-
         } else {
-            console.log("data is error");
+            console.log('data is error');
         }
-
     }
 
     _optionStr = JSON.stringify(this.option);
@@ -321,22 +293,19 @@ function addSerie (cases) {
 
     // CjCharts.clear(this.chart);
     this.chart.load(_option);
-
 }
 
 /**
  * 追加数据点到待显示的缓存队列中
  * @param cases : 数据对象的数组
  */
-function addDataOfToBeShow (cases) {
-
-    var caseLength = cases.length;
-    for (var i = 0; i < caseLength; i++) {
-
-        var points = [];
-        var xAxisLength = cases[i].xAxisData.length;
-        for (var j = 0; j < xAxisLength; j++) {
-            var pointObj = {};
+function addDataOfToBeShow(cases) {
+    let caseLength = cases.length;
+    for (let i = 0; i < caseLength; i++) {
+        let points = [];
+        let xAxisLength = cases[i].xAxisData.length;
+        for (let j = 0; j < xAxisLength; j++) {
+            let pointObj = {};
 
             pointObj.data = cases[i].data[j];
             pointObj.xAxisData = cases[i].xAxisData[j];
@@ -347,16 +316,14 @@ function addDataOfToBeShow (cases) {
         }
 
         if (this.cases[i]) {
-            var _cases = JSON.parse(JSON.stringify(this.cases[i]));
+            let _cases = JSON.parse(JSON.stringify(this.cases[i]));
             this.cases[i] = null;
             this.cases[i] = _cases.concat(points);
-        }
-        else {
+        } else {
             this.cases.push(points);
         }
         points = null;
     }
-
 }
 
 
@@ -369,10 +336,8 @@ function addDataOfToBeShow (cases) {
  * }
  *
  */
-function setDispalyParams (chart,param) {
-
+function setDispalyParams(chart, param) {
     chart.chartCount = param.chartCount;
-
 }
 
 

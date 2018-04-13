@@ -1,4 +1,4 @@
-var testUpp11 = function () {
+let testUpp11 = function() {
     const dgram = require('dgram');
     const server = dgram.createSocket('udp4');
 
@@ -9,14 +9,14 @@ var testUpp11 = function () {
 
     server.on('message', (msg, rinfo) => {
         console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-        var data = Buffer.from("hello");
+        let data = Buffer.from('hello');
         server.send([data], rinfo.port, rinfo.address, (err) => {
             // client.close();
         });
     });
 
     server.on('listening', () => {
-        var address = server.address();
+        let address = server.address();
         console.log(`server listening ${address.address}:${address.port}`);
     });
 

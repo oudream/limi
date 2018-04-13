@@ -5,9 +5,9 @@
  */
 
 
-var cjCharts = {
-    'version' : '1.0.0',
-    'chartParam' : {}
+let cjCharts = {
+    'version': '1.0.0',
+    'chartParam': {},
 };
 
 /**
@@ -15,8 +15,8 @@ var cjCharts = {
  * @param div : div DOM对象
  * @returns {{}} : 图表实例对象
  */
-cjCharts.init = function (div) {
-    var charts = {};
+cjCharts.init = function(div) {
+    let charts = {};
 
     charts.chart = echarts.init(div);
     charts.params = {};
@@ -24,9 +24,8 @@ cjCharts.init = function (div) {
     return charts;
 };
 
-cjCharts.clear = function (chart) {
-
-    var t = null;
+cjCharts.clear = function(chart) {
+    let t = null;
     for (t in chart) {
         if (t === 'chart') {
             if (chart[t].clear) {
@@ -37,7 +36,6 @@ cjCharts.clear = function (chart) {
 
         chart[t] = null;
     }
-
 };
 
 
@@ -84,17 +82,15 @@ cjCharts.clear = function (chart) {
  * @returns {*} : Object 图表标准格式配置对象
  */
 
-cjCharts.getOption = function (param) {
-
+cjCharts.getOption = function(param) {
     if (param.type == undefined) {
         return -1;
     }
 
-    var chartParam = {};
+    let chartParam = {};
     if (param.type == 'line' || param.type == 'bar') {
         chartParam = CjChartsCatesian.create(param.type);
-    }
-    else {
+    } else {
         return -2;
     }
 
@@ -128,7 +124,7 @@ cjCharts.getOption = function (param) {
     }
 
     if (param.dataZoom && param.dataZoom.startValue) {
-        var dataZoom = CjChartsBase.newDataZoom(param.dataZoom.startValue,param.dataZoom.endValue);
+        let dataZoom = CjChartsBase.newDataZoom(param.dataZoom.startValue, param.dataZoom.endValue);
 
         chartParam.dataZoom = [];
         chartParam.dataZoom.push(dataZoom);
@@ -136,26 +132,24 @@ cjCharts.getOption = function (param) {
 
     if (param.markPoint && param.markPoint.show == false) {
         chartParam.cjChart.markPoint = false;
-        //chartObj.params.markPoint = false;
-    }
-    else{
+        // chartObj.params.markPoint = false;
+    } else {
         chartParam.cjChart.markPoint = true;
-        //chartObj.params.markPoint = true;
+        // chartObj.params.markPoint = true;
     }
 
     if (param.markLine && param.markLine.show == false) {
         chartParam.cjChart.markLine = false;
-        //chartObj.params.markLine = false;
-    }
-    else{
+        // chartObj.params.markLine = false;
+    } else {
         chartParam.cjChart.markLine = true;
-        //chartObj.params.markLine = true;
+        // chartObj.params.markLine = true;
     }
 
-    //chartParam.series.push({
+    // chartParam.series.push({
     //    type:param.type,
     //    data:[]
-    //});
+    // });
 
     return chartParam;
 };
@@ -166,12 +160,12 @@ cjCharts.getOption = function (param) {
  * @param option : 图表标准格式配置项对象
  * @param notMerge : 是否与原来的option合并，默认false，合并
  */
-cjCharts.setOption = function (chartObj, option, notMerge) {
-    var _notMerge = false;
+cjCharts.setOption = function(chartObj, option, notMerge) {
+    let _notMerge = false;
     if (notMerge) {
         _notMerge = notMerge;
     }
-    chartObj.chart.setOption(option,_notMerge);
+    chartObj.chart.setOption(option, _notMerge);
     _notMerge = null;
 };
 
@@ -190,23 +184,19 @@ cjCharts.setOption = function (chartObj, option, notMerge) {
  * @returns {*} : 图表标准格式数据项对象
  *
 */
-cjCharts.getSerie = function (dataObj) {
-
+cjCharts.getSerie = function(dataObj) {
     if (dataObj.type == 'line' || dataObj.type == 'bar') {
-
         var serie = CjChartsCatesian.newSerie(dataObj);
-
     }
 
     if (serie) {
         serie.cjAttr = {
-            xAxisData: dataObj.xAxisData
+            xAxisData: dataObj.xAxisData,
         };
     }
 
     return serie;
 };
-
 
 
 /**
@@ -215,49 +205,45 @@ cjCharts.getSerie = function (dataObj) {
  * @param data : 数据项对象数组（或者整个配置项对象）
  *
  */
-cjCharts.load = function (chartObj, data){
-
-    //var series = [];
-    //for (var i = 0; i < cases.length; i++) {
+cjCharts.load = function(chartObj, data) {
+    // var series = [];
+    // for (var i = 0; i < cases.length; i++) {
     //    //if (chartObj.params.type == 'line') {
     //    //    serie = cjChartsLine.newSerie(cases[i].name, cases[i].data, cases[i].xAxisData, cases[i].falseFlag, cases[i].lineColor, chartObj.params.markPoint, chartObj.params.markLine);
     //    //}
     //
     //    series.push(cases[i]);
-    //}
+    // }
     //
-    //var seriesObj = {
+    // var seriesObj = {
     //    'series':series
-    //};
+    // };
     //
-    ////var option = chartObj.chart.getOption();
+    // //var option = chartObj.chart.getOption();
     //
-    ////option.series[0].data = series[0].data;
+    // //option.series[0].data = series[0].data;
 
-    var _option = null;
+    let _option = null;
     if (data.series == undefined && typeof data == 'object' && data.length > 0) {
-
         _option = {
             'xAxis': {
-                'data': data[0].cjAttr.xAxisData
+                'data': data[0].cjAttr.xAxisData,
             },
-            'series' : data
-        }
-    }
-    else if (data.series && data.series.length > 0) {
+            'series': data,
+        };
+    } else if (data.series && data.series.length > 0) {
         _option = data;
-    }
-    else {
+    } else {
         console.log('传入参数有误，请检查');
         return false;
     }
 
-    var optionStr = JSON.stringify(_option);
-    var option = JSON.parse(optionStr);
+    let optionStr = JSON.stringify(_option);
+    let option = JSON.parse(optionStr);
     _option = null;
     optionStr = null;
 
-    cjCharts.setOption(chartObj,option);
+    cjCharts.setOption(chartObj, option);
 
     return true;
 };
@@ -269,34 +255,34 @@ cjCharts.load = function (chartObj, data){
  */
 var CjChartsBase = {
 
-    'create' : function () {
-        var obj = {};
+    'create': function() {
+        let obj = {};
 
         obj.title = {
             'text': '',
             'subtext': '',
-            'x': ''
+            'x': '',
         };
 
         obj.tooltip = {
             'trigger': '',
-            'formatter': ''
+            'formatter': '',
         };
 
         obj.toolbox = {
-            'show' : true,
-            'feature' : {
-                'dataView' : {show: false, readOnly: false},
-                'dataZoom' : {show: false, xAxisIndex: '', yAxisIndex: 'none'},
-                'magicType' : {show: true, type: ['line', 'bar']},
-                'restore' : {show: true},
-                'saveAsImage' : {show: true}
-            }
+            'show': true,
+            'feature': {
+                'dataView': {show: false, readOnly: false},
+                'dataZoom': {show: false, xAxisIndex: '', yAxisIndex: 'none'},
+                'magicType': {show: true, type: ['line', 'bar']},
+                'restore': {show: true},
+                'saveAsImage': {show: true},
+            },
         };
 
         obj.legend = {
             'orient': '',
-            'data': []
+            'data': [],
         };
 
         obj.xAxis = {
@@ -304,7 +290,7 @@ var CjChartsBase = {
             'name': '',
             'nameLocation': 'end',
             'data': [],
-            'axisLabel': {formatter: null}
+            'axisLabel': {formatter: null},
         };
 
         obj.yAxis = {
@@ -312,13 +298,13 @@ var CjChartsBase = {
             'name': '',
             'nameLocation': 'end',
             'data': [],
-            'axisLabel': {formatter: null}
+            'axisLabel': {formatter: null},
         };
 
         obj.cjChart = {
             'type': '',
             'markPoint': true,
-            'markLine' : true
+            'markLine': true,
         };
 
         obj.series = [];
@@ -326,18 +312,17 @@ var CjChartsBase = {
         return obj;
     },
 
-    'newDataZoom' : function (startValue, endValue) {
-
-        var obj = {
+    'newDataZoom': function(startValue, endValue) {
+        let obj = {
             // 第一个 dataZoom 组件
-            'type' : 'inside',
-            'xAxisIndex' : 0, // 表示这个 dataZoom 组件控制 第一个 xAxis
-            'startValue' : startValue,
-            'endValue' : endValue
+            'type': 'inside',
+            'xAxisIndex': 0, // 表示这个 dataZoom 组件控制 第一个 xAxis
+            'startValue': startValue,
+            'endValue': endValue,
         };
 
         return obj;
-    }
+    },
 };
 
 /**
@@ -346,9 +331,8 @@ var CjChartsBase = {
  */
 var CjChartsCatesian = {
 
-    'create' : function (type) {
-
-        var obj = CjChartsBase.create();
+    'create': function(type) {
+        let obj = CjChartsBase.create();
 
         obj.title.x = 'left';
 
@@ -361,9 +345,8 @@ var CjChartsCatesian = {
         return obj;
     },
 
-    'newSerie' : function (param) {
-
-        var _name = param.name,
+    'newSerie': function(param) {
+        let _name = param.name,
             _type = param.type,
             _data = param.data,
             _xAxisData = param.xAxisData,
@@ -372,49 +355,44 @@ var CjChartsCatesian = {
             _needMarkLine = param.needMarkLine;
 
         if (_data.length > 0 && _xAxisData.length > 0 && _data.length != _xAxisData.length) {
-            console.log("数据项个数与X轴类目个数对不上，请检查！！");
+            console.log('数据项个数与X轴类目个数对不上，请检查！！');
             return false;
         }
 
-        var obj = {
-            'name' : _name,
-            'type' : _type,
-            'itemStyle':{},
+        let obj = {
+            'name': _name,
+            'type': _type,
+            'itemStyle': {},
             'markPoint': {},
-            'markLine': {}
+            'markLine': {},
         };
 
-        var dispData = [];
-        var loopArray = [];
+        let dispData = [];
+        let loopArray = [];
 
         if (_xAxisData.length == 0) {
             loopArray = _data;
-        }
-        else {
+        } else {
             loopArray = _xAxisData;
         }
 
-        for (var i = 0; i < loopArray.length; i++) {
-
+        for (let i = 0; i < loopArray.length; i++) {
             var item;
             if (_xAxisData.length == 0) {
                 item = loopArray[i];
-            }
-            else {
-                var dataObj = {};
+            } else {
+                let dataObj = {};
 
                 if (_data[i]) {
-                    //dataObj.value = [_xAxisData[i], _data[i]];
+                    // dataObj.value = [_xAxisData[i], _data[i]];
                     dataObj.value = _data[i];
-                }
-                else {
-                    //dataObj.value = [_xAxisData[i], '-'];
+                } else {
+                    // dataObj.value = [_xAxisData[i], '-'];
                     dataObj.value = '-';
                 }
 
 
                 item = dataObj;
-
             }
             dispData.push(item);
         }
@@ -423,7 +401,7 @@ var CjChartsCatesian = {
 
         if (_lineColor) {
             obj.itemStyle.normal = {
-                'color': _lineColor
+                'color': _lineColor,
             };
         }
 
@@ -431,31 +409,29 @@ var CjChartsCatesian = {
             obj.markPoint = {
                 data: [
                     {type: 'max', name: '最大值'},
-                    {type: 'min', name: '最小值'}
-                ]
-            }
+                    {type: 'min', name: '最小值'},
+                ],
+            };
         }
 
         if (_needMarkLine == true) {
             obj.markLine = {
                 data: [
-                    {type: 'average', name: '平均值'}
-                ]
-            }
+                    {type: 'average', name: '平均值'},
+                ],
+            };
         }
 
         return obj;
-    }
+    },
 
 };
 
-function copyArray (array) {
-
-    var _array = [];
-    for (var i = 0; i < array.length; i++) {
+function copyArray(array) {
+    let _array = [];
+    for (let i = 0; i < array.length; i++) {
         _array[i] = array[i];
     }
 
     return _array;
-
 }

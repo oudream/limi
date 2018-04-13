@@ -1,14 +1,13 @@
 /**
  * Created by liuchaoyu on 2017-03-08.
  */
-"use strict";
+'use strict';
 
 
 const path = require('path');
 const fs = require('fs');
 
-function loadConfigFile (filePath) {
-
+function loadConfigFile(filePath) {
     if (!filePath) {
         return -1;
     }
@@ -24,18 +23,16 @@ function loadConfigFile (filePath) {
     return JSON.parse(fs.readFileSync(filePath));
 }
 
-function saveConfigFile (filePath, config) {
-
+function saveConfigFile(filePath, config) {
     if (!filePath || !config) {
         return -1;
     }
 
-    return fs.writeFileSync(filePath, JSON.stringify(config,null,2));
-
+    return fs.writeFileSync(filePath, JSON.stringify(config, null, 2));
 }
 
 
 module.exports = {
-    load : loadConfigFile,
-    save : saveConfigFile,
+    load: loadConfigFile,
+    save: saveConfigFile,
 };

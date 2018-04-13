@@ -6,297 +6,289 @@
  */
 
 
-var cjEchartsConfig = {
-    version: "1.0.0",
+let cjEchartsConfig = {
+    version: '1.0.0',
 };
 
-var sysDate = new Date();
+let sysDate = new Date();
 
-var systemDate = {
+let systemDate = {
     year: sysDate.getFullYear(),
     month: sysDate.getMonth() + 1,
-    day: sysDate.getDate()
+    day: sysDate.getDate(),
 };
 
-var datePickerOption = {
-    "minDate":"2000-1-1",
-    "maxDate":"2050-12-31",
+let datePickerOption = {
+    'minDate': '2000-1-1',
+    'maxDate': '2050-12-31',
 
-    "yearRange":[2000,2050],
+    'yearRange': [2000, 2050],
 
-    "buttonOnClick":function(startDate,endDate){
-        StatisticsLine.start(startDate,endDate);
-    }
-}
+    'buttonOnClick': function(startDate, endDate) {
+        StatisticsLine.start(startDate, endDate);
+    },
+};
 
 
-cjEchartsConfig.getExtentByUrl = function(url){
-
-    var days = 0;
-    switch (url)
-    {
-        case "statistics.histogram.week":    //柱状图
+cjEchartsConfig.getExtentByUrl = function(url) {
+    let days = 0;
+    switch (url) {
+    case 'statistics.histogram.week':    // 柱状图
         {
             days = 7;
         }
-            break;
-        case "statistics.histogram.month":   //柱状图
+        break;
+    case 'statistics.histogram.month':   // 柱状图
         {
             days = 30;
         }
-            break;
-        case "statistics.pie.month":  //饼状图
+        break;
+    case 'statistics.pie.month':  // 饼状图
         {
             days = 30;
         }
-            break;
-        case "statistics.line.null":  //折线图
+        break;
+    case 'statistics.line.null':  // 折线图
         {
             days = 30;
         }
-            break;
-        case "statistics.dashboard.null":  //仪表盘
+        break;
+    case 'statistics.dashboard.null':  // 仪表盘
         {
         }
-            break;
+        break;
     }
     return days;
-}
+};
 
 
-var cjEchartsHistConfig = {
-    title:systemDate.year + "年" + systemDate.month + "月" + "存样柜统计数据",
-    subTitle:"xxx区域",
+let cjEchartsHistConfig = {
+    title: systemDate.year + '年' + systemDate.month + '月' + '存样柜统计数据',
+    subTitle: 'xxx区域',
 
-    xAxisType:"date",
-    xAxisStartPoint:"",
-    xAxisEndPoint:"",
+    xAxisType: 'date',
+    xAxisStartPoint: '',
+    xAxisEndPoint: '',
 
-    xAxisUnit:"日期",
-    yAxisUnit:"个",
+    xAxisUnit: '日期',
+    yAxisUnit: '个',
 
-    legendMap:{
-        "21":"存样",
-        "11":"存样",
-        "22":"取样",
-        "12":"取样",
-        "32":"弃样",
-        "31":"弃样"
+    legendMap: {
+        '21': '存样',
+        '11': '存样',
+        '22': '取样',
+        '12': '取样',
+        '32': '弃样',
+        '31': '弃样',
     },
 
-    setStartAndEndPoint:function(start,end){
+    setStartAndEndPoint: function(start, end) {
         this.xAxisStartPoint = start;
         this.xAxisEndPoint = end;
     },
 
-    buildJsonObjByUrl:function(){
-        var cjCommon = window.cjCommon;
-        var url = cjCommon.getUrlParam("url");
-        var type = cjCommon.getUrlParam("type");
-        var sql = cjEchartsConfig.getSql570(url,type);
-        if( sql == undefined || sql == "" ){
+    buildJsonObjByUrl: function() {
+        let cjCommon = window.cjCommon;
+        let url = cjCommon.getUrlParam('url');
+        let type = cjCommon.getUrlParam('type');
+        let sql = cjEchartsConfig.getSql570(url, type);
+        if ( sql == undefined || sql == '' ) {
             return;
         }
 
-        var sqlObj = JSON.parse(sql);
-        var sqlStr = sqlObj.sql;
+        let sqlObj = JSON.parse(sql);
+        let sqlStr = sqlObj.sql;
 
-        var days = cjEchartsConfig.getExtentByUrl(url);
+        let days = cjEchartsConfig.getExtentByUrl(url);
 
-        var start;
-        var end;
-        if (arguments.length > 0){
+        let start;
+        let end;
+        if (arguments.length > 0) {
             start = arguments[0];
             end = arguments[1];
-        }
-        else {
+        } else {
             start = getDatebeforeDay(days);
-            end = systemDate.year + "-" + systemDate.month + "-" + systemDate.day;
+            end = systemDate.year + '-' + systemDate.month + '-' + systemDate.day;
         }
-        //var start = "2016-4-1";
-        //var end = "2016-4-11";
+        // var start = "2016-4-1";
+        // var end = "2016-4-11";
 
-        sqlObj.sql = sqlStr.replace(/%t1/g,start);
+        sqlObj.sql = sqlStr.replace(/%t1/g, start);
         sqlStr = sqlObj.sql;
-        sqlObj.sql = sqlStr.replace(/%t2/g,end);
+        sqlObj.sql = sqlStr.replace(/%t2/g, end);
 
-        this.setStartAndEndPoint(start,end);
+        this.setStartAndEndPoint(start, end);
 
         return sqlObj;
     },
 
 };
 
-var cjEchartsPieConfig = {
-    title:systemDate.year + "年" + systemDate.month + "月" + "存样柜统计数据",
-    subTitle:"xxx区域",
-    x:"center",
+let cjEchartsPieConfig = {
+    title: systemDate.year + '年' + systemDate.month + '月' + '存样柜统计数据',
+    subTitle: 'xxx区域',
+    x: 'center',
 
-    legendMap:{
-        "21":"存样",
-        "11":"存样",
-        "22":"取样",
-        "12":"取样",
-        "32":"弃样",
-        "31":"弃样"
+    legendMap: {
+        '21': '存样',
+        '11': '存样',
+        '22': '取样',
+        '12': '取样',
+        '32': '弃样',
+        '31': '弃样',
     },
 
-    buildJsonObjByUrl:function(){
-        var cjCommon = window.cjCommon;
-        var url = cjCommon.getUrlParam("url");
-        var type = cjCommon.getUrlParam("type");
-        var sql = cjEchartsConfig.getSql570(url,type);
-        if( sql == undefined || sql == "" ){
+    buildJsonObjByUrl: function() {
+        let cjCommon = window.cjCommon;
+        let url = cjCommon.getUrlParam('url');
+        let type = cjCommon.getUrlParam('type');
+        let sql = cjEchartsConfig.getSql570(url, type);
+        if ( sql == undefined || sql == '' ) {
             return;
         }
 
-        var sqlObj = JSON.parse(sql);
-        var sqlStr = sqlObj.sql;
+        let sqlObj = JSON.parse(sql);
+        let sqlStr = sqlObj.sql;
 
-        var days = cjEchartsConfig.getExtentByUrl(url);
+        let days = cjEchartsConfig.getExtentByUrl(url);
 
-        var start;
-        var end;
-        if (arguments.length > 0){
+        let start;
+        let end;
+        if (arguments.length > 0) {
             start = arguments[0];
             end = arguments[1];
-        }
-        else {
+        } else {
             start = getDatebeforeDay(days);
-            end = systemDate.year + "-" + systemDate.month + "-" + systemDate.day;
+            end = systemDate.year + '-' + systemDate.month + '-' + systemDate.day;
         }
 
-        //var start = "2016-4-1";
-        //var end = "2016-4-11";
+        // var start = "2016-4-1";
+        // var end = "2016-4-11";
 
-        sqlObj.sql = sqlStr.replace(/%t1/g,start);
+        sqlObj.sql = sqlStr.replace(/%t1/g, start);
         sqlStr = sqlObj.sql;
-        sqlObj.sql = sqlStr.replace(/%t2/g,end);
+        sqlObj.sql = sqlStr.replace(/%t2/g, end);
 
         return sqlObj;
     },
 
 };
 
-var cjEchartsLineConfig = {
-    title:"存样柜使用统计数据",
-    subTitle:"xxx区域",
+let cjEchartsLineConfig = {
+    title: '存样柜使用统计数据',
+    subTitle: 'xxx区域',
 
-    xAxisType:"date",
-    xAxisStartPoint:"",
-    xAxisEndPoint:"",
+    xAxisType: 'date',
+    xAxisStartPoint: '',
+    xAxisEndPoint: '',
 
-    xAxisUnit:"日期",
-    yAxisUnit:"个",
+    xAxisUnit: '日期',
+    yAxisUnit: '个',
 
-    legendMap:{
-        "21":"存样",
-        "11":"存样",
-        "22":"取样",
-        "12":"取样",
-        "32":"弃样",
-        "31":"弃样"
+    legendMap: {
+        '21': '存样',
+        '11': '存样',
+        '22': '取样',
+        '12': '取样',
+        '32': '弃样',
+        '31': '弃样',
     },
 
-    setStartAndEndPoint:function(start,end){
+    setStartAndEndPoint: function(start, end) {
         this.xAxisStartPoint = start;
         this.xAxisEndPoint = end;
     },
 
-    buildJsonObjByUrl:function(){
-        var cjCommon = window.cjCommon;
-        var url = cjCommon.getUrlParam("url");
-        var type = cjCommon.getUrlParam("type");
-        var sql = cjEchartsConfig.getSql570(url,type);
-        if( sql == undefined || sql == "" ){
+    buildJsonObjByUrl: function() {
+        let cjCommon = window.cjCommon;
+        let url = cjCommon.getUrlParam('url');
+        let type = cjCommon.getUrlParam('type');
+        let sql = cjEchartsConfig.getSql570(url, type);
+        if ( sql == undefined || sql == '' ) {
             return;
         }
 
-        var sqlObj = JSON.parse(sql);
-        var sqlStr = sqlObj.sql;
+        let sqlObj = JSON.parse(sql);
+        let sqlStr = sqlObj.sql;
 
-        var days = cjEchartsConfig.getExtentByUrl(url);
+        let days = cjEchartsConfig.getExtentByUrl(url);
 
-        var start;
-        var end;
-        if (arguments.length > 0){
+        let start;
+        let end;
+        if (arguments.length > 0) {
             start = arguments[0];
             end = arguments[1];
-        }
-        else {
+        } else {
             start = getDatebeforeDay(days);
-            end = systemDate.year + "-" + systemDate.month + "-" + systemDate.day;
+            end = systemDate.year + '-' + systemDate.month + '-' + systemDate.day;
         }
-        //var start = "2016-4-1";
-        //var end = "2016-4-11";
+        // var start = "2016-4-1";
+        // var end = "2016-4-11";
 
-        sqlObj.sql = sqlStr.replace(/%t1/g,start);
+        sqlObj.sql = sqlStr.replace(/%t1/g, start);
         sqlStr = sqlObj.sql;
-        sqlObj.sql = sqlStr.replace(/%t2/g,end);
+        sqlObj.sql = sqlStr.replace(/%t2/g, end);
 
-        this.setStartAndEndPoint(start,end);
+        this.setStartAndEndPoint(start, end);
 
         return sqlObj;
     },
 
 };
 
-var cjEchartsDashBoardConfig = {
-    title:"存样柜仓位使用率",
-    subTitle:"xxx区域",
-    x:"center",
+let cjEchartsDashBoardConfig = {
+    title: '存样柜仓位使用率',
+    subTitle: 'xxx区域',
+    x: 'center',
 
-    name:"使用率",
+    name: '使用率',
 
-    buildJsonObjByUrl:function(){
-        var cjCommon = window.cjCommon;
-        var url = cjCommon.getUrlParam("url");
-        var type = cjCommon.getUrlParam("type");
-        var sql = cjEchartsConfig.getSql570(url,type);
-        if( sql == undefined || sql == "" ){
+    buildJsonObjByUrl: function() {
+        let cjCommon = window.cjCommon;
+        let url = cjCommon.getUrlParam('url');
+        let type = cjCommon.getUrlParam('type');
+        let sql = cjEchartsConfig.getSql570(url, type);
+        if ( sql == undefined || sql == '' ) {
             return;
         }
 
         return JSON.parse(sql);
     },
 
-    getSqlOfTotalCount:function() {
-        var sqlCommand = "select count(1) as 'data' from T_570_RT_STATE where F_IS_USED in (0,1)";
+    getSqlOfTotalCount: function() {
+        let sqlCommand = 'select count(1) as \'data\' from T_570_RT_STATE where F_IS_USED in (0,1)';
         return sqlCommand;
-    }
+    },
 
 };
-
 
 
 /*
  * 获取相应天数前的日期
  * 参数：days，几天前
  * */
-function getDatebeforeDay(days)
-{
-    var retMonth = 0;
-    var retDay = 0;
+function getDatebeforeDay(days) {
+    let retMonth = 0;
+    let retDay = 0;
 
-    if( days == undefined || days == "" || days == null || days == 0 ){
-        return systemDate.year + "-" + systemDate.month + "-" + systemDate.day;
+    if ( days == undefined || days == '' || days == null || days == 0 ) {
+        return systemDate.year + '-' + systemDate.month + '-' + systemDate.day;
     }
 
     days -= 1;
 
-    if( systemDate.day <= days ){
-        var beforeDate = new Date(systemDate.year,systemDate.month - 1,0);
-        var maxDayBeforeMonth = beforeDate.getDate();
+    if ( systemDate.day <= days ) {
+        let beforeDate = new Date(systemDate.year, systemDate.month - 1, 0);
+        let maxDayBeforeMonth = beforeDate.getDate();
 
         retDay = maxDayBeforeMonth + (systemDate.day - days);
         retMonth = systemDate.month - 1;
-    }
-    else{
+    } else {
         retDay = systemDate.day - days;
         retMonth = systemDate.month;
     }
 
-    return systemDate.year + "-" + retMonth + "-" + retDay;
+    return systemDate.year + '-' + retMonth + '-' + retDay;
 }
 
 /*
@@ -304,16 +296,14 @@ function getDatebeforeDay(days)
  * 参数：startDate,开始日期
  *       endDate,结束日期
  * */
-function getArrayBetweenDate(startDate,endDate)
-{
-    if( startDate == undefined || endDate == undefined || startDate == "" || endDate == "" ){
+function getArrayBetweenDate(startDate, endDate) {
+    if ( startDate == undefined || endDate == undefined || startDate == '' || endDate == '' ) {
         return false;
     }
 
-    function getDate(str)
-    {
-        var tempDate = new Date();
-        var list = str.split("-");
+    function getDate(str) {
+        let tempDate = new Date();
+        let list = str.split('-');
         tempDate.setFullYear(list[0]);
         tempDate.setMonth(list[1] - 1);
         tempDate.setDate(list[2]);
@@ -323,38 +313,35 @@ function getArrayBetweenDate(startDate,endDate)
     /*
      * 对于单位数月份和日期，进行自动补‘0’
      * */
-    function completeZero(date){
-        var monthStr;
-        var dayStr;
-        if( (date.getMonth() + 1) < 10 ){
-            monthStr = "0" + (date.getMonth() + 1).toString();
-        }
-        else{
+    function completeZero(date) {
+        let monthStr;
+        let dayStr;
+        if ( (date.getMonth() + 1) < 10 ) {
+            monthStr = '0' + (date.getMonth() + 1).toString();
+        } else {
             monthStr = (date.getMonth() + 1).toString();
         }
 
-        if( date.getDate() < 10 ){
-            dayStr = "0" + (date.getDate()).toString();
-        }
-        else{
+        if ( date.getDate() < 10 ) {
+            dayStr = '0' + (date.getDate()).toString();
+        } else {
             dayStr = (date.getDate()).toString();
         }
 
-        return date.getFullYear() + "-" + monthStr + "-" + dayStr;
+        return date.getFullYear() + '-' + monthStr + '-' + dayStr;
     }
 
-    var date1 = getDate(startDate);
-    var date2 = getDate(endDate);
+    let date1 = getDate(startDate);
+    let date2 = getDate(endDate);
 
     if (date1 > date2) {
-        var tempDate = date1;
+        let tempDate = date1;
         date1 = date2;
         date2 = tempDate;
     }
 
-    var dateArray = [];
+    let dateArray = [];
     while (!(date1.getFullYear() == date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() == date2.getDate())) {
-
         var dateStr = completeZero(date1);
 
         dateArray.push(dateStr);
@@ -372,56 +359,43 @@ function getArrayBetweenDate(startDate,endDate)
 * 分割线 =============================================
 * */
 
-var map = {};
+let map = {};
 
-//////////////////////////////////container
+// ////////////////////////////////container
 
-function ParseCoordinates(str_xy,pathType)
-{
-
-    var xyArray = str_xy.split(" ");
-    var xyInfo = {};
-    if(xyArray.length>1)
-    {
+function ParseCoordinates(str_xy, pathType) {
+    let xyArray = str_xy.split(' ');
+    let xyInfo = {};
+    if (xyArray.length>1) {
         xyInfo.type = pathType;
         xyInfo.x = xyArray[0];
         xyInfo.y = xyArray[1];
-    }
-    else if(xyArray.length<2&&xyArray.length>0) {
-        if(pathType ==="H")
-        {
+    } else if (xyArray.length<2&&xyArray.length>0) {
+        if (pathType ==='H') {
             xyInfo.type = pathType;
             xyInfo.x = xyArray[0];
             xyInfo.y = pathArray[pathArray.length-1].y;
-        }else if(pathType ==="V")
-        {
+        } else if (pathType ==='V') {
             xyInfo.type =pathType;
             xyInfo.x = pathArray[pathArray.length-1].x;
             xyInfo.y = xyArray[0];
         }
-
-    }
-    else
-    {
+    } else {
         return null;
     }
     return xyInfo;
 }
 
 
-function tanAngle(width,height)
-{
+function tanAngle(width, height) {
     return height/width;
 }
-function findPathLocation(path)
-{
-    var len=path.length;
-    var pathLocationArray = new Array();
-    for(var i=0;i<len;i++)
-    {
-        if(path[i] ==="M"||path[i] ==="H"||path[i] ==="L"||path[i] ==="Z")
-        {
-            var info = {};
+function findPathLocation(path) {
+    let len=path.length;
+    let pathLocationArray = new Array();
+    for (let i=0; i<len; i++) {
+        if (path[i] ==='M'||path[i] ==='H'||path[i] ==='L'||path[i] ==='Z') {
+            let info = {};
             info.type = path[i];
             info.location = i;
             pathLocationArray.push(info);
@@ -434,141 +408,125 @@ function findPathLocation(path)
  * drawRontainer 漏斗
  * higConfig: 参数对象
  * */
-cjEchartsConfig.drawRontainer = function(svgId,emtId,measure)
-{
-    if(measure>90)
-    {
+cjEchartsConfig.drawRontainer = function(svgId, emtId, measure) {
+    if (measure>90) {
         measure = 90;
     }
-    var color = "steelblue";
-    var b = measure % 2
-    if (b === 0)
-    {
-        color = "#28ff28";
+    let color = 'steelblue';
+    let b = measure % 2;
+    if (b === 0) {
+        color = '#28ff28';
     }
-    var svg = d3.selectAll("[id="+svgId+"]");
-    var rontainer = d3.selectAll("[id="+emtId+"]");
-    var path_d = rontainer.attr("d");
-    var pathArray = ParsePath(path_d);
+    let svg = d3.selectAll('[id='+svgId+']');
+    let rontainer = d3.selectAll('[id='+emtId+']');
+    let path_d = rontainer.attr('d');
+    let pathArray = ParsePath(path_d);
 
-    var v_Height = pathArray[2].y - pathArray[1].y;
-    var heightScale = d3.scale.linear()
-        .domain([0,100])
-        .range([v_Height,0]);
+    let v_Height = pathArray[2].y - pathArray[1].y;
+    let heightScale = d3.scale.linear()
+        .domain([0, 100])
+        .range([v_Height, 0]);
 
     //   var angle = getAngle(pathArray[2],pathArray[1]);
     var dd;
 
-    var Y_height = heightScale(measure);
-    var tan = tanAngle(pathArray[1].x-pathArray[2].x,v_Height);
+    let Y_height = heightScale(measure);
+    let tan = tanAngle(pathArray[1].x-pathArray[2].x, v_Height);
     var dd = (v_Height-Y_height)/tan;
-    var Mx_first = pathArray[3].x - ((v_Height-Y_height)/tan);
+    let Mx_first = pathArray[3].x - ((v_Height-Y_height)/tan);
 
-    var My_first = Y_height;
+    let My_first = Y_height;
 
-    var Lx_to = Number((v_Height-Y_height)/tan) + Number(pathArray[2].x);
-    var Ly_to = Y_height;
+    let Lx_to = Number((v_Height-Y_height)/tan) + Number(pathArray[2].x);
+    let Ly_to = Y_height;
 
-    var d = "M"+Mx_first+" "+My_first+" "+"L"+Lx_to+" "+Ly_to+" "+"L"+pathArray[2].x
-        +" "+pathArray[2].y+" "+pathArray[3].x+" "+pathArray[3].y;
+    let d = 'M'+Mx_first+' '+My_first+' '+'L'+Lx_to+' '+Ly_to+' '+'L'+pathArray[2].x
+        +' '+pathArray[2].y+' '+pathArray[3].x+' '+pathArray[3].y;
 
 
-    var newPathId = null;
-    if(emtId in map)
-    {
+    let newPathId = null;
+    if (emtId in map) {
         newPathId = map[emtId];
-    }else
-    {
-        var mysavePathId = {
-            nowPathId: "measurePath" + measure,
-            beforePathId: null
+    } else {
+        let mysavePathId = {
+            nowPathId: 'measurePath' + measure,
+            beforePathId: null,
         };
         map[emtId] = mysavePathId;
     }
 
-    svg.append("path")
-        .attr("class","axis")
-        .attr("id","measurePath"+measure)
-        .attr("stroke","steelblue")
-        .attr("stroke-width","2")
-        .attr("fill",color)
-        .attr("d",d);
+    svg.append('path')
+        .attr('class', 'axis')
+        .attr('id', 'measurePath'+measure)
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', '2')
+        .attr('fill', color)
+        .attr('d', d);
 
 
-    if(newPathId!=null||newPathId!=undefined)
-    {
-
-        var beforePath = document.getElementById(newPathId.beforePathId);
-        var _parentElement = beforePath.parentNode;
-        if(_parentElement){
+    if (newPathId!=null||newPathId!=undefined) {
+        let beforePath = document.getElementById(newPathId.beforePathId);
+        let _parentElement = beforePath.parentNode;
+        if (_parentElement) {
             _parentElement.removeChild(beforePath);
         }
         //  measurePath.attr("d",d);
     }
-    map[emtId].beforePathId = "measurePath"+measure;
+    map[emtId].beforePathId = 'measurePath'+measure;
+};
 
-}
 
+function ParsePath(path) {
+    let pathArray = new Array();
 
-function ParsePath(path)
-{
-    var pathArray = new Array();
-
-    var pathLocationArray = findPathLocation(path);
-    var len=pathLocationArray.length-1;
-    for(var i= 0;i<len;++i)
-    {
-        var sub = path.substring(pathLocationArray[i].location+1,pathLocationArray[i+1].location-1);
-        var xyArray = ParseCoordinates(sub,pathLocationArray[i].type);
-        if(xyArray!=null) {
-            pathArray.push(xyArray);    //解析XY坐标
+    let pathLocationArray = findPathLocation(path);
+    let len=pathLocationArray.length-1;
+    for (let i= 0; i<len; ++i) {
+        let sub = path.substring(pathLocationArray[i].location+1, pathLocationArray[i+1].location-1);
+        let xyArray = ParseCoordinates(sub, pathLocationArray[i].type);
+        if (xyArray!=null) {
+            pathArray.push(xyArray);    // 解析XY坐标
         }
     }
     return pathArray;
 }
 
 
-
-cjEchartsConfig.getSql570 = function(url,type)
-{
-    var sql = "";
-    switch (url)
-    {
-        case "statistics.histogram.week":
-        case "statistics.histogram.month":
+cjEchartsConfig.getSql570 = function(url, type) {
+    let sql = '';
+    switch (url) {
+    case 'statistics.histogram.week':
+    case 'statistics.histogram.month':
         {
-            if (type == "21") {
-                sql = window.cjSql570.getSqlJson("save", false);
-            }
-            else if (type == "22") {
-                sql = window.cjSql570.getSqlJson("take", false);
-            }
-            else if (type == "23") {
-                sql = window.cjSql570.getSqlJson("throw", false);
+            if (type == '21') {
+                sql = window.cjSql570.getSqlJson('save', false);
+            } else if (type == '22') {
+                sql = window.cjSql570.getSqlJson('take', false);
+            } else if (type == '23') {
+                sql = window.cjSql570.getSqlJson('throw', false);
             }
         }
-            break;
+        break;
 
-        case "statistics.pie.month":
+    case 'statistics.pie.month':
         {
-            sql = window.cjSql570.getSqlJson("pie_sql", false);
+            sql = window.cjSql570.getSqlJson('pie_sql', false);
         }
-            break;
+        break;
 
-        case "statistics.line.null":  //折线图
+    case 'statistics.line.null':  // 折线图
         {
-            sql = window.cjSql570.getSqlJson("line_sql",false);
+            sql = window.cjSql570.getSqlJson('line_sql', false);
         }
-            break;
+        break;
 
-        case "statistics.dashboard.null":  //仪表盘
+    case 'statistics.dashboard.null':  // 仪表盘
         {
-            sql = window.cjSql570.getSqlJson("dashboard_sql",false);
+            sql = window.cjSql570.getSqlJson('dashboard_sql', false);
         }
-            break;
+        break;
     }
     return sql;
-}
-
+};
 
 

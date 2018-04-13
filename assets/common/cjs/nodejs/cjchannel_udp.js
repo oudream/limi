@@ -1,6 +1,6 @@
 
 const dgram = require('dgram');
-var fs = require('fs');
+let fs = require('fs');
 
 exports = module.exports = CjChannelUdp;
 
@@ -13,9 +13,9 @@ function CjChannelUdp() {
     this.onReceived = null;
 }
 
-CjChannelUdp.prototype.receivedData = function (data, rinfo) {
-  console.log('received data: ', data.length);
-  if (this.onReceived) this.onReceived(data);
+CjChannelUdp.prototype.receivedData = function(data, rinfo) {
+    console.log('received data: ', data.length);
+    if (this.onReceived) this.onReceived(data);
   // var data = Buffer.from('hello')
   // this._udpSocket.send([data], rinfo.port, rinfo.address, (err) => {
   //   // client.close();
@@ -23,14 +23,14 @@ CjChannelUdp.prototype.receivedData = function (data, rinfo) {
   // )
 };
 
-CjChannelUdp.prototype.sendData = function (data) {
+CjChannelUdp.prototype.sendData = function(data) {
     if (this.isOpen()) {
         if (Number.isNaN(parseInt(this.connectParams.RemotePort))) {
             return 0;
         }
         this._udpSocket.send(data, this.connectParams.RemotePort, this.connectParams.RemoteIpAddress, (err) => {
             if (err !== null) {
-              console.log(err);
+                console.log(err);
             }
         });
     }
@@ -43,39 +43,41 @@ CjChannelUdp.CI_ConnectState_Connecting = 2;
 CjChannelUdp.CI_ConnectState_ConnectTimeout = 3;
 CjChannelUdp.CI_ConnectState_Connected = 4;
 
-CjChannelUdp.CS_EntryRemoteIpAddress   = "RemoteIpAddress";
-CjChannelUdp.CS_EntryRemotePort        = "RemotePort";
-CjChannelUdp.CS_EntryLocalIpAddress    = "LocalIpAddress";
-CjChannelUdp.CS_EntryLocalPort         = "LocalPort";
+CjChannelUdp.CS_EntryRemoteIpAddress = 'RemoteIpAddress';
+CjChannelUdp.CS_EntryRemotePort = 'RemotePort';
+CjChannelUdp.CS_EntryLocalIpAddress = 'LocalIpAddress';
+CjChannelUdp.CS_EntryLocalPort = 'LocalPort';
 
 /**
  * @param option = {LocalIpAddress:'127.0.0.1', LocalPort: 5555, RemoteIpAddress: '127.0.0,.1', RemotePort: 5556};
  */
-CjChannelUdp.prototype.open = function (option) {
+CjChannelUdp.prototype.open = function(option) {
     // var option = {port:5555, ip:'127.0.0.1'};
-    if (this._udpSocket)
+    if (this._udpSocket) {
         return;
-    if (this.connectState === CjChannelUdp.CI_ConnectState_Connecting)
+    }
+    if (this.connectState === CjChannelUdp.CI_ConnectState_Connecting) {
         return;
+    }
 
-    var self = this;
+    let self = this;
 
     if (option) self.connectParams = option;
 
     if (Number.isNaN(parseInt(self.connectParams.LocalPort))) {
-        console.log("open fail. connectParams.LocalPort is invalid.");
+        console.log('open fail. connectParams.LocalPort is invalid.');
         return;
     }
 
     if (Number.isNaN(parseInt(self.connectParams.RemotePort))) {
-        console.log("connectParams.RemotePort is invalid.");
+        console.log('connectParams.RemotePort is invalid.');
     }
 
     self.connectState = CjChannelUdp.CI_ConnectState_Connecting;
 
-    var udpSocket = null;
+    let udpSocket = null;
 
-    var connectTimeout = function () {
+    let connectTimeout = function() {
         self.connectState = CjChannelUdp.CI_ConnectState_ConnectTimeout;
         self._udpSocket = null;
         if (udpSocket) {
@@ -83,17 +85,17 @@ CjChannelUdp.prototype.open = function (option) {
         }
         console.log('connect timeout.');
     };
-    var timeout = setTimeout(connectTimeout, 5 * 1000);
+    let timeout = setTimeout(connectTimeout, 5 * 1000);
 
     udpSocket = dgram.createSocket('udp4');
 
-    udpSocket.on('error', function (err) {
+    udpSocket.on('error', function(err) {
         self._udpSocket = null;
         self.connectState = CjChannelUdp.CI_ConnectState_Disconnected;
         self.close();
     });
 
-    udpSocket.on('message', function (msg, rinfo) {
+    udpSocket.on('message', function(msg, rinfo) {
         self.receivedData.call(self, msg, rinfo);
     });
 
@@ -103,9 +105,9 @@ CjChannelUdp.prototype.open = function (option) {
             return;
         }
 
-        clearTimeout(timeout)
+        clearTimeout(timeout);
 
-        //'connect' listener
+        // 'connect' listener
         console.log('connected to server!');
 
         self._udpSocket = udpSocket;
@@ -115,24 +117,24 @@ CjChannelUdp.prototype.open = function (option) {
     // if (self.connectParams.LocalIpAddress)
     //     udpSocket.bind(self.connectParams.LocalPort, self.connectParams.LocalIpAddress);
     // else
-        udpSocket.bind(self.connectParams.LocalPort);
+    udpSocket.bind(self.connectParams.LocalPort);
 
     self.checkChannel(3000);
 };
 
-CjChannelUdp.prototype.close = function () {
+CjChannelUdp.prototype.close = function() {
     if (this._udpSocket) {
         this._udpSocket = null;
         this._udpSocket.close();
     }
 };
 
-CjChannelUdp.prototype.isOpen = function () {
+CjChannelUdp.prototype.isOpen = function() {
     return this._udpSocket && this.connectState == CjChannelUdp.CI_ConnectState_Connected;
 };
 
-CjChannelUdp.prototype.checkChannel = function (interval) {
-    var udp = this;
+CjChannelUdp.prototype.checkChannel = function(interval) {
+    let udp = this;
     if (interval < 1000) {
         if (udp.checkChannelTimer) {
             clearTimeout(udp.checkChannelTimer);
@@ -144,8 +146,8 @@ CjChannelUdp.prototype.checkChannel = function (interval) {
         clearTimeout(udp.checkChannelTimer);
     }
 
-    var timeOut = function () {
-        //*recycle connect
+    var timeOut = function() {
+        //* recycle connect
         if (udp.isAutoOpen) {
             if (!udp.isOpen()) {
                 udp.open();
@@ -153,7 +155,7 @@ CjChannelUdp.prototype.checkChannel = function (interval) {
             }
         }
 
-        //*recycle heart jump
+        //* recycle heart jump
         if (udp.isAutoHeartbeat) {
             if (udp.isOpen()) {
                 udp.send('heart jump!\r\n');

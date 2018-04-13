@@ -3,34 +3,33 @@
  */
 
 (function() {
-    window.cjSimpleMeasures = {}
+    window.cjSimpleMeasures = {};
 
-    var cjCommon = window.cjCommon;
-    var cjSql570 = window.cjSql570;
-    var cjDescript570 = window.cjDescript570;
-    var cjSimpleMeasures = window.cjSimpleMeasures;
+    let cjCommon = window.cjCommon;
+    let cjSql570 = window.cjSql570;
+    let cjDescript570 = window.cjDescript570;
+    let cjSimpleMeasures = window.cjSimpleMeasures;
 
-    var sTid = cjCommon.getUrlParam('tid');
-    console.log("tid=" + sTid);
+    let sTid = cjCommon.getUrlParam('tid');
+    console.log('tid=' + sTid);
 
     cjSimpleMeasures.req_resp$sql$tid_mid = function( ) {
-        var xmlhttp;
+        let xmlhttp;
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xmlhttp=new ActiveXObject('Microsoft.XMLHTTP');
         }
-        else if (window.ActiveXObject)  {
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.open("post", "ics.cgi?fncode=req.sql.select.&filetype=json", true);
+        xmlhttp.open('post', 'ics.cgi?fncode=req.sql.select.&filetype=json', true);
         xmlhttp.setRequestHeader('Content-Type', 'application/json');
-        xmlhttp.onreadystatechange = function () {
+        xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                cjSimpleMeasures.dealRespMeasures(xmlhttp.responseText)
+                cjSimpleMeasures.dealRespMeasures(xmlhttp.responseText);
             }
-        }
-        var sSql = cjSql570.getSqlJson( "rt_tid_mid", sTid);
+        };
+        let sSql = cjSql570.getSqlJson( 'rt_tid_mid', sTid);
         xmlhttp.send(sSql);
-    }
+    };
 
     /*
      // ics.json 数组请求
@@ -55,79 +54,70 @@
      ]
      }
      */
-    cjSimpleMeasures.dealRespMeasures =  function (response) {
-        var resp = JSON.parse(response);
-        var rows = resp.data;
-        if (!rows || rows.length<1)
-        {
-            document.getElementById("measuresPn").innerHTML = "<br><lable>没有tid["+sTid+"]对应的实时数据</lable>";
+    cjSimpleMeasures.dealRespMeasures = function(response) {
+        let resp = JSON.parse(response);
+        let rows = resp.data;
+        if (!rows || rows.length<1) {
+            document.getElementById('measuresPn').innerHTML = '<br><lable>没有tid['+sTid+']对应的实时数据</lable>';
             return;
         }
-        var row;
-        var i;
-        var oReqMeasures = {
-            "session":"rt_session",
-            "structtype": "rtdata_v102",
-            "params":
-                [
-                    {
-                        "mid": 33556644,
-                        "count": 100
-                    },
-                    {
-                        "mid": 33556645,
-                        "count": 100
-                    }
-                ]
+        let row;
+        let i;
+        let oReqMeasures = {
+            'session': 'rt_session',
+            'structtype': 'rtdata_v102',
+            'params':
+            [
+                {
+                    'mid': 33556644,
+                    'count': 100,
+                },
+                {
+                    'mid': 33556645,
+                    'count': 100,
+                },
+            ],
         };
-        var oReqMeasureCount = 0;
-        for(i = 0; i < rows.length; i++)
-        {
+        let oReqMeasureCount = 0;
+        for (i = 0; i < rows.length; i++) {
             row = rows[i];
-            var iMid = row["mid"];
-            var iCount = row["count"];
-            if (iMid>=0x01000000 && iMid<0x04000000 && iCount > 0)
-            {
-                var param = {
-                    "mid" : iMid,
-                    "count" : iCount
-                }
+            let iMid = row['mid'];
+            let iCount = row['count'];
+            if (iMid>=0x01000000 && iMid<0x04000000 && iCount > 0) {
+                let param = {
+                    'mid': iMid,
+                    'count': iCount,
+                };
                 oReqMeasures.params[oReqMeasureCount] = param;
                 oReqMeasureCount++;
-            }
-            else
-            {
-                console.log("table[T_RT_TID_MID] setting invalid!");
+            } else {
+                console.log('table[T_RT_TID_MID] setting invalid!');
             }
         }
-        if (oReqMeasures.params.length>0)
-        {
+        if (oReqMeasures.params.length>0) {
             cjSimpleMeasures.req_resp_rt(oReqMeasures);
-        }
-        else
-        {
-            document.getElementById("measuresPn").innerHTML = "<br><lable>没有tid["+sTid+"]对应的合适实时数据</lable>";
+        } else {
+            document.getElementById('measuresPn').innerHTML = '<br><lable>没有tid['+sTid+']对应的合适实时数据</lable>';
             return;
         }
-    }
+    };
 
     cjSimpleMeasures.req_resp_rt = function( oReq ) {
-        var xmlhttp;
+        let xmlhttp;
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xmlhttp=new ActiveXObject('Microsoft.XMLHTTP');
         }
-        else if (window.ActiveXObject)  {
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.open("post", "ics.cgi?fncode=req.rtdata_v102&filetype=json", true);
+        xmlhttp.open('post', 'ics.cgi?fncode=req.rtdata_v102&filetype=json', true);
         xmlhttp.setRequestHeader('Content-Type', 'application/json');
-        xmlhttp.onreadystatechange = function () {
+        xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-                cjSimpleMeasures.dealRespRt(xmlhttp.responseText)
+                cjSimpleMeasures.dealRespRt(xmlhttp.responseText);
             }
-        }
+        };
         xmlhttp.send(JSON.stringify(oReq));
-    }
+    };
 
     /*
      // ics.json返回时都统一用：rtdata_v001
@@ -161,71 +151,60 @@
      ]
      }
      */
-    cjSimpleMeasures.dealRespRt =  function (response) {
-        var resp = JSON.parse(response);
-        var rows = resp.data;
-        if (!rows || rows.length<1)
-        {
-            document.getElementById("measuresPn").innerHTML = "<br><lable>没有数据</lable>";
+    cjSimpleMeasures.dealRespRt = function(response) {
+        let resp = JSON.parse(response);
+        let rows = resp.data;
+        if (!rows || rows.length<1) {
+            document.getElementById('measuresPn').innerHTML = '<br><lable>没有数据</lable>';
             return;
         }
-        var row;
-        var i, j;
-        var sOut = "<table>";
-        var keys = Object.keys(rows[0]);
-        var key;
-        var value;
-        var descripts = cjDescript570["rt_measure"];
-        for(i = keys.length; i >= 0; i--)
-        {
-            if (! descripts.hasOwnProperty(keys[i]))
-            {
+        let row;
+        let i, j;
+        let sOut = '<table>';
+        let keys = Object.keys(rows[0]);
+        let key;
+        let value;
+        let descripts = cjDescript570['rt_measure'];
+        for (i = keys.length; i >= 0; i--) {
+            if (! descripts.hasOwnProperty(keys[i])) {
                 keys.splice(i, 1);
             }
         }
-        sOut += "<tr>"
-        for(i = 0; i < keys.length; i++)
-        {
-            sOut += "<th>";
+        sOut += '<tr>';
+        for (i = 0; i < keys.length; i++) {
+            sOut += '<th>';
             sOut += descripts[keys[i]];
-            sOut += "</th>";
+            sOut += '</th>';
         }
-        sOut += "</tr>"
-        sOut += "<tr>"
-        for(i = 0; i < keys.length; i++)
-        {
-            sOut += "<td>";
+        sOut += '</tr>';
+        sOut += '<tr>';
+        for (i = 0; i < keys.length; i++) {
+            sOut += '<td>';
             sOut += keys[i];
-            sOut += "</td>";
+            sOut += '</td>';
         }
-        sOut += "</tr>"
+        sOut += '</tr>';
 
-        for(i = 0; i < rows.length; i++)
-        {
+        for (i = 0; i < rows.length; i++) {
             row = rows[i];
-            sOut += "<tr>"
-            for(j = 0; j < keys.length; j++)
-            {
-                sOut += "<td>";
+            sOut += '<tr>';
+            for (j = 0; j < keys.length; j++) {
+                sOut += '<td>';
                 key = keys[j];
                 value = row[key];
-                if (key === "t")
-                {
+                if (key === 't') {
                     sOut += cjCommon.getLocalTime(value);
-                }
-                else
-                {
+                } else {
                     sOut += value;
                 }
-                sOut += "</td>";
+                sOut += '</td>';
             }
-            sOut += "</tr>"
+            sOut += '</tr>';
         }
-        sOut += "</table>"
+        sOut += '</table>';
 
-        document.getElementById("measuresPn").innerHTML = sOut;
-    }
+        document.getElementById('measuresPn').innerHTML = sOut;
+    };
 
     cjSimpleMeasures.req_resp$sql$tid_mid( sTid );
-
-})()
+})();

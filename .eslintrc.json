@@ -1,5 +1,5 @@
 {
-  "extends": "standard",
+  "extends": "Google",
   "plugins": [
     "standard",
     "promise"
@@ -9,6 +9,7 @@
     "es6": true
   },
   "rules": {
+    "indent":["error", 4],
      "semi": 1,
     "quotes": [
       "error",

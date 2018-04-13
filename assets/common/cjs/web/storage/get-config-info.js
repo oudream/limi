@@ -2,20 +2,17 @@
  * Created by liuchaoyu on 2017-03-14.
  */
 
-"use strict";
+'use strict';
 
-(function () {
-
+(function() {
     cjLocalStorage.clearAll();
 
     ShareCacheAccess.openShareCache();
 
-    ShareCacheAccess.getAll('',function (id,data,err) {
-        alert(data)
-        cjLocalStorage.saveObj('sinopec-' + id,data);
-
+    ShareCacheAccess.getAll('', function(id, data, err) {
+        alert(data);
+        cjLocalStorage.saveObj('sinopec-' + id, data);
     });
 
     ShareCacheAccess.closeShareCache();
-
 })();

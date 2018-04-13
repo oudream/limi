@@ -1,152 +1,144 @@
 (function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("echarts"));
-	else if(typeof define === 'function' && define.amd)
-		define(["echarts"], factory);
-	else if(typeof exports === 'object')
-		exports["dataTool"] = factory(require("echarts"));
-	else
-		root["echarts"] = root["echarts"] || {}, root["echarts"]["dataTool"] = factory(root["echarts"]);
+    if (typeof exports === 'object' && typeof module === 'object') {
+        module.exports = factory(require('echarts'));
+    } else if (typeof define === 'function' && define.amd) {
+        define(['echarts'], factory);
+    } else if (typeof exports === 'object') {
+        exports['dataTool'] = factory(require('echarts'));
+    } else		{
+        root['echarts'] = root['echarts'] || {}, root['echarts']['dataTool'] = factory(root['echarts']);
+    }
 })(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
+    return /** ****/ (function(modules) { // webpackBootstrap
+/** ****/ 	// The module cache
+        /** ****/ 	let installedModules = {};
 
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/** ****/ 	// The require function
+        /** ****/ 	function __webpack_require__(moduleId) {
+/** ****/ 		// Check if module is in cache
+            /** ****/ 		if (installedModules[moduleId])
+    /** ****/ 			{
+                return installedModules[moduleId].exports;
+            }
 
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+/** ****/ 		// Create a new module (and put it into the cache)
+            /** ****/ 		let module = installedModules[moduleId] = {
+                /** ****/ 			exports: {},
+                /** ****/ 			id: moduleId,
+                /** ****/ 			loaded: false,
+            /** ****/ 		};
 
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
+/** ****/ 		// Execute the module function
+            /** ****/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/** ****/ 		// Flag the module as loaded
+            /** ****/ 		module.loaded = true;
 
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
+/** ****/ 		// Return the exports of the module
+            /** ****/ 		return module.exports;
+        /** ****/}
 
 
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
+/** ****/ 	// expose the modules object (__webpack_modules__)
+        /** ****/ 	__webpack_require__.m = modules;
 
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
+/** ****/ 	// expose the module cache
+        /** ****/ 	__webpack_require__.c = installedModules;
 
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/** ****/ 	// __webpack_public_path__
+        /** ****/ 	__webpack_require__.p = '';
 
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
+/** ****/ 	// Load entry module and return exports
+        /** ****/ 	return __webpack_require__(0);
+    /** ****/ })
+/** **********************************************************************/
+/** ****/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-	    var echarts = __webpack_require__(1);
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__; !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
+	    let echarts = __webpack_require__(1);
 	    echarts.dataTool = {
 	        version: '1.0.0',
 	        gexf: __webpack_require__(5),
-	        prepareBoxplotData: __webpack_require__(6)
+	        prepareBoxplotData: __webpack_require__(6),
 	    };
 	    return echarts.dataTool;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 1 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */,
+    /** */ function(module, exports) {
+        module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+    /** */},,, /* 2 */, /* 3 */
+/* 4 */
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;// GEXF File Parser
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__;// GEXF File Parser
 	// http://gexf.net/1.2draft/gexf-12draft-primer.pdf
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
+        !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	    'use strict';
-	    var zrUtil = __webpack_require__(1).util;
+	    let zrUtil = __webpack_require__(1).util;
 
 	    function parse(xml) {
-	        var doc;
+	        let doc;
 	        if (typeof xml === 'string') {
-	            var parser = new DOMParser();
+	            let parser = new DOMParser();
 	            doc = parser.parseFromString(xml, 'text/xml');
-	        }
-	        else {
+	        } else {
 	            doc = xml;
 	        }
 	        if (!doc || doc.getElementsByTagName('parsererror').length) {
 	            return null;
 	        }
 
-	        var gexfRoot = getChildByTagName(doc, 'gexf');
+	        let gexfRoot = getChildByTagName(doc, 'gexf');
 
 	        if (!gexfRoot) {
 	            return null;
 	        }
 
-	        var graphRoot = getChildByTagName(gexfRoot, 'graph');
+	        let graphRoot = getChildByTagName(gexfRoot, 'graph');
 
-	        var attributes = parseAttributes(getChildByTagName(graphRoot, 'attributes'));
-	        var attributesMap = {};
-	        for (var i = 0; i < attributes.length; i++) {
+	        let attributes = parseAttributes(getChildByTagName(graphRoot, 'attributes'));
+	        let attributesMap = {};
+	        for (let i = 0; i < attributes.length; i++) {
 	            attributesMap[attributes[i].id] = attributes[i];
 	        }
 
 	        return {
 	            nodes: parseNodes(getChildByTagName(graphRoot, 'nodes'), attributesMap),
-	            links: parseEdges(getChildByTagName(graphRoot, 'edges'))
+	            links: parseEdges(getChildByTagName(graphRoot, 'edges')),
 	        };
 	    }
 
 	    function parseAttributes(parent) {
-	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'attribute'), function (attribDom) {
+	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'attribute'), function(attribDom) {
 	            return {
 	                id: getAttr(attribDom, 'id'),
 	                title: getAttr(attribDom, 'title'),
-	                type: getAttr(attribDom, 'type')
+	                type: getAttr(attribDom, 'type'),
 	            };
 	        }) : [];
 	    }
 
 	    function parseNodes(parent, attributesMap) {
-	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'node'), function (nodeDom) {
+	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'node'), function(nodeDom) {
+	            let id = getAttr(nodeDom, 'id');
+	            let label = getAttr(nodeDom, 'label');
 
-	            var id = getAttr(nodeDom, 'id');
-	            var label = getAttr(nodeDom, 'label');
-
-	            var node = {
+	            let node = {
 	                id: id,
 	                name: label,
 	                itemStyle: {
-	                    normal: {}
-	                }
+	                    normal: {},
+	                },
 	            };
 
-	            var vizSizeDom = getChildByTagName(nodeDom, 'viz:size');
-	            var vizPosDom = getChildByTagName(nodeDom, 'viz:position');
-	            var vizColorDom = getChildByTagName(nodeDom, 'viz:color');
+	            let vizSizeDom = getChildByTagName(nodeDom, 'viz:size');
+	            let vizPosDom = getChildByTagName(nodeDom, 'viz:position');
+	            let vizColorDom = getChildByTagName(nodeDom, 'viz:color');
 	            // var vizShapeDom = getChildByTagName(nodeDom, 'viz:shape');
 
-	            var attvaluesDom = getChildByTagName(nodeDom, 'attvalues');
+	            let attvaluesDom = getChildByTagName(nodeDom, 'attvalues');
 
 	            if (vizSizeDom) {
 	                node.symbolSize = parseFloat(getAttr(vizSizeDom, 'value'));
@@ -160,22 +152,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                node.itemStyle.normal.color = 'rgb(' +[
 	                    getAttr(vizColorDom, 'r') | 0,
 	                    getAttr(vizColorDom, 'g') | 0,
-	                    getAttr(vizColorDom, 'b') | 0
+	                    getAttr(vizColorDom, 'b') | 0,
 	                ].join(',') + ')';
 	            }
 	            // if (vizShapeDom) {
 	                // node.shape = getAttr(vizShapeDom, 'shape');
 	            // }
 	            if (attvaluesDom) {
-	                var attvalueDomList = getChildrenByTagName(attvaluesDom, 'attvalue');
+	                let attvalueDomList = getChildrenByTagName(attvaluesDom, 'attvalue');
 
 	                node.attributes = {};
 
-	                for (var j = 0; j < attvalueDomList.length; j++) {
-	                    var attvalueDom = attvalueDomList[j];
-	                    var attId = getAttr(attvalueDom, 'for');
-	                    var attValue = getAttr(attvalueDom, 'value');
-	                    var attribute = attributesMap[attId];
+	                for (let j = 0; j < attvalueDomList.length; j++) {
+	                    let attvalueDom = attvalueDomList[j];
+	                    let attId = getAttr(attvalueDom, 'for');
+	                    let attValue = getAttr(attvalueDom, 'value');
+	                    let attribute = attributesMap[attId];
 
 	                    if (attribute) {
 	                        switch (attribute.type) {
@@ -202,27 +194,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function parseEdges(parent) {
-	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'edge'), function (edgeDom) {
-	            var id = getAttr(edgeDom, 'id');
-	            var label = getAttr(edgeDom, 'label');
+	        return parent ? zrUtil.map(getChildrenByTagName(parent, 'edge'), function(edgeDom) {
+	            let id = getAttr(edgeDom, 'id');
+	            let label = getAttr(edgeDom, 'label');
 
-	            var sourceId = getAttr(edgeDom, 'source');
-	            var targetId = getAttr(edgeDom, 'target');
+	            let sourceId = getAttr(edgeDom, 'source');
+	            let targetId = getAttr(edgeDom, 'target');
 
-	            var edge = {
+	            let edge = {
 	                id: id,
 	                name: label,
 	                source: sourceId,
 	                target: targetId,
 	                lineStyle: {
-	                    normal: {}
-	                }
+	                    normal: {},
+	                },
 	            };
 
-	            var lineStyle = edge.lineStyle.normal;
+	            let lineStyle = edge.lineStyle.normal;
 
-	            var vizThicknessDom = getChildByTagName(edgeDom, 'viz:thickness');
-	            var vizColorDom = getChildByTagName(edgeDom, 'viz:color');
+	            let vizThicknessDom = getChildByTagName(edgeDom, 'viz:thickness');
+	            let vizColorDom = getChildByTagName(edgeDom, 'viz:color');
 	            // var vizShapeDom = getChildByTagName(edgeDom, 'viz:shape');
 
 	            if (vizThicknessDom) {
@@ -232,7 +224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                lineStyle.color = 'rgb(' + [
 	                    getAttr(vizColorDom, 'r') | 0,
 	                    getAttr(vizColorDom, 'g') | 0,
-	                    getAttr(vizColorDom, 'b') | 0
+	                    getAttr(vizColorDom, 'b') | 0,
 	                ].join(',') + ')';
 	            }
 	            // if (vizShapeDom) {
@@ -247,8 +239,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return el.getAttribute(attrName);
 	    }
 
-	    function getChildByTagName (parent, tagName) {
-	        var node = parent.firstChild;
+	    function getChildByTagName(parent, tagName) {
+	        let node = parent.firstChild;
 
 	        while (node) {
 	            if (
@@ -264,9 +256,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return null;
 	    }
 
-	    function getChildrenByTagName (parent, tagName) {
-	        var node = parent.firstChild;
-	        var children = [];
+	    function getChildrenByTagName(parent, tagName) {
+	        let node = parent.firstChild;
+	        let children = [];
 	        while (node) {
 	            if (node.nodeName.toLowerCase() == tagName.toLowerCase()) {
 	                children.push(node);
@@ -278,18 +270,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return {
-	        parse: parse
+	        parse: parse,
 	    };
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	    var quantile = __webpack_require__(7);
-	    var numberUtil = __webpack_require__(1).number;
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__; !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
+	    let quantile = __webpack_require__(7);
+	    let numberUtil = __webpack_require__(1).number;
 
 	    /**
 	     * Helper method for preparing data.
@@ -307,35 +296,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {(number|string)} [opt.layout='horizontal']
 	     *                          Box plot layout, can be 'horizontal' or 'vertical'
 	     */
-	    return function (rawData, opt) {
+	    return function(rawData, opt) {
 	        opt = opt || [];
-	        var boxData = [];
-	        var outliers = [];
-	        var axisData = [];
-	        var boundIQR = opt.boundIQR;
+	        let boxData = [];
+	        let outliers = [];
+	        let axisData = [];
+	        let boundIQR = opt.boundIQR;
 
-	        for (var i = 0; i < rawData.length; i++) {
+	        for (let i = 0; i < rawData.length; i++) {
 	            axisData.push(i + '');
-	            var ascList = numberUtil.asc(rawData[i].slice());
+	            let ascList = numberUtil.asc(rawData[i].slice());
 
-	            var Q1 = quantile(ascList, 0.25);
-	            var Q2 = quantile(ascList, 0.5);
-	            var Q3 = quantile(ascList, 0.75);
-	            var IQR = Q3 - Q1;
+	            let Q1 = quantile(ascList, 0.25);
+	            let Q2 = quantile(ascList, 0.5);
+	            let Q3 = quantile(ascList, 0.75);
+	            let IQR = Q3 - Q1;
 
-	            var low = boundIQR === 'none'
+	            let low = boundIQR === 'none'
 	                ? ascList[0]
 	                : Q1 - (boundIQR == null ? 1.5 : boundIQR) * IQR;
-	            var high = boundIQR === 'none'
+	            let high = boundIQR === 'none'
 	                ? ascList[ascList.length - 1]
 	                : Q3 + (boundIQR == null ? 1.5 : boundIQR) * IQR;
 
 	            boxData.push([low, Q1, Q2, Q3, high]);
 
-	            for (var j = 0; j < ascList.length; j++) {
-	                var dataItem = ascList[j];
+	            for (let j = 0; j < ascList.length; j++) {
+	                let dataItem = ascList[j];
 	                if (dataItem < low || dataItem > high) {
-	                    var outlier = [i, dataItem];
+	                    let outlier = [i, dataItem];
 	                    opt.layout === 'vertical' && outlier.reverse();
 	                    outliers.push(outlier);
 	                }
@@ -344,17 +333,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return {
 	            boxData: boxData,
 	            outliers: outliers,
-	            axisData: axisData
+	            axisData: axisData,
 	        };
 	    };
-
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * Copyright (c) 2010-2015, Michael Bostock
 	 * All rights reserved.
 	 *
@@ -382,24 +368,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 	 * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
+        !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	    /**
 	     * @see <https://github.com/mbostock/d3/blob/master/src/arrays/quantile.js>
 	     * @see <http://en.wikipedia.org/wiki/Quantile>
 	     * @param {Array.<number>} ascArr
 	     */
 	    return function(ascArr, p) {
-	        var H = (ascArr.length - 1) * p + 1,
+	        let H = (ascArr.length - 1) * p + 1,
 	            h = Math.floor(H),
 	            v = +ascArr[h - 1],
 	            e = H - h;
 	        return e ? v + e * (ascArr[h] - v) : v;
 	    };
-
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ }
-/******/ ])
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
+/** ****/ ]);
 });
 ;

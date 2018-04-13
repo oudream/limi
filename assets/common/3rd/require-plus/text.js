@@ -2,15 +2,15 @@
  * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/text/LICENSE
  */
-/*jslint regexp: true */
-/*global require, XMLHttpRequest, ActiveXObject,
+/* jslint regexp: true */
+/* global require, XMLHttpRequest, ActiveXObject,
   define, window, process, Packages,
   java, location, Components, FileUtils */
 
-define(['module'], function (module) {
+define(['module'], function(module) {
     'use strict';
 
-    var text, fs, Cc, Ci, xpcIsWindows,
+    let text, fs, Cc, Ci, xpcIsWindows,
         progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
         xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,
         bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im,
@@ -25,7 +25,7 @@ define(['module'], function (module) {
         return value === undefined || value === '' ? defaultValue : value;
     }
 
-    //Allow for default ports for http and https.
+    // Allow for default ports for http and https.
     function isSamePort(protocol1, port1, protocol2, port2) {
         if (port1 === port2) {
             return true;
@@ -42,39 +42,39 @@ define(['module'], function (module) {
     text = {
         version: '2.0.15',
 
-        strip: function (content) {
-            //Strips <?xml ...?> declarations so that external SVG and XML
-            //documents can be added to a document without worry. Also, if the string
-            //is an HTML document, only the part inside the body tag is returned.
+        strip: function(content) {
+            // Strips <?xml ...?> declarations so that external SVG and XML
+            // documents can be added to a document without worry. Also, if the string
+            // is an HTML document, only the part inside the body tag is returned.
             if (content) {
-                content = content.replace(xmlRegExp, "");
-                var matches = content.match(bodyRegExp);
+                content = content.replace(xmlRegExp, '');
+                let matches = content.match(bodyRegExp);
                 if (matches) {
                     content = matches[1];
                 }
             } else {
-                content = "";
+                content = '';
             }
             return content;
         },
 
-        jsEscape: function (content) {
+        jsEscape: function(content) {
             return content.replace(/(['\\])/g, '\\$1')
-                .replace(/[\f]/g, "\\f")
-                .replace(/[\b]/g, "\\b")
-                .replace(/[\n]/g, "\\n")
-                .replace(/[\t]/g, "\\t")
-                .replace(/[\r]/g, "\\r")
-                .replace(/[\u2028]/g, "\\u2028")
-                .replace(/[\u2029]/g, "\\u2029");
+                .replace(/[\f]/g, '\\f')
+                .replace(/[\b]/g, '\\b')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\t]/g, '\\t')
+                .replace(/[\r]/g, '\\r')
+                .replace(/[\u2028]/g, '\\u2028')
+                .replace(/[\u2029]/g, '\\u2029');
         },
 
-        createXhr: masterConfig.createXhr || function () {
-            //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
-            var xhr, i, progId;
-            if (typeof XMLHttpRequest !== "undefined") {
+        createXhr: masterConfig.createXhr || function() {
+            // Would love to dump the ActiveX crap in here. Need IE 6 to die first.
+            let xhr, i, progId;
+            if (typeof XMLHttpRequest !== 'undefined') {
                 return new XMLHttpRequest();
-            } else if (typeof ActiveXObject !== "undefined") {
+            } else if (typeof ActiveXObject !== 'undefined') {
                 for (i = 0; i < 3; i += 1) {
                     progId = progIds[i];
                     try {
@@ -99,10 +99,10 @@ define(['module'], function (module) {
          * @returns {Object} with properties "moduleName", "ext" and "strip"
          * where strip is a boolean.
          */
-        parseName: function (name) {
-            var modName, ext, temp,
+        parseName: function(name) {
+            let modName, ext, temp,
                 strip = false,
-                index = name.lastIndexOf("."),
+                index = name.lastIndexOf('.'),
                 isRelative = name.indexOf('./') === 0 ||
                              name.indexOf('../') === 0;
 
@@ -114,10 +114,10 @@ define(['module'], function (module) {
             }
 
             temp = ext || modName;
-            index = temp.indexOf("!");
+            index = temp.indexOf('!');
             if (index !== -1) {
-                //Pull off the strip arg.
-                strip = temp.substring(index + 1) === "strip";
+                // Pull off the strip arg.
+                strip = temp.substring(index + 1) === 'strip';
                 temp = temp.substring(0, index);
                 if (ext) {
                     ext = temp;
@@ -129,7 +129,7 @@ define(['module'], function (module) {
             return {
                 moduleName: modName,
                 ext: ext,
-                strip: strip
+                strip: strip,
             };
         },
 
@@ -143,8 +143,8 @@ define(['module'], function (module) {
          * @param {String} url
          * @returns Boolean
          */
-        useXhr: function (url, protocol, hostname, port) {
-            var uProtocol, uHostName, uPort,
+        useXhr: function(url, protocol, hostname, port) {
+            let uProtocol, uHostName, uPort,
                 match = text.xdRegExp.exec(url);
             if (!match) {
                 return true;
@@ -161,7 +161,7 @@ define(['module'], function (module) {
                    ((!uPort && !uHostName) || isSamePort(uProtocol, uPort, protocol, port));
         },
 
-        finishLoad: function (name, strip, content, onLoad) {
+        finishLoad: function(name, strip, content, onLoad) {
             content = strip ? text.strip(content) : content;
             if (masterConfig.isBuild) {
                 buildMap[name] = content;
@@ -169,13 +169,13 @@ define(['module'], function (module) {
             onLoad(content);
         },
 
-        load: function (name, req, onLoad, config) {
-            //Name has format: some.module.filext!strip
-            //The strip part is optional.
-            //if strip is present, then that means only get the string contents
-            //inside a body tag in an HTML string. For XML/SVG content it means
-            //removing the <?xml ...?> declarations so the content can be inserted
-            //into the current doc without problems.
+        load: function(name, req, onLoad, config) {
+            // Name has format: some.module.filext!strip
+            // The strip part is optional.
+            // if strip is present, then that means only get the string contents
+            // inside a body tag in an HTML string. For XML/SVG content it means
+            // removing the <?xml ...?> declarations so the content can be inserted
+            // into the current doc without problems.
 
             // Do not bother with the work if a build and text will
             // not be inlined.
@@ -186,7 +186,7 @@ define(['module'], function (module) {
 
             masterConfig.isBuild = config && config.isBuild;
 
-            var parsed = text.parseName(name),
+            let parsed = text.parseName(name),
                 nonStripName = parsed.moduleName +
                     (parsed.ext ? '.' + parsed.ext : ''),
                 url = req.toUrl(nonStripName),
@@ -199,77 +199,77 @@ define(['module'], function (module) {
                 return;
             }
 
-            //Load the text. Use XHR if possible and in a browser.
+            // Load the text. Use XHR if possible and in a browser.
             if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
-                text.get(url, function (content) {
+                text.get(url, function(content) {
                     text.finishLoad(name, parsed.strip, content, onLoad);
-                }, function (err) {
+                }, function(err) {
                     if (onLoad.error) {
                         onLoad.error(err);
                     }
                 });
             } else {
-                //Need to fetch the resource across domains. Assume
-                //the resource has been optimized into a JS module. Fetch
-                //by the module name + extension, but do not include the
-                //!strip part to avoid file system issues.
-                req([nonStripName], function (content) {
+                // Need to fetch the resource across domains. Assume
+                // the resource has been optimized into a JS module. Fetch
+                // by the module name + extension, but do not include the
+                // !strip part to avoid file system issues.
+                req([nonStripName], function(content) {
                     text.finishLoad(parsed.moduleName + '.' + parsed.ext,
                                     parsed.strip, content, onLoad);
                 });
             }
         },
 
-        write: function (pluginName, moduleName, write, config) {
+        write: function(pluginName, moduleName, write, config) {
             if (buildMap.hasOwnProperty(moduleName)) {
-                var content = text.jsEscape(buildMap[moduleName]);
-                write.asModule(pluginName + "!" + moduleName,
-                               "define(function () { return '" +
+                let content = text.jsEscape(buildMap[moduleName]);
+                write.asModule(pluginName + '!' + moduleName,
+                               'define(function () { return \'' +
                                    content +
-                               "';});\n");
+                               '\';});\n');
             }
         },
 
-        writeFile: function (pluginName, moduleName, req, write, config) {
-            var parsed = text.parseName(moduleName),
+        writeFile: function(pluginName, moduleName, req, write, config) {
+            let parsed = text.parseName(moduleName),
                 extPart = parsed.ext ? '.' + parsed.ext : '',
                 nonStripName = parsed.moduleName + extPart,
-                //Use a '.js' file name so that it indicates it is a
-                //script that can be loaded across domains.
+                // Use a '.js' file name so that it indicates it is a
+                // script that can be loaded across domains.
                 fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
 
-            //Leverage own load() method to load plugin value, but only
-            //write out values that do not have the strip argument,
-            //to avoid any potential issues with ! in file names.
-            text.load(nonStripName, req, function (value) {
-                //Use own write() method to construct full module value.
-                //But need to create shell that translates writeFile's
-                //write() to the right interface.
-                var textWrite = function (contents) {
+            // Leverage own load() method to load plugin value, but only
+            // write out values that do not have the strip argument,
+            // to avoid any potential issues with ! in file names.
+            text.load(nonStripName, req, function(value) {
+                // Use own write() method to construct full module value.
+                // But need to create shell that translates writeFile's
+                // write() to the right interface.
+                let textWrite = function(contents) {
                     return write(fileName, contents);
                 };
-                textWrite.asModule = function (moduleName, contents) {
+                textWrite.asModule = function(moduleName, contents) {
                     return write.asModule(moduleName, fileName, contents);
                 };
 
                 text.write(pluginName, nonStripName, textWrite, config);
             }, config);
-        }
+        },
     };
 
     if (masterConfig.env === 'node' || (!masterConfig.env &&
-            typeof process !== "undefined" &&
+            typeof process !== 'undefined' &&
             process.versions &&
             !!process.versions.node &&
             !process.versions['node-webkit'] &&
             !process.versions['atom-shell'])) {
-        //Using special require.nodeRequire, something added by r.js.
+        // Using special require.nodeRequire, something added by r.js.
         fs = require.nodeRequire('fs');
 
-        text.get = function (url, callback, errback) {
+        text.get = function(url, callback, errback) {
             try {
-                var file = fs.readFileSync(url, 'utf8');
-                //Remove BOM (Byte Mark Order) from utf8 files if it is there.
+                let file = fs.readFileSync(url, 'utf8');
+                // Remove BOM (Byte Mark Order) from utf8 files if it is there.
                 if (file[0] === '\uFEFF') {
                     file = file.substring(1);
                 }
@@ -282,11 +282,11 @@ define(['module'], function (module) {
         };
     } else if (masterConfig.env === 'xhr' || (!masterConfig.env &&
             text.createXhr())) {
-        text.get = function (url, callback, errback, headers) {
-            var xhr = text.createXhr(), header;
+        text.get = function(url, callback, errback, headers) {
+            let xhr = text.createXhr(), header;
             xhr.open('GET', url, true);
 
-            //Allow plugins direct access to xhr headers
+            // Allow plugins direct access to xhr headers
             if (headers) {
                 for (header in headers) {
                     if (headers.hasOwnProperty(header)) {
@@ -295,19 +295,19 @@ define(['module'], function (module) {
                 }
             }
 
-            //Allow overrides specified in config
+            // Allow overrides specified in config
             if (masterConfig.onXhr) {
                 masterConfig.onXhr(xhr, url);
             }
 
-            xhr.onreadystatechange = function (evt) {
-                var status, err;
-                //Do not explicitly handle errors, those should be
-                //visible via console output in the browser.
+            xhr.onreadystatechange = function(evt) {
+                let status, err;
+                // Do not explicitly handle errors, those should be
+                // visible via console output in the browser.
                 if (xhr.readyState === 4) {
                     status = xhr.status || 0;
                     if (status > 399 && status < 600) {
-                        //An http 4xx or 5xx error. Signal an error.
+                        // An http 4xx or 5xx error. Signal an error.
                         err = new Error(url + ' HTTP status: ' + status);
                         err.xhr = xhr;
                         if (errback) {
@@ -326,12 +326,12 @@ define(['module'], function (module) {
         };
     } else if (masterConfig.env === 'rhino' || (!masterConfig.env &&
             typeof Packages !== 'undefined' && typeof java !== 'undefined')) {
-        //Why Java, why is this so awkward?
-        text.get = function (url, callback) {
-            var stringBuffer, line,
-                encoding = "utf-8",
+        // Why Java, why is this so awkward?
+        text.get = function(url, callback) {
+            let stringBuffer, line,
+                encoding = 'utf-8',
                 file = new java.io.File(url),
-                lineSeparator = java.lang.System.getProperty("line.separator"),
+                lineSeparator = java.lang.System.getProperty('line.separator'),
                 input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)),
                 content = '';
             try {
@@ -358,8 +358,8 @@ define(['module'], function (module) {
                     stringBuffer.append(lineSeparator);
                     stringBuffer.append(line);
                 }
-                //Make sure we return a JavaScript string and not a Java string.
-                content = String(stringBuffer.toString()); //String
+                // Make sure we return a JavaScript string and not a Java string.
+                content = String(stringBuffer.toString()); // String
             } finally {
                 input.close();
             }
@@ -368,14 +368,14 @@ define(['module'], function (module) {
     } else if (masterConfig.env === 'xpconnect' || (!masterConfig.env &&
             typeof Components !== 'undefined' && Components.classes &&
             Components.interfaces)) {
-        //Avert your gaze!
+        // Avert your gaze!
         Cc = Components.classes;
         Ci = Components.interfaces;
         Components.utils['import']('resource://gre/modules/FileUtils.jsm');
         xpcIsWindows = ('@mozilla.org/windows-registry-key;1' in Cc);
 
-        text.get = function (url, callback) {
-            var inStream, convertStream, fileObj,
+        text.get = function(url, callback) {
+            let inStream, convertStream, fileObj,
                 readData = {};
 
             if (xpcIsWindows) {
@@ -384,7 +384,7 @@ define(['module'], function (module) {
 
             fileObj = new FileUtils.File(url);
 
-            //XPCOM, you so crazy
+            // XPCOM, you so crazy
             try {
                 inStream = Cc['@mozilla.org/network/file-input-stream;1']
                            .createInstance(Ci.nsIFileInputStream);
@@ -392,7 +392,7 @@ define(['module'], function (module) {
 
                 convertStream = Cc['@mozilla.org/intl/converter-input-stream;1']
                                 .createInstance(Ci.nsIConverterInputStream);
-                convertStream.init(inStream, "utf-8", inStream.available(),
+                convertStream.init(inStream, 'utf-8', inStream.available(),
                 Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
 
                 convertStream.readString(inStream.available(), readData);

@@ -5,10 +5,21 @@
     <title>Hello2</title>
 
     <style type="text/css">
-        h1 {text-align: center}
-        h2 {text-align: left}
-        h3 {text-align: right}
-        .td-rtdata {width: 220px}
+        h1 {
+            text-align: center
+        }
+
+        h2 {
+            text-align: left
+        }
+
+        h3 {
+            text-align: right
+        }
+
+        .td-rtdata {
+            width: 220px
+        }
     </style>
 
     <script>
@@ -101,6 +112,39 @@
         gcl.gis.uiRtcurve.rtcurveStartRefresh();
         gcl.rtdb.startSyncMeasures();
     });
+</script>
+
+<script>
+    function testGetTxt1(){
+        let dealRespMeasures = function (response) {
+            let arr = JSON.parse(response);
+            console.log(arr);
+        };
+
+
+        let req_resp_rtdatas = function () {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            }
+            else if (window.ActiveXObject) {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open("get", "./../rtlog/20180327/0x010000A2.txt", true);
+            xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
+            xmlhttp.setRequestHeader('Content-Type', 'json');
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    dealRespMeasures(xmlhttp.responseText)
+                }
+            };
+            let r = xmlhttp.send('');
+            console.log(r);
+        };
+
+        req_resp_rtdatas();
+    };
+//    testGetTxt1();
 </script>
 
 <!--<script src="./gcl_rtlog.js"></script>-->

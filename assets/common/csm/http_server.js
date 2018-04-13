@@ -1,33 +1,33 @@
 
-'use strict'
+'use strict';
 
-require('./../cjs/cjinterinfo')
-require('./../cjs/cjstring')
+require('./../cjs/cjinterinfo');
+require('./../cjs/cjstring');
 
-var Route = require('./../cjs/nodejs/cjhttp_route')
-var FileServer = require('./../cjs/nodejs/cjhttp_file_server')
-var path = require('path')
-var http = require('http')
+let Route = require('./../cjs/nodejs/cjhttp_route');
+let FileServer = require('./../cjs/nodejs/cjhttp_file_server');
+let path = require('path');
+let http = require('http');
 
-exports = module.exports = HttpServer
+exports = module.exports = HttpServer;
 
-function HttpServer (confParams) {
-  this.route = new Route()
-  this.fileServer = new FileServer()
+function HttpServer(confParams) {
+    this.route = new Route();
+    this.fileServer = new FileServer();
     // this.fileServer.config.assetsPath = path.normalize(path.join(process.cwd(), '..'));
     // this.fileServer.config.assetsPath = path.normalize(path.join(__dirname, './../..'));
-  this.fileServer.config.assetsPath = path.normalize(confParams.staticAssetsPath)
+    this.fileServer.config.assetsPath = path.normalize(confParams.staticAssetsPath);
 
-  var _this = this
-  this.server = http.createServer(function (req, res) {
-    var ret = _this.route.handle(req, res, function () {
-      console.log(arguments)
-    })
+    let _this = this;
+    this.server = http.createServer(function(req, res) {
+        let ret = _this.route.handle(req, res, function() {
+            console.log(arguments);
+        });
 
-    if (!ret) {
-      _this.fileServer.dispatch(req, res)
-    }
-  })
+        if (!ret) {
+            _this.fileServer.dispatch(req, res);
+        }
+    });
 
     // this.route.all(/\/(.){0,}.cgi/, function (req, res) {
     //    res.end('Hello World!');
@@ -81,38 +81,38 @@ function HttpServer (confParams) {
     //
     // });
 
-  this.server.on('checkContinue', function (req, res) {
-    var msg = 'step checkContinue' + Date()
-    res.writeContinue()
-    console.log(msg)
-  })
+    this.server.on('checkContinue', function(req, res) {
+        let msg = 'step checkContinue' + Date();
+        res.writeContinue();
+        console.log(msg);
+    });
 
-  this.server.on('clientError', (err, socket) => {
-    var msg = 'step clientError' + Date()
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
-    console.log(msg)
-  })
+    this.server.on('clientError', (err, socket) => {
+        let msg = 'step clientError' + Date();
+        socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+        console.log(msg);
+    });
 
-  this.server.on('close', function () {
-    var msg = 'step close' + Date()
-    console.log(msg)
-  })
+    this.server.on('close', function() {
+        let msg = 'step close' + Date();
+        console.log(msg);
+    });
 
-  this.server.on('connect', function (req, socket, firstBodyChunk) {
-    var msg = 'step connect' + Date()
-    console.log(msg)
-  })
+    this.server.on('connect', function(req, socket, firstBodyChunk) {
+        let msg = 'step connect' + Date();
+        console.log(msg);
+    });
 
-  this.server.on('connection', function (connection) {
-    var msg = 'step connection' + Date()
-    console.log(msg)
-  })
+    this.server.on('connection', function(connection) {
+        let msg = 'step connection' + Date();
+        console.log(msg);
+    });
 
-  this.server.on('upgrade', function (req, socket, head) {
-    var msg = 'step upgrade' + Date()
-    console.log(msg)
-  })
+    this.server.on('upgrade', function(req, socket, head) {
+        let msg = 'step upgrade' + Date();
+        console.log(msg);
+    });
 
-  this.server.listen(confParams.port)
-  console.log('http this.server listen %s', confParams.port)
+    this.server.listen(confParams.port);
+    console.log('http this.server listen %s', confParams.port);
 }

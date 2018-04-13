@@ -2,68 +2,58 @@
  * Created by liuchaoyu on 2017-03-15.
  */
 
-"use strict";
+'use strict';
 
 let shareCache = null;
 
 class ShareCacheAccess {
 
-    static openShareCache () {
+    static openShareCache() {
         if (!shareCache) {
             shareCache = remote.getGlobal('shareCache');
         }
     }
 
-    static closeShareCache () {
+    static closeShareCache() {
         shareCache = null;
     }
 
-    static set (id, key, value) {
+    static set(id, key, value) {
         if (typeof key == 'string') {
             let _shareData = shareCache[id];
             _shareData[key] = value;
-        }
-        else if (typeof key == 'object') {
+        } else if (typeof key == 'object') {
             shareCache[id] = key;
         }
-
     }
 
-    static get (id, key) {
-
+    static get(id, key) {
         let v = null;
         if (key) {
             v = shareCache[id][key];
-        }
-        else {
+        } else {
             v = shareCache[id];
         }
 
         return v;
     }
 
-    static getAll (filterId, fn_callback) {
-
+    static getAll(filterId, fn_callback) {
         let err = null;
 
         if (shareCache) {
-
             for (let t in shareCache) {
                 if (t !== filterId) {
-                    fn_callback(t,shareCache[t],err);
+                    fn_callback(t, shareCache[t], err);
                 }
             }
-
-        }
-        else {
-
+        } else {
             err = {
-                code : 'Error : ShareCache is null',
+                code: 'Error : ShareCache is null',
             };
 
-            fn_callback(null,null,err);
+            fn_callback(null, null, err);
         }
-
     }
 
 }

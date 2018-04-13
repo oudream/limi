@@ -1,38 +1,38 @@
-var assert = require('assert')
+let assert = require('assert');
 
-var immediateThis, intervalThis, timeoutThis;
-var immediateArgsThis, intervalArgsThis, timeoutArgsThis;
+let immediateThis, intervalThis, timeoutThis;
+let immediateArgsThis, intervalArgsThis, timeoutArgsThis;
 
-var iTimes = 0;
+let iTimes = 0;
 
-var immediateHandler = setImmediate(function() {
+let immediateHandler = setImmediate(function() {
     console.log('setImmediate');
     immediateThis = this;
 });
 
-var immediateArgsHandler = setImmediate(function() {
+let immediateArgsHandler = setImmediate(function() {
     console.log('setImmediate args');
     immediateArgsThis = this;
 }, 'args ...');
 
-var intervalHandler = setInterval(function() {
-    //clearInterval(intervalHandler);
+let intervalHandler = setInterval(function() {
+    // clearInterval(intervalHandler);
     console.log('setInterval', iTimes++);
     intervalThis = this;
 }, 1000);
 
-var intervalArgsHandler = setInterval(function() {
-    //clearInterval(intervalArgsHandler);
+let intervalArgsHandler = setInterval(function() {
+    // clearInterval(intervalArgsHandler);
     console.log('setInterval args', iTimes++);
     intervalArgsThis = this;
 }, 1000, 'args ...');
 
-var timeoutHandler = setTimeout(function() {
+let timeoutHandler = setTimeout(function() {
     console.log('setTimeout');
     timeoutThis = this;
 }, 1000);
 
-var timeoutArgsHandler = setTimeout(function() {
+let timeoutArgsHandler = setTimeout(function() {
     console.log('setTimeout args');
     timeoutArgsThis = this;
 }, 1000, 'args ...');

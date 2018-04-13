@@ -2,14 +2,12 @@
  * Created by liuchaoyu on 2016-10-28.
  */
 
-(function () {
-
+(function() {
     window.cjTime = {};
 
-    var cjTime = window.cjTime;
+    let cjTime = window.cjTime;
 
-    cjTime.now = function () {
+    cjTime.now = function() {
         return new Date().getTime();
     };
-
 })();

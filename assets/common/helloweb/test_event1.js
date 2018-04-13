@@ -1,10 +1,10 @@
 
-var EventEmitter = require('events').EventEmitter;
+let EventEmitter = require('events').EventEmitter;
 
-var testEvent11 = function () {
-//event.js 文件
-    var event = new EventEmitter();
-    var index = 0;
+let testEvent11 = function() {
+// event.js 文件
+    let event = new EventEmitter();
+    let index = 0;
     event.on('some_event0', function() {
         console.log('some_event 1 事件触发');
     });

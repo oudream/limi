@@ -2,7 +2,7 @@
  * Created by liuchaoyu on 2017-03-10.
  */
 
-"use strict";
+'use strict';
 
 class DatabaseSessionManager {
     constructor() {
@@ -10,7 +10,6 @@ class DatabaseSessionManager {
     }
 
     requestSession(prefix) {
-
         let sessions = this.sessions[prefix];
         if (!sessions) {
             this.sessions[prefix] = [];
@@ -38,7 +37,6 @@ class DatabaseSessionManager {
     }
 
     releaseSession(sessionId) {
-
         let _session = sessionId.split('_');
         let _prefix = _session[0];
         let _index = parseInt(_session[1], 10);
@@ -54,12 +52,10 @@ class DatabaseSessionManager {
             }
 
             return 1;
-        }
-        else {
+        } else {
             console.log('Error: sessionId(\"' + sessionId + '\") is not exist!');
             return -1;
         }
-
     }
 }
 
@@ -98,15 +94,14 @@ class CjDatabaseAccess {
 
     /**
      * 获取数据库数据（select语句）
-     * 
-     * @param {any} sql : String SQL语句 
+     *
+     * @param {any} sql : String SQL语句
      * @param {any} fn_callback : Function 运行完成后的返回函数
      * @param {any} params : Object 请求IP和端口
-     * 
+     *
      * @memberof CjDatabaseAccess
      */
     load(sql, fn_callback, params) {
-
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
@@ -119,7 +114,7 @@ class CjDatabaseAccess {
             fncode: 'req.sql.load',
             type: this.type,
             sessionId: curSessionId,
-            callback: requestReturn
+            callback: requestReturn,
         };
 
         if (params && params.reqHost) {
@@ -128,10 +123,8 @@ class CjDatabaseAccess {
         }
 
         httpRequest(reqParam);
-
     }
     loadT(sql, fn_callback, params) {
-
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
@@ -144,7 +137,7 @@ class CjDatabaseAccess {
             fncode: 'req.sql.transaction',
             type: this.type,
             sessionId: curSessionId,
-            callback: requestReturn
+            callback: requestReturn,
         };
 
         if (params && params.reqHost) {
@@ -153,11 +146,9 @@ class CjDatabaseAccess {
         }
 
         httpRequest(reqParam);
-
     }
 
     exec(sql, fn_callback, params) {
-
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
@@ -170,7 +161,7 @@ class CjDatabaseAccess {
             fncode: 'req.sql.exec',
             type: this.type,
             sessionId: curSessionId,
-            callback: requestReturn
+            callback: requestReturn,
         };
 
         if (params && params.reqHost) {
@@ -179,11 +170,9 @@ class CjDatabaseAccess {
         }
 
         httpRequest(reqParam);
-
     }
 
     execM(sql, values, fn_callback, params) {
-
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
@@ -197,7 +186,7 @@ class CjDatabaseAccess {
             fncode: 'req.sql.exec.multi',
             type: this.type,
             sessionId: curSessionId,
-            callback: requestReturn
+            callback: requestReturn,
         };
 
         if (params && params.reqHost) {
@@ -206,7 +195,6 @@ class CjDatabaseAccess {
         }
 
         httpRequest(reqParam);
-
     }
 }
 
@@ -218,14 +206,12 @@ function runCallBack(sessionId, err) {
 
     let _fn = this.requestPool[sessionId];
     if (_fn) {
-
         _fn(err, dbRecords);
 
         this.dbSessionManager.releaseSession(sessionId);
 
         this.requestPool[sessionId] = null;
         delete this.requestPool[sessionId];
-
     }
 }
 
@@ -240,7 +226,6 @@ function runCallBack(sessionId, err) {
  * }
  */
 function httpRequest(param) {
-
     let _sendData = {
         'sql': param.sql,
         'fncode': param.fncode,
@@ -256,9 +241,8 @@ function httpRequest(param) {
     if (window.nodeRequire) {
         url = 'http://' + param.reqHost + ':' + param.reqPort + '/ics.sql';
         _sendData['terminalType'] = 'app';
-    }
-    else {
-        url = "ics.sql";
+    } else {
+        url = 'ics.sql';
         _sendData['terminalType'] = 'browser';
     }
 
@@ -267,7 +251,7 @@ function httpRequest(param) {
     ajaxParams.url = url;
     ajaxParams.urlParams = {
         fncode: param.fncode,
-        session: param.sessionId
+        session: param.sessionId,
     };
     ajaxParams.callback = param.callback;
 
@@ -275,12 +259,11 @@ function httpRequest(param) {
 }
 
 /**
- * 
- * 
- * @param {any} returnData 
+ *
+ *
+ * @param {any} returnData
  */
 function requestReturn(returnData) {
-
     let dataObj = JSON.parse(returnData);
     let sessionId = dataObj['sessionId'];
     let data = dataObj['data'];
@@ -290,8 +273,7 @@ function requestReturn(returnData) {
 
     if (fn) {
         fn(err, data);
-    }
-    else {
+    } else {
         console.log('callback function is not found');
     }
 
@@ -300,8 +282,7 @@ function requestReturn(returnData) {
     let sessionIdPart = '';
     if (count == 5) {
         sessionIdPart = sessionStrs[count - 2] + '_' + sessionStrs[count - 1];
-    }
-    else {
+    } else {
         sessionIdPart = sessionId;
     }
 

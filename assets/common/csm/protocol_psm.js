@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const CjChannelUdp = require('./../cjs/nodejs/cjchannel_udp');
 const fs = require('fs');
@@ -39,7 +39,7 @@ let crc16Table = [
     0xfd2e, 0xed0f, 0xdd6c, 0xcd4d, 0xbdaa, 0xad8b, 0x9de8, 0x8dc9,
     0x7c26, 0x6c07, 0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0x0cc1,
     0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
-    0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
+    0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
 ];
 
 if (typeof Int32Array !== 'undefined') {
@@ -57,24 +57,24 @@ function crc16(buf, iOffset, length) {
 }
 
 
-//** body
-//*1 head
+//* * body
+//* 1 head
 //    uint    head;
 
-//*2 front
+//* 2 front
 //    ushort  version;
 
-//*3 dataLength
+//* 3 dataLength
 //    ushort  dataLength;
 
-//*4 body
+//* 4 body
 function PsmPacketBody() {
     this.frameType = 0; // send received calcer : IEC104
     this.sourceOriginal = 0;
     this.sourceAddress = 0;
     this.resFrame = 0;
     this.targetAddress = 0;
-    //4(head) + 2 + 2 + 10 + 2
+    // 4(head) + 2 + 2 + 10 + 2
     this.controlWord = 0; // short controlWord; short frameNo;
     //  + 24 + 2(crc)
     this.command = 0;
@@ -87,7 +87,7 @@ function PsmPacketBody() {
 
 PsmPacketBody.byteCout = 48;
 
-PsmPacketBody.prototype.fromBuffer = function (buf, offset) {
+PsmPacketBody.prototype.fromBuffer = function(buf, offset) {
     let offset2 = offset;
     this.frameType = buf.readInt32LE(offset2, true);
     offset2 += 4;
@@ -116,7 +116,7 @@ PsmPacketBody.prototype.fromBuffer = function (buf, offset) {
     return offset2;
 };
 
-PsmPacketBody.prototype.toBuffer = function () {
+PsmPacketBody.prototype.toBuffer = function() {
     let rBuf = Buffer.allocUnsafe(PsmPacketBody.byteCout);
     let iOffset = 0;
     rBuf.writeInt32LE(this.frameType, iOffset, true);
@@ -145,14 +145,14 @@ PsmPacketBody.prototype.toBuffer = function () {
     return rBuf;
 };
 
-//*5 data
+//* 5 data
 //  char data[dataLength]
 
-//*6 crc
+//* 6 crc
 //    int  crc;
 
 
-//** define
+//* * define
 /**
  * PsmDefine
  * @constructor
@@ -169,7 +169,7 @@ PsmDefine.CIPsmControlCode_NACK = 0xC000;
 
 PsmDefine.ci_psm_packet_default_size = 1024 * 2;
 PsmDefine.ci_psm_fix_size = (PsmPacketBody.byteCout + 10);
-PsmDefine.ci_psm_packet_default_count = function (byteCout) {
+PsmDefine.ci_psm_packet_default_count = function(byteCout) {
     return ( (PsmDefine.ci_psm_packet_default_size - PsmDefine.ci_psm_fix_size) / byteCout );
 };
 
@@ -209,54 +209,54 @@ PsmDefine.gct_core5_base = (0x05000000);
 PsmDefine.gct_core6_base = (0x06000000);
 PsmDefine.gct_core7_base = (0x07000000);
 
-//link check
+// link check
 PsmDefine.gct_channel_base = (PsmDefine.gct_core1_base + (0x050000));
 PsmDefine.gct_channel_hand = (PsmDefine.gct_channel_base + (0x0202));
 PsmDefine.gct_channel_check = (PsmDefine.gct_channel_base + (0x0302));
 
-//message
+// message
 PsmDefine.gct_message_base = (PsmDefine.gct_core3_base + (0x050000));
-//0x03050101 03 05 01 01
+// 0x03050101 03 05 01 01
 PsmDefine.gct_message_command_param = (PsmDefine.gct_message_base + (0x0101));
 
-//file
+// file
 PsmDefine.gct_file_base = (PsmDefine.gct_core3_base + (0x060000));
-//PsmDefine.gct_file_information_read = (PsmDefine.gct_file_base + (0x0101));
-//0x03060102 03 06 01 02
+// PsmDefine.gct_file_information_read = (PsmDefine.gct_file_base + (0x0101));
+// 0x03060102 03 06 01 02
 PsmDefine.gct_file_information_write = (PsmDefine.gct_file_base + (0x0102));
-//PsmDefine.gct_file_content_read = (PsmDefine.gct_file_base + (0x0201));
-//0x03060202 03 06 02 02
+// PsmDefine.gct_file_content_read = (PsmDefine.gct_file_base + (0x0201));
+// 0x03060202 03 06 02 02
 PsmDefine.gct_file_content_write = (PsmDefine.gct_file_base + (0x0202));
-//0x03060302 03 06 03 02
+// 0x03060302 03 06 03 02
 PsmDefine.gct_file_shell = (PsmDefine.gct_file_base + (0x0302));
 
-//realtime
+// realtime
 PsmDefine.gct_realtime_base = (PsmDefine.gct_core5_base + (0x050000));
-//0x05050101 05 05 01 01
+// 0x05050101 05 05 01 01
 PsmDefine.gct_realtime_data_request = (PsmDefine.gct_realtime_base + (0x0101));
-//0x05050101 05 05 01 02
+// 0x05050101 05 05 01 02
 PsmDefine.gct_realtime_data_post = (PsmDefine.gct_realtime_base + (0x0102));
 
-PsmDefine.GM_req_sys_login_1 = "req.sys.user.login.1";
-PsmDefine.GM_req_db_sql_execute_1 = "req.db.sql.execute.1";
-PsmDefine.GM_req_db_sql_select_1 = "req.db.sql.select.1";
+PsmDefine.GM_req_sys_login_1 = 'req.sys.user.login.1';
+PsmDefine.GM_req_db_sql_execute_1 = 'req.db.sql.execute.1';
+PsmDefine.GM_req_db_sql_select_1 = 'req.db.sql.select.1';
 
-PsmDefine.GM_resp_sys_login_1 = "resp.sys.user.login.1";
-PsmDefine.GM_resp_db_sql_execute_1 = "resp.db.sql.execute.1";
-PsmDefine.GM_resp_db_sql_select_1 = "resp.db.sql.select.1";
+PsmDefine.GM_resp_sys_login_1 = 'resp.sys.user.login.1';
+PsmDefine.GM_resp_db_sql_execute_1 = 'resp.db.sql.execute.1';
+PsmDefine.GM_resp_db_sql_select_1 = 'resp.db.sql.select.1';
 
-PsmDefine.CS_EntryPsmStationNumSource = "PsmStationNumSource";
-PsmDefine.CS_EntryPsmStationNumTarget = "PsmStationNumTarget";
+PsmDefine.CS_EntryPsmStationNumSource = 'PsmStationNumSource';
+PsmDefine.CS_EntryPsmStationNumTarget = 'PsmStationNumTarget';
 
-PsmDefine.CS_EntryPsmSentReason = "PsmSentReason";
-PsmDefine.CS_EntryPsmSentContainerId = "PsmSentContainerId";
-PsmDefine.CS_EntryPsmSentSourceId = "PsmSentSourceId";
-PsmDefine.CS_EntryPsmSentTargetId = "PsmSentTargetId";
-PsmDefine.CS_EntryPsmSentTag = "PsmSentTag";
-PsmDefine.CS_EntryPsmHeartJumpInterval = "PsmHeartJumpInterval";
-PsmDefine.CS_EntryPsmYxSendInterval = "PsmSendYxInterval";
-PsmDefine.CS_EntryPsmYcSendInterval = "PsmSendYcInterval";
-PsmDefine.CS_EntryPsmYwSendInterval = "PsmSendYwInterval";
+PsmDefine.CS_EntryPsmSentReason = 'PsmSentReason';
+PsmDefine.CS_EntryPsmSentContainerId = 'PsmSentContainerId';
+PsmDefine.CS_EntryPsmSentSourceId = 'PsmSentSourceId';
+PsmDefine.CS_EntryPsmSentTargetId = 'PsmSentTargetId';
+PsmDefine.CS_EntryPsmSentTag = 'PsmSentTag';
+PsmDefine.CS_EntryPsmHeartJumpInterval = 'PsmHeartJumpInterval';
+PsmDefine.CS_EntryPsmYxSendInterval = 'PsmSendYxInterval';
+PsmDefine.CS_EntryPsmYcSendInterval = 'PsmSendYcInterval';
+PsmDefine.CS_EntryPsmYwSendInterval = 'PsmSendYwInterval';
 
 
 PsmDefine.DealReplyType_None = 0;
@@ -265,7 +265,7 @@ PsmDefine.DealReplyType_Nack = 2;
 PsmDefine.DealReplyType_Define = 3;
 
 
-//**
+//* *
 function PsmAttach(iReason = 0, iContainerId = 0, iSourceId = 0, iTargetId = 0, iTag = 0) {
     this.reason = iReason;
     this.containerId = iContainerId;
@@ -281,7 +281,7 @@ function PsmAttach(iReason = 0, iContainerId = 0, iSourceId = 0, iTargetId = 0, 
  */
 function UserException(message) {
     this.message = message;
-    this.name = "UserException";
+    this.name = 'UserException';
 }
 
 /**
@@ -294,7 +294,7 @@ function UserException(message) {
  */
 function BaseAttr(name, size, type, encoding) {
     if (!name) {
-        throw new UserException("invalid name");
+        throw new UserException('invalid name');
     }
     this.name = name;
     this.size = size;
@@ -321,7 +321,7 @@ function PsmRealtimeDataStruct() {
 
 PsmRealtimeDataStruct.structs = new Map();
 
-PsmRealtimeDataStruct.getByteCount = function (stack) {
+PsmRealtimeDataStruct.getByteCount = function(stack) {
     let iSize = 0;
     let attr;
     let idx = 0;
@@ -332,23 +332,21 @@ PsmRealtimeDataStruct.getByteCount = function (stack) {
     return iSize;
 };
 
-PsmRealtimeDataStruct.prototype.add = function (name, size = 4, type = BaseAttr.CI_Type_int, encoding = 'ascii') {
-    if (size === 4 && type !== BaseAttr.CI_Type_int)
-    {
+PsmRealtimeDataStruct.prototype.add = function(name, size = 4, type = BaseAttr.CI_Type_int, encoding = 'ascii') {
+    if (size === 4 && type !== BaseAttr.CI_Type_int) {
         return;
     }
     this.stack.push(new BaseAttr(name, size, type, encoding));
 };
 
-PsmRealtimeDataStruct.prototype.setParamType = function (paramType) {
+PsmRealtimeDataStruct.prototype.setParamType = function(paramType) {
     this.paramType = paramType;
     this.byteCount = PsmRealtimeDataStruct.getByteCount(this.stack);
     PsmRealtimeDataStruct.structs.set(paramType, this);
 };
 
-PsmRealtimeDataStruct.prototype.toBuffer = function (objs) {
-    if (!(objs instanceof Array))
-    {
+PsmRealtimeDataStruct.prototype.toBuffer = function(objs) {
+    if (!(objs instanceof Array)) {
         return Buffer.allocUnsafe(0);
     }
     let rBuf = Buffer.allocUnsafe(this.byteCount * objs.length);
@@ -365,48 +363,46 @@ PsmRealtimeDataStruct.prototype.toBuffer = function (objs) {
             attr = stack[j];
             value = obj[attr.name];
             switch (attr.type) {
-                case BaseAttr.CI_Type_int:
-                    if (attr.size > 4) {
-                        rBuf.writeInt32LE(value, iOffset, 4, true);
-                        iOffset += 4;
-                    }
-                    else {
-                        rBuf.writeIntLE(value, iOffset, attr.size, true);
-                        iOffset += attr.size;
-                    }
-                    break;
-                case BaseAttr.CI_Type_long:
-                    rBuf.writeIntLE(value, iOffset, 8, true);
-                    iOffset += 8;
-                    break;
-                case BaseAttr.CI_Type_float:
-                    rBuf.writeFloatLE(value, iOffset, 4, true);
+            case BaseAttr.CI_Type_int:
+                if (attr.size > 4) {
+                    rBuf.writeInt32LE(value, iOffset, 4, true);
                     iOffset += 4;
-                    break;
-                case BaseAttr.CI_Type_double:
-                    rBuf.writeDoubleLE(value, iOffset, 8, true);
-                    iOffset += 8;
-                    break;
-                case BaseAttr.CI_Type_string:
-                    if (value.length > attr.size) {
-                        rBuf.write(value, iOffset, attr.size);
-                    }
-                    else {
-                        rBuf.write(value, iOffset, value.length);
-                        rBuf[iOffset + value.length] = 0;
-                    }
+                } else {
+                    rBuf.writeIntLE(value, iOffset, attr.size, true);
                     iOffset += attr.size;
-                    break;
-                default:
+                }
+                break;
+            case BaseAttr.CI_Type_long:
+                rBuf.writeIntLE(value, iOffset, 8, true);
+                iOffset += 8;
+                break;
+            case BaseAttr.CI_Type_float:
+                rBuf.writeFloatLE(value, iOffset, 4, true);
+                iOffset += 4;
+                break;
+            case BaseAttr.CI_Type_double:
+                rBuf.writeDoubleLE(value, iOffset, 8, true);
+                iOffset += 8;
+                break;
+            case BaseAttr.CI_Type_string:
+                if (value.length > attr.size) {
+                    rBuf.write(value, iOffset, attr.size);
+                } else {
+                    rBuf.write(value, iOffset, value.length);
+                    rBuf[iOffset + value.length] = 0;
+                }
+                iOffset += attr.size;
+                break;
+            default:
 
-                    break;
+                break;
             }
         }
     }
     return rBuf;
 };
 
-PsmRealtimeDataStruct.prototype.fromBuffer = function (bufData) {
+PsmRealtimeDataStruct.prototype.fromBuffer = function(bufData) {
     let objs = [];
     if (!(bufData instanceof Buffer)) {
         return objs;
@@ -423,40 +419,39 @@ PsmRealtimeDataStruct.prototype.fromBuffer = function (bufData) {
         for (j = 0; j < stackLength; j++) {
             attr = stack[j];
             switch (attr.type) {
-                case BaseAttr.CI_Type_int:
-                    if (attr.size > 4) {
-                        value = bufData.readInt32LE(iOffset, 4, true);
-                        iOffset += 4;
-                    }
-                    else {
-                        value = bufData.readIntLE(iOffset, attr.size, true);
-                        iOffset += attr.size;
-                    }
-                    break;
-                case BaseAttr.CI_Type_long:
-                    value = bufData.readIntLE(iOffset, 6, true);
-                    iOffset += 8;
-                    break;
-                case BaseAttr.CI_Type_float:
-                    value = bufData.readFloatLE(iOffset, 4, true);
+            case BaseAttr.CI_Type_int:
+                if (attr.size > 4) {
+                    value = bufData.readInt32LE(iOffset, 4, true);
                     iOffset += 4;
-                    break;
-                case BaseAttr.CI_Type_double:
-                    value = bufData.readDoubleLE(iOffset, 8, true);
-                    iOffset += 8;
-                    break;
-                case BaseAttr.CI_Type_string:
-                    value = bufData.toString('utf8', iOffset, iOffset + attr.size);
+                } else {
+                    value = bufData.readIntLE(iOffset, attr.size, true);
                     iOffset += attr.size;
-                    break;
-                default:
+                }
+                break;
+            case BaseAttr.CI_Type_long:
+                value = bufData.readIntLE(iOffset, 6, true);
+                iOffset += 8;
+                break;
+            case BaseAttr.CI_Type_float:
+                value = bufData.readFloatLE(iOffset, 4, true);
+                iOffset += 4;
+                break;
+            case BaseAttr.CI_Type_double:
+                value = bufData.readDoubleLE(iOffset, 8, true);
+                iOffset += 8;
+                break;
+            case BaseAttr.CI_Type_string:
+                value = bufData.toString('utf8', iOffset, iOffset + attr.size);
+                iOffset += attr.size;
+                break;
+            default:
                     //
-                    break;
+                break;
             }
             Object.defineProperty(obj, attr.name, {
                 configurable: true,
                 enumerable: true,
-                value: value
+                value: value,
             });
         }
         objs.push(obj);
@@ -475,7 +470,7 @@ function PsmReceivePacket() {
     this._state = 0;
     this._dataOffset = 0;
 
-    //recvCache : recv data -> push to recvCache
+    // recvCache : recv data -> push to recvCache
     this.recvCache = Buffer.allocUnsafeSlow(PsmDefine.PACKAGE_MAX_BUF_SIZE);
     this.recvOffset = 0;
     this.dealOffset = 0;
@@ -487,9 +482,9 @@ function PsmReceivePacket() {
  * only deal on complete psm packet
  * @param data
  */
-PsmReceivePacket.prototype.doReceived = function (data) {
+PsmReceivePacket.prototype.doReceived = function(data) {
     if (!data) {
-        throw new UserException("BasParser.prototype.handleRecv(buf) : invalid buf!");
+        throw new UserException('BasParser.prototype.handleRecv(buf) : invalid buf!');
     }
     if (data.length > PsmDefine.PACKAGE_MAX_SIZE) {
         console.log('BasParser.prototype.handleRecv(buf) : data.length > PsmDefine.PACKAGE_MAX_SIZE!');
@@ -500,8 +495,7 @@ PsmReceivePacket.prototype.doReceived = function (data) {
         if (iNoDeal > PsmDefine.PACKAGE_MAX_SIZE) {
             this.recvOffset = 0;
             console.log('BasParser.prototype.handleRecv(buf) : iNoDeal > PsmDefine.PACKAGE_MAX_SIZE!');
-        }
-        else {
+        } else {
             this.recvCache.copy(this.recvCache, 0, this.dealOffset, this.recvOffset);
             this.recvOffset = iNoDeal;
         }
@@ -512,7 +506,7 @@ PsmReceivePacket.prototype.doReceived = function (data) {
     this.dealCache();
 };
 
-PsmReceivePacket.prototype.dealCache = function () {
+PsmReceivePacket.prototype.dealCache = function() {
     let index = this.dealOffset;
     let end = this.recvOffset;
     let buf = this.recvCache;
@@ -522,55 +516,54 @@ PsmReceivePacket.prototype.dealCache = function () {
     }
     while (index < end) {
         switch (state) {
-            case 0: {
-                this._head = buf.readInt32LE(index, true);
-                index += 4;
-                if (this._head === PsmDefine.c_psm_head) {
-                    state = 1;
-                }
+        case 0: {
+            this._head = buf.readInt32LE(index, true);
+            index += 4;
+            if (this._head === PsmDefine.c_psm_head) {
+                state = 1;
             }
+        }
+            break;
+        case 1: {
+            this._front = buf.readInt16LE(index, true);
+            index += 2;
+            state = 2;
+        }
+            break;
+        case 2: {
+            this._dataLength = buf.readInt16LE(index, true);
+            index += 2;
+            state = 3;
+        }
+            break;
+        case 3: {
+            index = this._body.fromBuffer(buf, index);
+            this._dataOffset = index;
+            state = (this._dataLength > 0) ? 4 : 5;
+        }
+            break;
+        case 4: {
+            if (index >= (this._dataOffset + this._dataLength)) {
+                state = 5;
                 break;
-            case 1: {
-                this._front = buf.readInt16LE(index, true);
+            }
+            ++index;
+        }
+            break;
+        case 5: {
+            if (end - index > 1) {
+                this._end = buf.readInt16LE(index, true);
                 index += 2;
-                state = 2;
-            }
-                break;
-            case 2: {
-                this._dataLength = buf.readInt16LE(index, true);
-                index += 2;
-                state = 3;
-            }
-                break;
-            case 3: {
-                index = this._body.fromBuffer(buf, index);
-                this._dataOffset = index;
-                state = (this._dataLength > 0) ? 4 : 5;
-            }
-                break;
-            case 4: {
-                if (index >= (this._dataOffset + this._dataLength)) {
-                    state = 5;
-                    break;
-                }
-                ++index;
-            }
-                break;
-            case 5: {
-                if (end - index > 1) {
-                    this._end = buf.readInt16LE(index, true);
-                    index += 2;
-                    state = 0;
-                    //todo:best:crc
-                    if (this.onReceivedPacket) {
-                        this.onReceivedPacket();
-                    }
-
+                state = 0;
+                    // todo:best:crc
+                if (this.onReceivedPacket) {
+                    this.onReceivedPacket();
                 }
             }
-                break;
-            default:
-                break;
+        }
+            break;
+        default:
+            break;
         }
     }
     this.dealOffset = index;
@@ -605,7 +598,7 @@ function PsmFileDataInfo(fileName = '', fileDir = '', fileSize = 0, fileData = [
     this.attach = attach;
 }
 
-PsmFileDataInfo.getFileSize = function (fileData) {
+PsmFileDataInfo.getFileSize = function(fileData) {
     let iFileSize = 0;
     for (let i = 0; i < fileData.length; i++) {
         iFileSize += fileData[i].length;
@@ -653,16 +646,16 @@ function PsmProtocol() {
     // //#lock
     // CxMutex _processLock;
 
-    //*receivePacket
+    //* receivePacket
     let receivePacket = new PsmReceivePacket();
-    receivePacket.onReceivedPacket = function () {
+    receivePacket.onReceivedPacket = function() {
         self.dealPacket();
     };
 
-    //*channel
+    //* channel
     let channel = new CjChannelUdp();
     channel.isAutoOpen = true;
-    channel.onReceived = function (data) {
+    channel.onReceived = function(data) {
         receivePacket.doReceived(data);
     };
 
@@ -671,7 +664,7 @@ function PsmProtocol() {
     this.channel = channel;
     this.receivePacket = receivePacket;
 
-    //*on
+    //* on
     this.onReceivedMessage = null; // onReceivedMessage(sCommand, sParam, attach)
     this.onReceivedFile = null; // onReceivedFile(PsmFileDataInfo)
     this.onReceivedRealtimeDataPost = null; // onReceivedRealtimeDataPost(iParamType, bufParam, iParamCount, attach)
@@ -685,62 +678,61 @@ function PsmProtocol() {
  *
  * @param option = {LocalIpAddress:'127.0.0.1', LocalPort: 5555, RemoteIpAddress: '127.0.0,.1', RemotePort: 5556, FileSavePath: '/temp'};
  */
-PsmProtocol.prototype.start = function (option) {
+PsmProtocol.prototype.start = function(option) {
     // tcpclient1.open({port: 5556, host: '127.0.0.1'});
     this.channel.open(option);
     this.checkProtocol(1000);
     this._fileSavePath = option.FileSavePath;
 };
 
-PsmProtocol.prototype.stop = function () {
+PsmProtocol.prototype.stop = function() {
     this.checkProtocol(0);
     this.channel.close();
 };
 
-//this._body, this.recvCache, this._dataOffset, this._dataLength
-PsmProtocol.prototype.dealPacket = function () {
+// this._body, this.recvCache, this._dataOffset, this._dataLength
+PsmProtocol.prototype.dealPacket = function() {
     let body = this.receivePacket._body;
     if (body.controlWord === PsmDefine.CIPsmControlCode_NACK) {
         this.dealNack(body);
-    }
-    else {
+    } else {
         let bufData = Buffer.allocUnsafe(this.receivePacket._dataLength);
         this.receivePacket.recvCache.copy(bufData, 0, this.receivePacket._dataOffset, this.receivePacket._dataOffset+this.receivePacket._dataLength);
         let iDeal = 0;
         switch (body.command) {
-            //*heart jump
-            case PsmDefine.gct_channel_hand: {
-                iDeal = PsmDefine.DealReplyType_Ack;
-            }
-                break;
-            //*message
-            case PsmDefine.gct_message_command_param: {
-                iDeal = this.dealMessageCommand(body, bufData);
-            }
-                break;
-            //*realtime
-            case PsmDefine.gct_realtime_data_request: {
-                iDeal = this.dealRealtimeRequest(body, bufData);
-            }
-                break;
-            case PsmDefine.gct_realtime_data_post: {
-                iDeal = this.dealRealtimePost(body, bufData);
-            }
-                break;
-            //*file
-            case PsmDefine.gct_file_information_write: {
-                iDeal = this.dealFileInformationWrite(body, bufData);
-            }
-                break;
-            case PsmDefine.gct_file_content_write: {
-                iDeal = this.dealFileDataWrite(body, bufData);
-            }
-                break;
-            case PsmDefine.gct_file_shell:
+            //* heart jump
+        case PsmDefine.gct_channel_hand: {
+            iDeal = PsmDefine.DealReplyType_Ack;
+        }
+            break;
+            //* message
+        case PsmDefine.gct_message_command_param: {
+            iDeal = this.dealMessageCommand(body, bufData);
+        }
+            break;
+            //* realtime
+        case PsmDefine.gct_realtime_data_request: {
+            iDeal = this.dealRealtimeRequest(body, bufData);
+        }
+            break;
+        case PsmDefine.gct_realtime_data_post: {
+            iDeal = this.dealRealtimePost(body, bufData);
+        }
+            break;
+            //* file
+        case PsmDefine.gct_file_information_write: {
+            iDeal = this.dealFileInformationWrite(body, bufData);
+        }
+            break;
+        case PsmDefine.gct_file_content_write: {
+            iDeal = this.dealFileDataWrite(body, bufData);
+        }
+            break;
+        case PsmDefine.gct_file_shell:
 //            iDeal = this.dealFileShell();
-                break;
-            default:
-                break;
+            break;
+        default:
+            break;
         }
         if (iDeal === PsmDefine.DealReplyType_Ack) {
             let iReason = body.reason;
@@ -750,8 +742,7 @@ PsmProtocol.prototype.dealPacket = function () {
             let iTag = body.resCommand;
             let attach = new PsmAttach(iReason, iContainerId, iSourceID, iTargetId, iTag);
             this.responseAck(body.command, attach);
-        }
-        else if (iDeal < 0) {
+        } else if (iDeal < 0) {
             let iReason = body.reason;
             let iContainerId = body.container;
             let iSourceID = body.targetAddress;
@@ -763,39 +754,38 @@ PsmProtocol.prototype.dealPacket = function () {
     }
 };
 
-PsmProtocol.prototype.dealNack = function (body) {
+PsmProtocol.prototype.dealNack = function(body) {
     switch (body.command) {
-        case PsmDefine.gct_file_information_write:
-        case PsmDefine.gct_file_content_write: {
-            if (body.command === PsmDefine.gct_file_information_write) {
-                this._sendFileCurrentIndex = -1;
-            }
-            ++this._sendFileCurrentIndex;
-            if (this._sendFileCurrentIndex < this._sendFileCurrentDataInfo.fileData.length) {
-                let fileData = this._sendFileCurrentDataInfo.fileData[this._sendFileCurrentIndex];
-                let iReason = body.reason;
-                let iContainerId = body.container;
-                let iSourceID = body.targetAddress;
-                let iTargetId = body.sourceAddress;
-                let iTag = body.resCommand;
-                let attach = new PsmAttach(iReason, iContainerId, iSourceID, iTargetId, iTag);
-                this.sendFileData(fileData, attach);
-            }
-            else {
-                this.sendFileComplete();
-                this._sendFileCurrentIndex = -1;
-                this._sendFileTime = 0;
-                this._sendingFileTime = 0;
-                this.sendNextFilePath();
-            }
+    case PsmDefine.gct_file_information_write:
+    case PsmDefine.gct_file_content_write: {
+        if (body.command === PsmDefine.gct_file_information_write) {
+            this._sendFileCurrentIndex = -1;
         }
-            break;
-        default:
-            break;
+        ++this._sendFileCurrentIndex;
+        if (this._sendFileCurrentIndex < this._sendFileCurrentDataInfo.fileData.length) {
+            let fileData = this._sendFileCurrentDataInfo.fileData[this._sendFileCurrentIndex];
+            let iReason = body.reason;
+            let iContainerId = body.container;
+            let iSourceID = body.targetAddress;
+            let iTargetId = body.sourceAddress;
+            let iTag = body.resCommand;
+            let attach = new PsmAttach(iReason, iContainerId, iSourceID, iTargetId, iTag);
+            this.sendFileData(fileData, attach);
+        } else {
+            this.sendFileComplete();
+            this._sendFileCurrentIndex = -1;
+            this._sendFileTime = 0;
+            this._sendingFileTime = 0;
+            this.sendNextFilePath();
+        }
+    }
+        break;
+    default:
+        break;
     }
 };
 
-PsmProtocol.prototype.dealMessageCommand = function (body, bufData) {
+PsmProtocol.prototype.dealMessageCommand = function(body, bufData) {
     if (bufData.length > 0) {
         let iParam = bufData.indexOf(0);
         let sCommand = bufData.toString('utf8', 0, iParam);
@@ -816,7 +806,7 @@ PsmProtocol.prototype.dealMessageCommand = function (body, bufData) {
     return PsmDefine.DealReplyType_Error_Data;
 };
 
-PsmProtocol.prototype.dealFileInformationWrite = function (body, bufData) {
+PsmProtocol.prototype.dealFileInformationWrite = function(body, bufData) {
     let pathInfo = PsmProtocol.pathInfoFromBuffer(bufData);
     this._receiveFileCurrentDataInfo.fileName = pathInfo[0];
     this._receiveFileCurrentDataInfo.fileSize = pathInfo[1];
@@ -825,13 +815,12 @@ PsmProtocol.prototype.dealFileInformationWrite = function (body, bufData) {
         this._receivedFileSize = 0;
         this._receiveFileInfoTargetId = body.targetAddress;
         return PsmDefine.DealReplyType_Ack;
-    }
-    else {
+    } else {
         return PsmDefine.DealReplyType_Error_Data;
     }
 };
 
-PsmProtocol.prototype.dealFileDataWrite = function (body, bufData) {
+PsmProtocol.prototype.dealFileDataWrite = function(body, bufData) {
     if (bufData.length <= 0) {
         return;
     }
@@ -841,14 +830,14 @@ PsmProtocol.prototype.dealFileDataWrite = function (body, bufData) {
         let iReason = body.reason;
         let iContainerId = body.container;
         let iSourceID = body.sourceOriginal;
-        let iTargetId = this._receiveFileInfoTargetId;//body.targetAddress;
+        let iTargetId = this._receiveFileInfoTargetId;// body.targetAddress;
         let iTag = body.resCommand;
         this._receiveFileCurrentDataInfo.attach = new PsmAttach(iReason, iContainerId, iSourceID, iTargetId, iTag);
         this.receivedFileWrite();
     }
 };
 
-PsmProtocol.prototype.dealRealtimeRequest = function (body, bufData) {
+PsmProtocol.prototype.dealRealtimeRequest = function(body, bufData) {
     let iReason = body.reason;
     let iContainerId = body.container;
     let iSourceID = body.sourceOriginal;
@@ -859,7 +848,7 @@ PsmProtocol.prototype.dealRealtimeRequest = function (body, bufData) {
     return PsmDefine.DealReplyType_Define;
 };
 
-PsmProtocol.prototype.dealRealtimePost = function (body, bufData) {
+PsmProtocol.prototype.dealRealtimePost = function(body, bufData) {
     if (bufData.length > 0) {
         let iReason = body.reason;
         let iContainerId = body.container;
@@ -873,7 +862,7 @@ PsmProtocol.prototype.dealRealtimePost = function (body, bufData) {
     return PsmDefine.DealReplyType_Error_Data;
 };
 
-PsmProtocol.prototype.postMessageCommand = function (sCommand, sParam = '', attach = null) {
+PsmProtocol.prototype.postMessageCommand = function(sCommand, sParam = '', attach = null) {
     if (!(typeof sCommand === 'string' || sCommand instanceof String)) {
         return -1;
     }
@@ -894,46 +883,44 @@ PsmProtocol.prototype.postMessageCommand = function (sCommand, sParam = '', atta
     return this.postData(PsmDefine.gct_message_command_param, 0, bufData, 0, attach);
 };
 
-PsmProtocol.prototype.postFile = function (sFilePath, attach = null) {
+PsmProtocol.prototype.postFile = function(sFilePath, attach = null) {
     this._sendFilePathes.set(sFilePath, attach);
     return this.sendNextFilePath();
 };
 
-PsmProtocol.prototype.postFileData = function (fileName, fileData, attach = null) {
+PsmProtocol.prototype.postFileData = function(fileName, fileData, attach = null) {
     let fileDataInfo = new PsmFileDataInfo(fileName, '', PsmFileDataInfo.getFileSize(fileData), fileData, attach);
     this._sendFileQueueDataInfos.push(fileDataInfo);
     return this.sendNextFilePath();
 };
 
-PsmProtocol.prototype.postRealtimeDataRequest = function (attach = null) {
+PsmProtocol.prototype.postRealtimeDataRequest = function(attach = null) {
     return this.postData(PsmDefine.gct_realtime_data_request, 0, 0, 0, attach);
 };
 
-PsmProtocol.prototype.postRealtimeDataPost = function (iParamType, bufParam, iParamCount, attach = null) {
+PsmProtocol.prototype.postRealtimeDataPost = function(iParamType, bufParam, iParamCount, attach = null) {
     return this.postData(PsmDefine.gct_realtime_data_post, iParamType, bufParam, iParamCount, attach);
 };
 
-PsmProtocol.prototype.postRealtimeDataStructsPost = function (iParamType, structs, attach = null) {
+PsmProtocol.prototype.postRealtimeDataStructsPost = function(iParamType, structs, attach = null) {
     let struct = PsmRealtimeDataStruct.structs.get(iParamType);
     if (struct) {
         let bufData = struct.toBuffer(structs);
         if (bufData.length > 0) {
             return this.postData(PsmDefine.gct_realtime_data_post, iParamType, bufData, structs.length, attach);
-        }
-        else {
+        } else {
             return -2;
         }
-    }
-    else {
+    } else {
         return -1;
     }
 };
 
-PsmProtocol.prototype.postHeartJump = function (attach = null) {
+PsmProtocol.prototype.postHeartJump = function(attach = null) {
     return this.postData(PsmDefine.gct_channel_hand, 0, 0, 1, attach);
 };
 
-PsmProtocol.prototype.sendFileData = function (fileData, attach) {
+PsmProtocol.prototype.sendFileData = function(fileData, attach) {
     this.postData(PsmDefine.gct_file_content_write, 0, fileData, 0, attach);
     this._sendingFileTime = Date.now();
 };
@@ -944,7 +931,7 @@ PsmProtocol.prototype.sendFileData = function (fileData, attach) {
  * @param fnAfterLoad = function(iResult, <Array<buffer>>fileDatas)
  * @param iSpitLength
  */
-PsmProtocol.loadFile = function (sFilePath, fnAfterLoad, iSpitLength = 1024) {
+PsmProtocol.loadFile = function(sFilePath, fnAfterLoad, iSpitLength = 1024) {
     if (!(fnAfterLoad instanceof Function)) {
         return;
     }
@@ -962,12 +949,12 @@ PsmProtocol.loadFile = function (sFilePath, fnAfterLoad, iSpitLength = 1024) {
             iResult += chunk.length;
         }
     });
-    readable.on('end', function () {
+    readable.on('end', function() {
         fnAfterLoad(iResult, rFileDatas);
     });
 };
 
-PsmProtocol.prototype.sendNextFilePath = function () {
+PsmProtocol.prototype.sendNextFilePath = function() {
     let r = 0;
     let self = this;
     if (self._sendFilePathes.size > 100) {
@@ -985,50 +972,46 @@ PsmProtocol.prototype.sendNextFilePath = function () {
             self._sendFileCurrentDataInfo = self._sendFileQueueDataInfos.shift();
             self._sendFileTime = Date.now();
             r = self.sendFileInfo();
-        }
-        else {
+        } else {
             let sFilePath = null, attach = null;
             for ([sFilePath, attach] of self._sendFilePathes) {
                 break;
             }
             if (sFilePath !== null) {
                 self._sendFilePathes.delete(sFilePath);
-                PsmProtocol.loadFile(sFilePath, function (iResult, fileDates) {
+                PsmProtocol.loadFile(sFilePath, function(iResult, fileDates) {
                     if (iResult > 0) {
                         self._sendFileCurrentDataInfo = new PsmFileDataInfo(path.basename(sFilePath), path.dirname(sFilePath), iResult, fileDates, attach);
                         self._sendFileTime = Date.now();
                         r = self.sendFileInfo();
-                    }
-                    else {
+                    } else {
                         if (self.onSentFile) {
                             self.onSentFile(-3, sFilePath);
                         }
                     }
                 });
-            }
-            else {
+            } else {
                 r = -4;
             }
         }
-    }
-    else {
+    } else {
         r = 1;
     }
     return r;
 };
 
-PsmProtocol.prototype.sendFileComplete = function () {
+PsmProtocol.prototype.sendFileComplete = function() {
     if (this.onSentFile) {
         this.onSentFile(this._sendFileCurrentDataInfo.fileSize, this._sendFileCurrentDataInfo);
     }
 };
 
-PsmProtocol.prototype.sendFileInfo = function () {
+PsmProtocol.prototype.sendFileInfo = function() {
     let bufData = PsmProtocol.pathInfoToBuffer(this._sendFileCurrentDataInfo.fileName, this._sendFileCurrentDataInfo.fileSize);
     return this.postData(PsmDefine.gct_file_information_write, 0, bufData, 0, this._sendFileCurrentDataInfo.attach);
 };
 
-PsmProtocol.pathInfoToBuffer = function (fileName, fileSize) {
+PsmProtocol.pathInfoToBuffer = function(fileName, fileSize) {
     let bufFileName = new Buffer(fileName);
     let r = Buffer.allocUnsafe(bufFileName.length + 5);
     bufFileName.copy(r, 0);
@@ -1037,7 +1020,7 @@ PsmProtocol.pathInfoToBuffer = function (fileName, fileSize) {
     return r;
 };
 
-PsmProtocol.pathInfoFromBuffer = function (buf) {
+PsmProtocol.pathInfoFromBuffer = function(buf) {
     let rFileName = buf.toString('utf8', 0, buf.length - 5);
     let rFileSize = buf.readInt32LE(buf.length - 4, true);
     return [rFileName, rFileSize];
@@ -1052,7 +1035,7 @@ PsmProtocol.pathInfoFromBuffer = function (buf) {
  * @param attach
  * @returns int
  */
-PsmProtocol.prototype.postData = function (iCommand, iParamType, bufData, iParamCount, attach = null) {
+PsmProtocol.prototype.postData = function(iCommand, iParamType, bufData, iParamCount, attach = null) {
     let iReason = 0;
     let iContainerId = 0;
     let iSourceId = 0;
@@ -1069,15 +1052,13 @@ PsmProtocol.prototype.postData = function (iCommand, iParamType, bufData, iParam
     body.sourceOriginal = iSourceId;
     if (this._sentSourceId > 0) {
         body.sourceAddress = this._sentSourceId;
-    }
-    else {
+    } else {
         body.sourceAddress = iSourceId;
     }
     body.resFrame = 0;
     if (this._sentTargetId > 0) {
         body.targetAddress = this._sentTargetId;
-    }
-    else {
+    } else {
         body.targetAddress = iTargetId;
     }
     body.controlWord = PsmDefine.CIPsmControlCode_Initiactive;
@@ -1096,7 +1077,7 @@ PsmProtocol.prototype.postData = function (iCommand, iParamType, bufData, iParam
  * @param attach
  * @returns int
  */
-PsmProtocol.prototype.responseAck = function (iCommand, attach) {
+PsmProtocol.prototype.responseAck = function(iCommand, attach) {
     let iReason = 0;
     let iContainerId = 0;
     let iSourceId = 0;
@@ -1113,8 +1094,7 @@ PsmProtocol.prototype.responseAck = function (iCommand, attach) {
     body.sourceOriginal = iSourceId;
     if (this._sentSourceId > 0) {
         body.sourceAddress = this._sentSourceId;
-    }
-    else {
+    } else {
         body.sourceAddress = iSourceId;
     }
     body.resFrame = 0;
@@ -1136,7 +1116,7 @@ PsmProtocol.prototype.responseAck = function (iCommand, attach) {
  * @param attach
  * @returns int
  */
-PsmProtocol.prototype.responseNack = function (iCommand, iErrorid, attach) {
+PsmProtocol.prototype.responseNack = function(iCommand, iErrorid, attach) {
     let iReason = iErrorid;
     let iContainerId = 0;
     let iSourceId = 0;
@@ -1153,8 +1133,7 @@ PsmProtocol.prototype.responseNack = function (iCommand, iErrorid, attach) {
     body.sourceOriginal = iSourceId;
     if (this._sentSourceId > 0) {
         body.sourceAddress = this._sentSourceId;
-    }
-    else {
+    } else {
         body.sourceAddress = iSourceId;
     }
     body.resFrame = 0;
@@ -1174,7 +1153,7 @@ PsmProtocol.prototype.responseNack = function (iCommand, iErrorid, attach) {
  * @param bufData
  * @returns int
  */
-PsmProtocol.prototype.postPacketData = function (body, bufData) {
+PsmProtocol.prototype.postPacketData = function(body, bufData) {
     let buf = PsmSendPacket(body, bufData);
     return this.channel.sendData(buf);
 };
@@ -1184,13 +1163,13 @@ PsmProtocol.prototype.postPacketData = function (body, bufData) {
  *
  * @returns string
  */
-PsmProtocol.prototype.reportSelf = function () {
+PsmProtocol.prototype.reportSelf = function() {
     let sLastTime = new Date(this._lastReceivedDataTime);
-    return util.format(" sentSourceId: %d, sentTargetId: %d, lastReceivedDataTime: %s ",
+    return util.format(' sentSourceId: %d, sentTargetId: %d, lastReceivedDataTime: %s ',
         this._sentSourceId, this._sentTargetId, sLastTime);
 };
 
-PsmProtocol.prototype.checkProtocol = function (interval) {
+PsmProtocol.prototype.checkProtocol = function(interval) {
     let self = this;
     if (interval < 1000) {
         if (self.checkTimer) {
@@ -1203,8 +1182,8 @@ PsmProtocol.prototype.checkProtocol = function (interval) {
         clearTimeout(self.checkTimer);
     }
 
-    let timeOut = function () {
-        //发送超时
+    let timeOut = function() {
+        // 发送超时
         if (this._sendingFileTime !== 0) {
             if ((Date.now() - this._sendingFileTime) > 1000) {
                 this._sendFileCurrentDataInfo = new PsmFileDataInfo();
@@ -1212,8 +1191,7 @@ PsmProtocol.prototype.checkProtocol = function (interval) {
                 this._sendFileTime = 0;
                 this._sendingFileTime = 0;
             }
-        }
-        else if (this._sendFileTime !== 0) {
+        } else if (this._sendFileTime !== 0) {
             if ((Date.now() - this._sendFileTime) > 1000) {
                 this._sendFileCurrentDataInfo = new PsmFileDataInfo();
                 this._sendFileCurrentIndex = -1;
@@ -1227,25 +1205,25 @@ PsmProtocol.prototype.checkProtocol = function (interval) {
     self.checkTimer = setTimeout(timeOut, interval);
 };
 
-PsmProtocol.prototype.receivedMessageCommand = function (sCommand, sParam, attach) {
+PsmProtocol.prototype.receivedMessageCommand = function(sCommand, sParam, attach) {
     if (this.onReceivedMessage instanceof Function) {
         this.onReceivedMessage(sCommand, sParam, attach);
     }
 };
 
-PsmProtocol.prototype.receivedFileWrite = function () {
+PsmProtocol.prototype.receivedFileWrite = function() {
     if (this.onReceivedFile instanceof Function) {
         this.onReceivedFile(this._receiveFileCurrentDataInfo);
     }
 };
 
-PsmProtocol.prototype.receivedRealtimeDataRequest = function (attach) {
+PsmProtocol.prototype.receivedRealtimeDataRequest = function(attach) {
     if (this.onReceivedRealtimeDataRequest instanceof Function) {
         this.onReceivedRealtimeDataRequest(attach);
     }
 };
 
-PsmProtocol.prototype.receivedRealtimeDataPost = function (iParamType, bufParam, iParamCount, attach) {
+PsmProtocol.prototype.receivedRealtimeDataPost = function(iParamType, bufParam, iParamCount, attach) {
     if (this.onReceivedRealtimeDataPost instanceof Function) {
         this.onReceivedRealtimeDataPost(iParamType, bufParam, iParamCount, attach);
     }
@@ -1258,50 +1236,49 @@ PsmProtocol.prototype.receivedRealtimeDataPost = function (iParamType, bufParam,
     }
 };
 
-PsmProtocol.prototype.on = function (command, fn) {
+PsmProtocol.prototype.on = function(command, fn) {
     this.fns.set(command, fn);
 };
 
-PsmProtocol.prototype.dispatch = function (command, msgObj) {
+PsmProtocol.prototype.dispatch = function(command, msgObj) {
     let fn = this.fns.get(command);
     if (fn) {
         fn(msgObj);
-    }
-    else if (this.fnAllPacket) {
+    } else if (this.fnAllPacket) {
         this.fnAllPacket(command, msgObj);
     }
 };
 
-PsmProtocol.prototype.sendPacket = function (packet) {
+PsmProtocol.prototype.sendPacket = function(packet) {
     return this.channel.sendData(packet);
 };
 
 PsmProtocol.PsmDefine = PsmDefine;
 PsmProtocol.PsmRealtimeDataStruct = PsmRealtimeDataStruct;
 
-//Init User Packet
+// Init User Packet
 {
     let yxStruct = new PsmRealtimeDataStruct();
-    yxStruct.add("address");
-    yxStruct.add("value");
-    yxStruct.add("quality");
-    yxStruct.add("datetime", 8, BaseAttr.CI_Type_long);
+    yxStruct.add('address');
+    yxStruct.add('value');
+    yxStruct.add('quality');
+    yxStruct.add('datetime', 8, BaseAttr.CI_Type_long);
     yxStruct.setParamType(0x01010203);
     PsmRealtimeDataStruct.yxStruct = yxStruct;
 
     let ycStruct = new PsmRealtimeDataStruct();
-    ycStruct.add("address");
-    ycStruct.add("value", 8, BaseAttr.CI_Type_double);
-    ycStruct.add("quality");
-    ycStruct.add("datetime", 8, BaseAttr.CI_Type_long);
+    ycStruct.add('address');
+    ycStruct.add('value', 8, BaseAttr.CI_Type_double);
+    ycStruct.add('quality');
+    ycStruct.add('datetime', 8, BaseAttr.CI_Type_long);
     ycStruct.setParamType(0x0101021C);
     PsmRealtimeDataStruct.ycStruct = ycStruct;
 
     let ywStruct = new PsmRealtimeDataStruct();
-    ywStruct.add("address");
-    ywStruct.add("value", 128, BaseAttr.CI_Type_string);
-    ywStruct.add("quality");
-    ywStruct.add("datetime", 8, BaseAttr.CI_Type_long);
+    ywStruct.add('address');
+    ywStruct.add('value', 128, BaseAttr.CI_Type_string);
+    ywStruct.add('quality');
+    ywStruct.add('datetime', 8, BaseAttr.CI_Type_long);
     ywStruct.setParamType(0x0101022F);
     PsmRealtimeDataStruct.ycStruct = ywStruct;
 
@@ -1312,55 +1289,55 @@ PsmProtocol.PsmRealtimeDataStruct = PsmRealtimeDataStruct;
             LocalPort: 5555,
             RemoteIpAddress: '127.0.0,.1',
             RemotePort: 5556,
-            FileSavePath: 'f:/temp'
+            FileSavePath: 'f:/temp',
         });
 
         let yxes = [
             {address: 0x01000001, value: 1, quality: 1, datetime: Date.now()},
-            {address: 0x01000002, value: 2, quality: 1, datetime: Date.now()}
+            {address: 0x01000002, value: 2, quality: 1, datetime: Date.now()},
         ];
         let iResult = psm.postRealtimeDataStructsPost(PsmRealtimeDataStruct.yxStruct.paramType, yxes);
         console.log('psm.postRealtimeDataStructsPost iResult=', iResult);
     }
 }
 
-PsmProtocol.test1 = function () {
-  var psmProtocol = new PsmProtocol();
+PsmProtocol.test1 = function() {
+    let psmProtocol = new PsmProtocol();
 
-  psmProtocol.start({
-    LocalIpAddress: '127.0.0.1',
-    LocalPort: 9005,
-    RemoteIpAddress: '127.0.0.1',
-    RemotePort: 9105,
-    FileSavePath: 'f:/temp'
-  });
+    psmProtocol.start({
+        LocalIpAddress: '127.0.0.1',
+        LocalPort: 9005,
+        RemoteIpAddress: '127.0.0.1',
+        RemotePort: 9105,
+        FileSavePath: 'f:/temp',
+    });
 
   // all in
-  psmProtocol.onReceivedMessage = function (sCommand, sParam, attach) {
-    console.log(sCommand, sParam);
-  };
+    psmProtocol.onReceivedMessage = function(sCommand, sParam, attach) {
+        console.log(sCommand, sParam);
+    };
 
-  let iTimes = 0;
-  setInterval(function () {
-    let yxes = [
+    let iTimes = 0;
+    setInterval(function() {
+        let yxes = [
       {address: 0x01000001+iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
-      {address: 0x01000001+iTimes, value: iTimes++, quality: 1, datetime: Date.now()}
-    ];
-    let iResult = psmProtocol.postRealtimeDataStructsPost(PsmRealtimeDataStruct.yxStruct.paramType, yxes);
-    let sLog = 'psmProtocol.postRealtimeDataStructsPost iResult=' + iResult.toString();
-    console.log(sLog);
-    fs.writeFile('f:/001.txt', sLog, function (err) {
-      if (err) {
-        console.log(err);
-      }
-    });
-    iResult = psmProtocol.postMessageCommand('post.tts.1', 'txt=你好才是大家好');
-    sLog = 'psmProtocol.postMessageCommand iResult=' + iResult.toString();
-    console.log(sLog);
-    fs.writeFile('f:/001.txt', sLog, function (err) {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }, 3000);
-}
+      {address: 0x01000001+iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
+        ];
+        let iResult = psmProtocol.postRealtimeDataStructsPost(PsmRealtimeDataStruct.yxStruct.paramType, yxes);
+        let sLog = 'psmProtocol.postRealtimeDataStructsPost iResult=' + iResult.toString();
+        console.log(sLog);
+        fs.writeFile('f:/001.txt', sLog, function(err) {
+            if (err) {
+                console.log(err);
+            }
+        });
+        iResult = psmProtocol.postMessageCommand('post.tts.1', 'txt=你好才是大家好');
+        sLog = 'psmProtocol.postMessageCommand iResult=' + iResult.toString();
+        console.log(sLog);
+        fs.writeFile('f:/001.txt', sLog, function(err) {
+            if (err) {
+                console.log(err);
+            }
+        });
+    }, 3000);
+};

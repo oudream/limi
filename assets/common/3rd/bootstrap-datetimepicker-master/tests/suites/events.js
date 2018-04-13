@@ -1,22 +1,22 @@
 module('Events', {
-    setup: function(){
+    setup: function() {
         this.input = $('<input type="text" value="31-03-2011">')
                         .appendTo('#qunit-fixture')
-                        .datetimepicker({format: "dd-mm-yyyy"})
+                        .datetimepicker({format: 'dd-mm-yyyy'})
                         .focus(); // Activate for visibility checks
-        this.dp = this.input.data('datetimepicker')
+        this.dp = this.input.data('datetimepicker');
         this.picker = this.dp.picker;
     },
-    teardown: function(){
+    teardown: function() {
         this.picker.remove();
-    }
+    },
 });
 
-test('Selecting a year from decade view triggers pickYear', function(){
-    var target,
+test('Selecting a year from decade view triggers pickYear', function() {
+    let target,
         triggered = 0;
 
-    this.input.on('changeYear', function(){
+    this.input.on('changeYear', function() {
         triggered++;
     });
 
@@ -51,11 +51,11 @@ test('Selecting a year from decade view triggers pickYear', function(){
     equal(triggered, 1);
 });
 
-test('Selecting a month from year view triggers pickMonth', function(){
-    var target,
+test('Selecting a month from year view triggers pickMonth', function() {
+    let target,
         triggered = 0;
 
-    this.input.on('changeMonth', function(){
+    this.input.on('changeMonth', function() {
         triggered++;
     });
 

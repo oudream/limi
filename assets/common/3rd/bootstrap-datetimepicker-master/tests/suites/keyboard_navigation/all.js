@@ -1,25 +1,25 @@
 module('Keyboard Navigation (All)', {
-    setup: function(){
+    setup: function() {
         this.input = $('<input type="text">')
                         .appendTo('#qunit-fixture')
-                        .datetimepicker({format: "dd-mm-yyyy"})
+                        .datetimepicker({format: 'dd-mm-yyyy'})
                         .focus(); // Activate for visibility checks
-        this.dp = this.input.data('datetimepicker')
+        this.dp = this.input.data('datetimepicker');
         this.picker = this.dp.picker;
     },
-    teardown: function(){
+    teardown: function() {
         this.picker.remove();
-    }
+    },
 });
 
-test('TAB hides picker', function(){
-    var target;
+test('TAB hides picker', function() {
+    let target;
 
     ok(this.picker.is(':visible'), 'Picker is visible');
 
     this.input.trigger({
         type: 'keydown',
-        keyCode: 9
+        keyCode: 9,
     });
 
     ok(this.picker.is(':not(:visible)'), 'Picker is hidden');

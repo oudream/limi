@@ -23,14 +23,14 @@ class Square extends Polygon {
     }
 }
 
-var polygon = new Polygon(11, 12);
+let polygon = new Polygon(11, 12);
 polygon.say();
 
-var square = new Square(11);
+let square = new Square(11);
 square.say();
 
 function Class1() {
-    this.name = "Class1";
+    this.name = 'Class1';
     this.old = 11;
     return this;
 }
@@ -38,7 +38,7 @@ function Class1() {
 Class1.prototype.weight = 12;
 Class1.prototype.height = 180;
 
-var class1 = Class1();
+let class1 = Class1();
 console.log(class1.name);
 console.log(class1.old);
 console.log(class1.weight);

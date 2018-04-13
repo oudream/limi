@@ -3,95 +3,76 @@
  */
 
 
-(function () {
-
+(function() {
     window.cjEvent = {};
 
-    var cjEvent = window.cjEvent;
+    let cjEvent = window.cjEvent;
 
-    var bind = function (elem, param, procFunc) {
-
-        var _elem;
+    let bind = function(elem, param, procFunc) {
+        let _elem;
 
         if (elem.jquery) {
         /** 是jQuery对象时 */
             _elem = elem[0];
-        }
-        else{
+        } else {
         /** 是Dom对象时 */
             _elem = elem;
         }
 
-        var mutation = new MutationObserver(procFunc);
+        let mutation = new MutationObserver(procFunc);
 
-        mutation.observe(_elem,param);
-
+        mutation.observe(_elem, param);
     };
 
-    cjEvent.resize = function (elem, callback_fn) {
+    cjEvent.resize = function(elem, callback_fn) {
+        let procFunc = function(mutationRec) {
+            let hasChange = false;
 
-        var procFunc = function (mutationRec) {
-
-            var hasChange = false;
-
-            for (var i = 0; i < mutationRec.length; i++) {
-
-                var rec = mutationRec[i];
-                if (rec.type == 'attributes' && rec.attributeName == 'style' && cjString.isContain(rec.oldValue,"width") != -1) {
+            for (let i = 0; i < mutationRec.length; i++) {
+                let rec = mutationRec[i];
+                if (rec.type == 'attributes' && rec.attributeName == 'style' && cjString.isContain(rec.oldValue, 'width') != -1) {
                     hasChange = true;
                     break;
                 }
             }
 
-            if (hasChange){
+            if (hasChange) {
                 callback_fn();
             }
         };
 
-        var param = {
+        let param = {
             'attributes': true,
             'attributeOldValue': true,
         };
 
-        bind.apply(this,[elem,param,procFunc]);
-
+        bind.apply(this, [elem, param, procFunc]);
     };
 
-    cjEvent.subChange = function (elem, callback_fn) {
+    cjEvent.subChange = function(elem, callback_fn) {
+        let procFunc = function(mutationRec) {
+            let hasChange = false;
 
-        var procFunc = function (mutationRec) {
-
-            var hasChange = false;
-
-            for (var i = 0; i < mutationRec.length; i++) {
-
-                var rec = mutationRec[i];
+            for (let i = 0; i < mutationRec.length; i++) {
+                let rec = mutationRec[i];
                 if (rec.type == 'subtree' || rec.type == 'attributes' || rec.type == 'childList') {
                     hasChange = true;
                     break;
                 }
             }
 
-            if (hasChange){
+            if (hasChange) {
                 callback_fn();
             }
         };
 
-        var param = {
+        let param = {
             'attributes': true,
             'childList': true,
-            'subtree': true
+            'subtree': true,
         };
 
-        bind.apply(this,[elem,param,procFunc]);
-
-    }
-
-
-
-
-
-
-
+        bind.apply(this, [elem, param, procFunc]);
+    };
 })();
 

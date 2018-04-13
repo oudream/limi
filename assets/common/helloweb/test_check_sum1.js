@@ -4,16 +4,16 @@
 
 // var Buffer = require("buffer")
 
-var testCheckSum1 = function () {
+let testCheckSum1 = function() {
     const buf1 = Buffer.from('414243', 'hex');
     const buf2 = Buffer.from('ABCD');
 
-    for (var i = 0 ; i < 26 ; i++) {
+    for (var i = 0; i < 26; i++) {
         // 97 is the decimal ASCII value for 'a'
         buf1[i] = i + 97;
     }
 
-    var crc = 0;
+    let crc = 0;
     console.log(buf1[0]);
     console.log(buf1[1]);
 
@@ -22,5 +22,5 @@ var testCheckSum1 = function () {
     }
 
     console.log(crc);
-}
+};
 testCheckSum1();

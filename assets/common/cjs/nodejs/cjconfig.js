@@ -4,12 +4,12 @@
 
 'use strict';
 
-//define cjs
+// define cjs
 global.cjs = global.cjs || {};
-//define CjJson
-var CjConfig = cjs.CjConfig || {};
+// define CjJson
+let CjConfig = cjs.CjConfig || {};
 cjs.CjConfig = CjConfig;
-//require depend
+// require depend
 exports = module.exports = CjConfig;
 if (! cjs.CjMeta) require('./../cjjson');
 

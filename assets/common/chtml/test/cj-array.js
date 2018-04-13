@@ -5,17 +5,16 @@
 (function() {
     window.cjArray = {};
 
-    var cjArray = window.cjArray;
+    let cjArray = window.cjArray;
 
-    cjArray.findInArray = function(array,elem) {
-        if( array == null || array == undefined) {
+    cjArray.findInArray = function(array, elem) {
+        if ( array == null || array == undefined) {
             return -2;
-        }
-        else if (array.length == 0) {
+        } else if (array.length == 0) {
             return -1;
         }
-        for( var i = 0; i < array.length; i++ ){
-            if( elem == array[i] ){
+        for ( let i = 0; i < array.length; i++ ) {
+            if ( elem == array[i] ) {
                 return i;
             }
         }
@@ -23,11 +22,10 @@
         return -1;
     };
 
-    cjArray.remove = function (array, elem) {
-        var index = array.indexOf(elem);
+    cjArray.remove = function(array, elem) {
+        let index = array.indexOf(elem);
         if (index > -1) {
             array.splice(index, 1);
         }
     };
-
-})()
+})();

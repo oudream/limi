@@ -2,16 +2,16 @@
  * Created by liuchaoyu on 2017-05-08.
  */
 
-"use strict";
+'use strict';
 
 let utils = {
-    net : {
-        getInfoFromSession : getInfoFromSession,
-        getRemoteIpAddress : getRemoteIpAddress,
+    net: {
+        getInfoFromSession: getInfoFromSession,
+        getRemoteIpAddress: getRemoteIpAddress,
     },
-    date : {
-        getDateTime : getDateTime,
-    }
+    date: {
+        getDateTime: getDateTime,
+    },
 };
 
 
@@ -28,28 +28,25 @@ function getInfoFromSession(sessionId) {
     let hostAndDsn = '';
     if (count == 5) {
         hostAndDsn = sessionStrs[count - 2];
-    }
-    else {
+    } else {
         hostAndDsn = sessionStrs[0];
     }
 
-    let host,dsn;
+    let host, dsn;
     if (hostAndDsn.indexOf(':') != -1) {
         let info = hostAndDsn.split(':');
 
         host = info[0];
         dsn = info[1];
-    }
-    else {
+    } else {
         host = '';
         dsn = hostAndDsn;
     }
 
     return {
-        host : host,
-        dsn : dsn,
-    }
-
+        host: host,
+        dsn: dsn,
+    };
 }
 
 /**
@@ -72,7 +69,7 @@ function getRemoteIpAddress(req) {
     let _ipAddress = (req.connection) ? req.connection.remoteAddress : req.upgradeReq.connection.remoteAddress;
 
     if (_ipAddress.indexOf(':') != -1) {
-        _ipAddressStr = _ipAddress.split(":");
+        _ipAddressStr = _ipAddress.split(':');
     }
 
     ipAddress = _ipAddressStr[_ipAddressStr.length - 1];
@@ -85,8 +82,6 @@ function getRemoteIpAddress(req) {
 /** net end */
 
 
-
-
 /** date */
 /**
  * 获取当前日期时间
@@ -94,12 +89,12 @@ function getRemoteIpAddress(req) {
  * @param separator : String 日期分隔符，例如：'/','-'
  * @returns {*} : String 日期时间字符串
  */
-function getDateTime(type,separator) {
+function getDateTime(type, separator) {
     let date = new Date();
 
     let result = null;
     let _sep = '/';
-    let year,month,day,hour,min,sec;
+    let year, month, day, hour, min, sec;
 
     let _year = date.getFullYear();
     year = _year;
@@ -125,20 +120,15 @@ function getDateTime(type,separator) {
 
     if (type == 'date') {
         result = year + _sep + month + _sep + day;
-    }
-    else if (type == 'time') {
+    } else if (type == 'time') {
         result = hour + ':' + min + ':' + sec;
-    }
-    else {
+    } else {
         result = year + _sep + month + _sep + day + ' ' + hour + ':' + min + ':' + sec;
     }
 
     return result;
 }
 /** date end */
-
-
-
 
 
 module.exports = {

@@ -10,97 +10,97 @@
  * email: hunter.z@263.net
  * Date: 2017-06-19
  */
-(function ($) {
+(function($) {
     var settings = {}, roots = {}, caches = {},
-        //default consts of core
+        // default consts of core
         _consts = {
             className: {
-                BUTTON: "button",
-                LEVEL: "level",
-                ICO_LOADING: "ico_loading",
-                SWITCH: "switch",
-                NAME: 'node_name'
+                BUTTON: 'button',
+                LEVEL: 'level',
+                ICO_LOADING: 'ico_loading',
+                SWITCH: 'switch',
+                NAME: 'node_name',
             },
             event: {
-                NODECREATED: "ztree_nodeCreated",
-                CLICK: "ztree_click",
-                EXPAND: "ztree_expand",
-                COLLAPSE: "ztree_collapse",
-                ASYNC_SUCCESS: "ztree_async_success",
-                ASYNC_ERROR: "ztree_async_error",
-                REMOVE: "ztree_remove",
-                SELECTED: "ztree_selected",
-                UNSELECTED: "ztree_unselected"
+                NODECREATED: 'ztree_nodeCreated',
+                CLICK: 'ztree_click',
+                EXPAND: 'ztree_expand',
+                COLLAPSE: 'ztree_collapse',
+                ASYNC_SUCCESS: 'ztree_async_success',
+                ASYNC_ERROR: 'ztree_async_error',
+                REMOVE: 'ztree_remove',
+                SELECTED: 'ztree_selected',
+                UNSELECTED: 'ztree_unselected',
             },
             id: {
-                A: "_a",
-                ICON: "_ico",
-                SPAN: "_span",
-                SWITCH: "_switch",
-                UL: "_ul"
+                A: '_a',
+                ICON: '_ico',
+                SPAN: '_span',
+                SWITCH: '_switch',
+                UL: '_ul',
             },
             line: {
-                ROOT: "root",
-                ROOTS: "roots",
-                CENTER: "center",
-                BOTTOM: "bottom",
-                NOLINE: "noline",
-                LINE: "line"
+                ROOT: 'root',
+                ROOTS: 'roots',
+                CENTER: 'center',
+                BOTTOM: 'bottom',
+                NOLINE: 'noline',
+                LINE: 'line',
             },
             folder: {
-                OPEN: "open",
-                CLOSE: "close",
-                DOCU: "docu"
+                OPEN: 'open',
+                CLOSE: 'close',
+                DOCU: 'docu',
             },
             node: {
-                CURSELECTED: "curSelectedNode"
-            }
+                CURSELECTED: 'curSelectedNode',
+            },
         },
-        //default setting of core
+        // default setting of core
         _setting = {
-            treeId: "",
+            treeId: '',
             treeObj: null,
             view: {
                 addDiyDom: null,
                 autoCancelSelected: true,
                 dblClickExpand: true,
-                expandSpeed: "fast",
+                expandSpeed: 'fast',
                 fontCss: {},
                 nameIsHTML: false,
                 selectedMulti: true,
                 showIcon: true,
                 showLine: true,
                 showTitle: true,
-                txtSelectedEnable: false
+                txtSelectedEnable: false,
             },
             data: {
                 key: {
-                    children: "children",
-                    name: "name",
-                    title: "",
-                    url: "url",
-                    icon: "icon"
+                    children: 'children',
+                    name: 'name',
+                    title: '',
+                    url: 'url',
+                    icon: 'icon',
                 },
                 simpleData: {
                     enable: false,
-                    idKey: "id",
-                    pIdKey: "pId",
-                    rootPId: null
+                    idKey: 'id',
+                    pIdKey: 'pId',
+                    rootPId: null,
                 },
                 keep: {
                     parent: false,
-                    leaf: false
-                }
+                    leaf: false,
+                },
             },
             async: {
                 enable: false,
-                contentType: "application/x-www-form-urlencoded",
-                type: "post",
-                dataType: "text",
-                url: "",
+                contentType: 'application/x-www-form-urlencoded',
+                type: 'post',
+                dataType: 'text',
+                url: '',
                 autoParam: [],
                 otherParam: [],
-                dataFilter: null
+                dataFilter: null,
             },
             callback: {
                 beforeAsync: null,
@@ -123,13 +123,13 @@
                 onMouseUp: null,
                 onExpand: null,
                 onCollapse: null,
-                onRemove: null
-            }
+                onRemove: null,
+            },
         },
-        //default root of core
-        //zTree use root to save full data
-        _initRoot = function (setting) {
-            var r = data.getRoot(setting);
+        // default root of core
+        // zTree use root to save full data
+        _initRoot = function(setting) {
+            let r = data.getRoot(setting);
             if (!r) {
                 r = {};
                 data.setRoot(setting, r);
@@ -142,9 +142,9 @@
             r.zId = 0;
             r._ver = (new Date()).getTime();
         },
-        //default cache of core
-        _initCache = function (setting) {
-            var c = data.getCache(setting);
+        // default cache of core
+        _initCache = function(setting) {
+            let c = data.getCache(setting);
             if (!c) {
                 c = {};
                 data.setCache(setting, c);
@@ -152,47 +152,47 @@
             c.nodes = [];
             c.doms = [];
         },
-        //default bindEvent of core
-        _bindEvent = function (setting) {
-            var o = setting.treeObj,
+        // default bindEvent of core
+        _bindEvent = function(setting) {
+            let o = setting.treeObj,
                 c = consts.event;
-            o.bind(c.NODECREATED, function (event, treeId, node) {
+            o.bind(c.NODECREATED, function(event, treeId, node) {
                 tools.apply(setting.callback.onNodeCreated, [event, treeId, node]);
             });
 
-            o.bind(c.CLICK, function (event, srcEvent, treeId, node, clickFlag) {
+            o.bind(c.CLICK, function(event, srcEvent, treeId, node, clickFlag) {
                 tools.apply(setting.callback.onClick, [srcEvent, treeId, node, clickFlag]);
             });
 
-            o.bind(c.EXPAND, function (event, treeId, node) {
+            o.bind(c.EXPAND, function(event, treeId, node) {
                 tools.apply(setting.callback.onExpand, [event, treeId, node]);
             });
 
-            o.bind(c.COLLAPSE, function (event, treeId, node) {
+            o.bind(c.COLLAPSE, function(event, treeId, node) {
                 tools.apply(setting.callback.onCollapse, [event, treeId, node]);
             });
 
-            o.bind(c.ASYNC_SUCCESS, function (event, treeId, node, msg) {
+            o.bind(c.ASYNC_SUCCESS, function(event, treeId, node, msg) {
                 tools.apply(setting.callback.onAsyncSuccess, [event, treeId, node, msg]);
             });
 
-            o.bind(c.ASYNC_ERROR, function (event, treeId, node, XMLHttpRequest, textStatus, errorThrown) {
+            o.bind(c.ASYNC_ERROR, function(event, treeId, node, XMLHttpRequest, textStatus, errorThrown) {
                 tools.apply(setting.callback.onAsyncError, [event, treeId, node, XMLHttpRequest, textStatus, errorThrown]);
             });
 
-            o.bind(c.REMOVE, function (event, treeId, treeNode) {
+            o.bind(c.REMOVE, function(event, treeId, treeNode) {
                 tools.apply(setting.callback.onRemove, [event, treeId, treeNode]);
             });
 
-            o.bind(c.SELECTED, function (event, treeId, node) {
+            o.bind(c.SELECTED, function(event, treeId, node) {
                 tools.apply(setting.callback.onSelected, [treeId, node]);
             });
-            o.bind(c.UNSELECTED, function (event, treeId, node) {
+            o.bind(c.UNSELECTED, function(event, treeId, node) {
                 tools.apply(setting.callback.onUnSelected, [treeId, node]);
             });
         },
-        _unbindEvent = function (setting) {
-            var o = setting.treeObj,
+        _unbindEvent = function(setting) {
+            let o = setting.treeObj,
                 c = consts.event;
             o.unbind(c.NODECREATED)
                 .unbind(c.CLICK)
@@ -204,42 +204,42 @@
                 .unbind(c.SELECTED)
                 .unbind(c.UNSELECTED);
         },
-        //default event proxy of core
-        _eventProxy = function (event) {
-            var target = event.target,
+        // default event proxy of core
+        _eventProxy = function(event) {
+            let target = event.target,
                 setting = data.getSetting(event.data.treeId),
-                tId = "", node = null,
-                nodeEventType = "", treeEventType = "",
+                tId = '', node = null,
+                nodeEventType = '', treeEventType = '',
                 nodeEventCallback = null, treeEventCallback = null,
                 tmp = null;
 
-            if (tools.eqs(event.type, "mousedown")) {
-                treeEventType = "mousedown";
-            } else if (tools.eqs(event.type, "mouseup")) {
-                treeEventType = "mouseup";
-            } else if (tools.eqs(event.type, "contextmenu")) {
-                treeEventType = "contextmenu";
-            } else if (tools.eqs(event.type, "click")) {
-                if (tools.eqs(target.tagName, "span") && target.getAttribute("treeNode" + consts.id.SWITCH) !== null) {
+            if (tools.eqs(event.type, 'mousedown')) {
+                treeEventType = 'mousedown';
+            } else if (tools.eqs(event.type, 'mouseup')) {
+                treeEventType = 'mouseup';
+            } else if (tools.eqs(event.type, 'contextmenu')) {
+                treeEventType = 'contextmenu';
+            } else if (tools.eqs(event.type, 'click')) {
+                if (tools.eqs(target.tagName, 'span') && target.getAttribute('treeNode' + consts.id.SWITCH) !== null) {
                     tId = tools.getNodeMainDom(target).id;
-                    nodeEventType = "switchNode";
+                    nodeEventType = 'switchNode';
                 } else {
-                    tmp = tools.getMDom(setting, target, [{tagName: "a", attrName: "treeNode" + consts.id.A}]);
+                    tmp = tools.getMDom(setting, target, [{tagName: 'a', attrName: 'treeNode' + consts.id.A}]);
                     if (tmp) {
                         tId = tools.getNodeMainDom(tmp).id;
-                        nodeEventType = "clickNode";
+                        nodeEventType = 'clickNode';
                     }
                 }
-            } else if (tools.eqs(event.type, "dblclick")) {
-                treeEventType = "dblclick";
-                tmp = tools.getMDom(setting, target, [{tagName: "a", attrName: "treeNode" + consts.id.A}]);
+            } else if (tools.eqs(event.type, 'dblclick')) {
+                treeEventType = 'dblclick';
+                tmp = tools.getMDom(setting, target, [{tagName: 'a', attrName: 'treeNode' + consts.id.A}]);
                 if (tmp) {
                     tId = tools.getNodeMainDom(tmp).id;
-                    nodeEventType = "switchNode";
+                    nodeEventType = 'switchNode';
                 }
             }
             if (treeEventType.length > 0 && tId.length == 0) {
-                tmp = tools.getMDom(setting, target, [{tagName: "a", attrName: "treeNode" + consts.id.A}]);
+                tmp = tools.getMDom(setting, target, [{tagName: 'a', attrName: 'treeNode' + consts.id.A}]);
                 if (tmp) {
                     tId = tools.getNodeMainDom(tmp).id;
                 }
@@ -248,78 +248,78 @@
             if (tId.length > 0) {
                 node = data.getNodeCache(setting, tId);
                 switch (nodeEventType) {
-                    case "switchNode" :
-                        if (!node.isParent) {
-                            nodeEventType = "";
-                        } else if (tools.eqs(event.type, "click")
-                            || (tools.eqs(event.type, "dblclick") && tools.apply(setting.view.dblClickExpand, [setting.treeId, node], setting.view.dblClickExpand))) {
-                            nodeEventCallback = handler.onSwitchNode;
-                        } else {
-                            nodeEventType = "";
-                        }
-                        break;
-                    case "clickNode" :
-                        nodeEventCallback = handler.onClickNode;
-                        break;
+                case 'switchNode' :
+                    if (!node.isParent) {
+                        nodeEventType = '';
+                    } else if (tools.eqs(event.type, 'click')
+                            || (tools.eqs(event.type, 'dblclick') && tools.apply(setting.view.dblClickExpand, [setting.treeId, node], setting.view.dblClickExpand))) {
+                        nodeEventCallback = handler.onSwitchNode;
+                    } else {
+                        nodeEventType = '';
+                    }
+                    break;
+                case 'clickNode' :
+                    nodeEventCallback = handler.onClickNode;
+                    break;
                 }
             }
             // event to zTree
             switch (treeEventType) {
-                case "mousedown" :
-                    treeEventCallback = handler.onZTreeMousedown;
-                    break;
-                case "mouseup" :
-                    treeEventCallback = handler.onZTreeMouseup;
-                    break;
-                case "dblclick" :
-                    treeEventCallback = handler.onZTreeDblclick;
-                    break;
-                case "contextmenu" :
-                    treeEventCallback = handler.onZTreeContextmenu;
-                    break;
+            case 'mousedown' :
+                treeEventCallback = handler.onZTreeMousedown;
+                break;
+            case 'mouseup' :
+                treeEventCallback = handler.onZTreeMouseup;
+                break;
+            case 'dblclick' :
+                treeEventCallback = handler.onZTreeDblclick;
+                break;
+            case 'contextmenu' :
+                treeEventCallback = handler.onZTreeContextmenu;
+                break;
             }
-            var proxyResult = {
+            let proxyResult = {
                 stop: false,
                 node: node,
                 nodeEventType: nodeEventType,
                 nodeEventCallback: nodeEventCallback,
                 treeEventType: treeEventType,
-                treeEventCallback: treeEventCallback
+                treeEventCallback: treeEventCallback,
             };
-            return proxyResult
+            return proxyResult;
         },
-        //default init node of core
-        _initNode = function (setting, level, n, parentNode, isFirstNode, isLastNode, openFlag) {
+        // default init node of core
+        _initNode = function(setting, level, n, parentNode, isFirstNode, isLastNode, openFlag) {
             if (!n) return;
-            var r = data.getRoot(setting),
+            let r = data.getRoot(setting),
                 childKey = setting.data.key.children;
             n.level = level;
-            n.tId = setting.treeId + "_" + (++r.zId);
+            n.tId = setting.treeId + '_' + (++r.zId);
             n.parentTId = parentNode ? parentNode.tId : null;
-            n.open = (typeof n.open == "string") ? tools.eqs(n.open, "true") : !!n.open;
+            n.open = (typeof n.open == 'string') ? tools.eqs(n.open, 'true') : !!n.open;
             if (n[childKey] && n[childKey].length > 0) {
                 n.isParent = true;
                 n.zAsync = true;
             } else {
-                n.isParent = (typeof n.isParent == "string") ? tools.eqs(n.isParent, "true") : !!n.isParent;
+                n.isParent = (typeof n.isParent == 'string') ? tools.eqs(n.isParent, 'true') : !!n.isParent;
                 n.open = (n.isParent && !setting.async.enable) ? n.open : false;
                 n.zAsync = !n.isParent;
             }
             n.isFirstNode = isFirstNode;
             n.isLastNode = isLastNode;
-            n.getParentNode = function () {
+            n.getParentNode = function() {
                 return data.getNodeCache(setting, n.parentTId);
             };
-            n.getPreNode = function () {
+            n.getPreNode = function() {
                 return data.getPreNode(setting, n);
             };
-            n.getNextNode = function () {
+            n.getNextNode = function() {
                 return data.getNextNode(setting, n);
             };
-            n.getIndex = function () {
+            n.getIndex = function() {
                 return data.getNodeIndex(setting, n);
             };
-            n.getPath = function () {
+            n.getPath = function() {
                 return data.getNodePath(setting, n);
             };
             n.isAjaxing = false;
@@ -336,52 +336,52 @@
             afterA: [],
             innerBeforeA: [],
             innerAfterA: [],
-            zTreeTools: []
+            zTreeTools: [],
         },
-        //method of operate data
+        // method of operate data
         data = {
-            addNodeCache: function (setting, node) {
+            addNodeCache: function(setting, node) {
                 data.getCache(setting).nodes[data.getNodeCacheId(node.tId)] = node;
             },
-            getNodeCacheId: function (tId) {
-                return tId.substring(tId.lastIndexOf("_") + 1);
+            getNodeCacheId: function(tId) {
+                return tId.substring(tId.lastIndexOf('_') + 1);
             },
-            addAfterA: function (afterA) {
+            addAfterA: function(afterA) {
                 _init.afterA.push(afterA);
             },
-            addBeforeA: function (beforeA) {
+            addBeforeA: function(beforeA) {
                 _init.beforeA.push(beforeA);
             },
-            addInnerAfterA: function (innerAfterA) {
+            addInnerAfterA: function(innerAfterA) {
                 _init.innerAfterA.push(innerAfterA);
             },
-            addInnerBeforeA: function (innerBeforeA) {
+            addInnerBeforeA: function(innerBeforeA) {
                 _init.innerBeforeA.push(innerBeforeA);
             },
-            addInitBind: function (bindEvent) {
+            addInitBind: function(bindEvent) {
                 _init.bind.push(bindEvent);
             },
-            addInitUnBind: function (unbindEvent) {
+            addInitUnBind: function(unbindEvent) {
                 _init.unbind.push(unbindEvent);
             },
-            addInitCache: function (initCache) {
+            addInitCache: function(initCache) {
                 _init.caches.push(initCache);
             },
-            addInitNode: function (initNode) {
+            addInitNode: function(initNode) {
                 _init.nodes.push(initNode);
             },
-            addInitProxy: function (initProxy, isFirst) {
+            addInitProxy: function(initProxy, isFirst) {
                 if (!!isFirst) {
                     _init.proxys.splice(0, 0, initProxy);
                 } else {
                     _init.proxys.push(initProxy);
                 }
             },
-            addInitRoot: function (initRoot) {
+            addInitRoot: function(initRoot) {
                 _init.roots.push(initRoot);
             },
-            addNodesData: function (setting, parentNode, index, nodes) {
-                var childKey = setting.data.key.children, params;
+            addNodesData: function(setting, parentNode, index, nodes) {
+                let childKey = setting.data.key.children, params;
                 if (!parentNode[childKey]) {
                     parentNode[childKey] = [];
                     index = -1;
@@ -405,99 +405,99 @@
                     parentNode[childKey].splice.apply(parentNode[childKey], params);
                 }
             },
-            addSelectedNode: function (setting, node) {
-                var root = data.getRoot(setting);
+            addSelectedNode: function(setting, node) {
+                let root = data.getRoot(setting);
                 if (!data.isSelectedNode(setting, node)) {
                     root.curSelectedList.push(node);
                 }
             },
-            addCreatedNode: function (setting, node) {
+            addCreatedNode: function(setting, node) {
                 if (!!setting.callback.onNodeCreated || !!setting.view.addDiyDom) {
-                    var root = data.getRoot(setting);
+                    let root = data.getRoot(setting);
                     root.createdNodes.push(node);
                 }
             },
-            addZTreeTools: function (zTreeTools) {
+            addZTreeTools: function(zTreeTools) {
                 _init.zTreeTools.push(zTreeTools);
             },
-            exSetting: function (s) {
+            exSetting: function(s) {
                 $.extend(true, _setting, s);
             },
-            fixPIdKeyValue: function (setting, node) {
+            fixPIdKeyValue: function(setting, node) {
                 if (setting.data.simpleData.enable) {
                     node[setting.data.simpleData.pIdKey] = node.parentTId ? node.getParentNode()[setting.data.simpleData.idKey] : setting.data.simpleData.rootPId;
                 }
             },
-            getAfterA: function (setting, node, array) {
-                for (var i = 0, j = _init.afterA.length; i < j; i++) {
+            getAfterA: function(setting, node, array) {
+                for (let i = 0, j = _init.afterA.length; i < j; i++) {
                     _init.afterA[i].apply(this, arguments);
                 }
             },
-            getBeforeA: function (setting, node, array) {
-                for (var i = 0, j = _init.beforeA.length; i < j; i++) {
+            getBeforeA: function(setting, node, array) {
+                for (let i = 0, j = _init.beforeA.length; i < j; i++) {
                     _init.beforeA[i].apply(this, arguments);
                 }
             },
-            getInnerAfterA: function (setting, node, array) {
-                for (var i = 0, j = _init.innerAfterA.length; i < j; i++) {
+            getInnerAfterA: function(setting, node, array) {
+                for (let i = 0, j = _init.innerAfterA.length; i < j; i++) {
                     _init.innerAfterA[i].apply(this, arguments);
                 }
             },
-            getInnerBeforeA: function (setting, node, array) {
-                for (var i = 0, j = _init.innerBeforeA.length; i < j; i++) {
+            getInnerBeforeA: function(setting, node, array) {
+                for (let i = 0, j = _init.innerBeforeA.length; i < j; i++) {
                     _init.innerBeforeA[i].apply(this, arguments);
                 }
             },
-            getCache: function (setting) {
+            getCache: function(setting) {
                 return caches[setting.treeId];
             },
-            getNodeIndex: function (setting, node) {
+            getNodeIndex: function(setting, node) {
                 if (!node) return null;
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     p = node.parentTId ? node.getParentNode() : data.getRoot(setting);
-                for (var i = 0, l = p[childKey].length - 1; i <= l; i++) {
+                for (let i = 0, l = p[childKey].length - 1; i <= l; i++) {
                     if (p[childKey][i] === node) {
                         return i;
                     }
                 }
                 return -1;
             },
-            getNextNode: function (setting, node) {
+            getNextNode: function(setting, node) {
                 if (!node) return null;
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     p = node.parentTId ? node.getParentNode() : data.getRoot(setting);
-                for (var i = 0, l = p[childKey].length - 1; i <= l; i++) {
+                for (let i = 0, l = p[childKey].length - 1; i <= l; i++) {
                     if (p[childKey][i] === node) {
                         return (i == l ? null : p[childKey][i + 1]);
                     }
                 }
                 return null;
             },
-            getNodeByParam: function (setting, nodes, key, value) {
+            getNodeByParam: function(setting, nodes, key, value) {
                 if (!nodes || !key) return null;
-                var childKey = setting.data.key.children;
-                for (var i = 0, l = nodes.length; i < l; i++) {
+                let childKey = setting.data.key.children;
+                for (let i = 0, l = nodes.length; i < l; i++) {
                     if (nodes[i][key] == value) {
                         return nodes[i];
                     }
-                    var tmp = data.getNodeByParam(setting, nodes[i][childKey], key, value);
+                    let tmp = data.getNodeByParam(setting, nodes[i][childKey], key, value);
                     if (tmp) return tmp;
                 }
                 return null;
             },
-            getNodeCache: function (setting, tId) {
+            getNodeCache: function(setting, tId) {
                 if (!tId) return null;
-                var n = caches[setting.treeId].nodes[data.getNodeCacheId(tId)];
+                let n = caches[setting.treeId].nodes[data.getNodeCacheId(tId)];
                 return n ? n : null;
             },
-            getNodeName: function (setting, node) {
-                var nameKey = setting.data.key.name;
-                return "" + node[nameKey];
+            getNodeName: function(setting, node) {
+                let nameKey = setting.data.key.name;
+                return '' + node[nameKey];
             },
-            getNodePath: function (setting, node) {
+            getNodePath: function(setting, node) {
                 if (!node) return null;
 
-                var path;
+                let path;
                 if (node.parentTId) {
                     path = node.getParentNode().getPath();
                 } else {
@@ -510,18 +510,18 @@
 
                 return path;
             },
-            getNodeTitle: function (setting, node) {
-                var t = setting.data.key.title === "" ? setting.data.key.name : setting.data.key.title;
-                return "" + node[t];
+            getNodeTitle: function(setting, node) {
+                let t = setting.data.key.title === '' ? setting.data.key.name : setting.data.key.title;
+                return '' + node[t];
             },
-            getNodes: function (setting) {
+            getNodes: function(setting) {
                 return data.getRoot(setting)[setting.data.key.children];
             },
-            getNodesByParam: function (setting, nodes, key, value) {
+            getNodesByParam: function(setting, nodes, key, value) {
                 if (!nodes || !key) return [];
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     result = [];
-                for (var i = 0, l = nodes.length; i < l; i++) {
+                for (let i = 0, l = nodes.length; i < l; i++) {
                     if (nodes[i][key] == value) {
                         result.push(nodes[i]);
                     }
@@ -529,31 +529,31 @@
                 }
                 return result;
             },
-            getNodesByParamFuzzy: function (setting, nodes, key, value) {
+            getNodesByParamFuzzy: function(setting, nodes, key, value) {
                 if (!nodes || !key) return [];
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     result = [];
                 value = value.toLowerCase();
-                for (var i = 0, l = nodes.length; i < l; i++) {
-                    if (typeof nodes[i][key] == "string" && nodes[i][key].toLowerCase().indexOf(value) > -1) {
+                for (let i = 0, l = nodes.length; i < l; i++) {
+                    if (typeof nodes[i][key] == 'string' && nodes[i][key].toLowerCase().indexOf(value) > -1) {
                         result.push(nodes[i]);
                     }
                     result = result.concat(data.getNodesByParamFuzzy(setting, nodes[i][childKey], key, value));
                 }
                 return result;
             },
-            getNodesByFilter: function (setting, nodes, filter, isSingle, invokeParam) {
+            getNodesByFilter: function(setting, nodes, filter, isSingle, invokeParam) {
                 if (!nodes) return (isSingle ? null : []);
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     result = isSingle ? null : [];
-                for (var i = 0, l = nodes.length; i < l; i++) {
+                for (let i = 0, l = nodes.length; i < l; i++) {
                     if (tools.apply(filter, [nodes[i], invokeParam], false)) {
                         if (isSingle) {
                             return nodes[i];
                         }
                         result.push(nodes[i]);
                     }
-                    var tmpResult = data.getNodesByFilter(setting, nodes[i][childKey], filter, isSingle, invokeParam);
+                    let tmpResult = data.getNodesByFilter(setting, nodes[i][childKey], filter, isSingle, invokeParam);
                     if (isSingle && !!tmpResult) {
                         return tmpResult;
                     }
@@ -561,67 +561,67 @@
                 }
                 return result;
             },
-            getPreNode: function (setting, node) {
+            getPreNode: function(setting, node) {
                 if (!node) return null;
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     p = node.parentTId ? node.getParentNode() : data.getRoot(setting);
-                for (var i = 0, l = p[childKey].length; i < l; i++) {
+                for (let i = 0, l = p[childKey].length; i < l; i++) {
                     if (p[childKey][i] === node) {
                         return (i == 0 ? null : p[childKey][i - 1]);
                     }
                 }
                 return null;
             },
-            getRoot: function (setting) {
+            getRoot: function(setting) {
                 return setting ? roots[setting.treeId] : null;
             },
-            getRoots: function () {
+            getRoots: function() {
                 return roots;
             },
-            getSetting: function (treeId) {
+            getSetting: function(treeId) {
                 return settings[treeId];
             },
-            getSettings: function () {
+            getSettings: function() {
                 return settings;
             },
-            getZTreeTools: function (treeId) {
-                var r = this.getRoot(this.getSetting(treeId));
+            getZTreeTools: function(treeId) {
+                let r = this.getRoot(this.getSetting(treeId));
                 return r ? r.treeTools : null;
             },
-            initCache: function (setting) {
-                for (var i = 0, j = _init.caches.length; i < j; i++) {
+            initCache: function(setting) {
+                for (let i = 0, j = _init.caches.length; i < j; i++) {
                     _init.caches[i].apply(this, arguments);
                 }
             },
-            initNode: function (setting, level, node, parentNode, preNode, nextNode) {
-                for (var i = 0, j = _init.nodes.length; i < j; i++) {
+            initNode: function(setting, level, node, parentNode, preNode, nextNode) {
+                for (let i = 0, j = _init.nodes.length; i < j; i++) {
                     _init.nodes[i].apply(this, arguments);
                 }
             },
-            initRoot: function (setting) {
-                for (var i = 0, j = _init.roots.length; i < j; i++) {
+            initRoot: function(setting) {
+                for (let i = 0, j = _init.roots.length; i < j; i++) {
                     _init.roots[i].apply(this, arguments);
                 }
             },
-            isSelectedNode: function (setting, node) {
-                var root = data.getRoot(setting);
-                for (var i = 0, j = root.curSelectedList.length; i < j; i++) {
+            isSelectedNode: function(setting, node) {
+                let root = data.getRoot(setting);
+                for (let i = 0, j = root.curSelectedList.length; i < j; i++) {
                     if (node === root.curSelectedList[i]) return true;
                 }
                 return false;
             },
-            removeNodeCache: function (setting, node) {
-                var childKey = setting.data.key.children;
+            removeNodeCache: function(setting, node) {
+                let childKey = setting.data.key.children;
                 if (node[childKey]) {
-                    for (var i = 0, l = node[childKey].length; i < l; i++) {
+                    for (let i = 0, l = node[childKey].length; i < l; i++) {
                         data.removeNodeCache(setting, node[childKey][i]);
                     }
                 }
                 data.getCache(setting).nodes[data.getNodeCacheId(node.tId)] = null;
             },
-            removeSelectedNode: function (setting, node) {
-                var root = data.getRoot(setting);
-                for (var i = 0, j = root.curSelectedList.length; i < j; i++) {
+            removeSelectedNode: function(setting, node) {
+                let root = data.getRoot(setting);
+                for (let i = 0, j = root.curSelectedList.length; i < j; i++) {
                     if (node === root.curSelectedList[i] || !data.getNodeCache(setting, root.curSelectedList[i].tId)) {
                         root.curSelectedList.splice(i, 1);
                         setting.treeObj.trigger(consts.event.UNSELECTED, [setting.treeId, node]);
@@ -630,51 +630,54 @@
                     }
                 }
             },
-            setCache: function (setting, cache) {
+            setCache: function(setting, cache) {
                 caches[setting.treeId] = cache;
             },
-            setRoot: function (setting, root) {
+            setRoot: function(setting, root) {
                 roots[setting.treeId] = root;
             },
-            setZTreeTools: function (setting, zTreeTools) {
-                for (var i = 0, j = _init.zTreeTools.length; i < j; i++) {
+            setZTreeTools: function(setting, zTreeTools) {
+                for (let i = 0, j = _init.zTreeTools.length; i < j; i++) {
                     _init.zTreeTools[i].apply(this, arguments);
                 }
             },
-            transformToArrayFormat: function (setting, nodes) {
+            transformToArrayFormat: function(setting, nodes) {
                 if (!nodes) return [];
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     r = [];
                 if (tools.isArray(nodes)) {
-                    for (var i = 0, l = nodes.length; i < l; i++) {
+                    for (let i = 0, l = nodes.length; i < l; i++) {
                         r.push(nodes[i]);
-                        if (nodes[i][childKey])
+                        if (nodes[i][childKey]) {
                             r = r.concat(data.transformToArrayFormat(setting, nodes[i][childKey]));
+                        }
                     }
                 } else {
                     r.push(nodes);
-                    if (nodes[childKey])
+                    if (nodes[childKey]) {
                         r = r.concat(data.transformToArrayFormat(setting, nodes[childKey]));
+                    }
                 }
                 return r;
             },
-            transformTozTreeFormat: function (setting, sNodes) {
-                var i, l,
+            transformTozTreeFormat: function(setting, sNodes) {
+                let i, l,
                     key = setting.data.simpleData.idKey,
                     parentKey = setting.data.simpleData.pIdKey,
                     childKey = setting.data.key.children;
-                if (!key || key == "" || !sNodes) return [];
+                if (!key || key == '' || !sNodes) return [];
 
                 if (tools.isArray(sNodes)) {
-                    var r = [];
-                    var tmpMap = {};
+                    let r = [];
+                    let tmpMap = {};
                     for (i = 0, l = sNodes.length; i < l; i++) {
                         tmpMap[sNodes[i][key]] = sNodes[i];
                     }
                     for (i = 0, l = sNodes.length; i < l; i++) {
                         if (tmpMap[sNodes[i][parentKey]] && sNodes[i][key] != sNodes[i][parentKey]) {
-                            if (!tmpMap[sNodes[i][parentKey]][childKey])
+                            if (!tmpMap[sNodes[i][parentKey]][childKey]) {
                                 tmpMap[sNodes[i][parentKey]][childKey] = [];
+                            }
                             tmpMap[sNodes[i][parentKey]][childKey].push(sNodes[i]);
                         } else {
                             r.push(sNodes[i]);
@@ -684,29 +687,29 @@
                 } else {
                     return [sNodes];
                 }
-            }
+            },
         },
-        //method of event proxy
+        // method of event proxy
         event = {
-            bindEvent: function (setting) {
-                for (var i = 0, j = _init.bind.length; i < j; i++) {
+            bindEvent: function(setting) {
+                for (let i = 0, j = _init.bind.length; i < j; i++) {
                     _init.bind[i].apply(this, arguments);
                 }
             },
-            unbindEvent: function (setting) {
-                for (var i = 0, j = _init.unbind.length; i < j; i++) {
+            unbindEvent: function(setting) {
+                for (let i = 0, j = _init.unbind.length; i < j; i++) {
                     _init.unbind[i].apply(this, arguments);
                 }
             },
-            bindTree: function (setting) {
-                var eventParam = {
-                        treeId: setting.treeId
+            bindTree: function(setting) {
+                let eventParam = {
+                        treeId: setting.treeId,
                     },
                     o = setting.treeObj;
                 if (!setting.view.txtSelectedEnable) {
                     // for can't select text
                     o.bind('selectstart', handler.onSelectStart).css({
-                        "-moz-user-select": "-moz-none"
+                        '-moz-user-select': '-moz-none',
                     });
                 }
                 o.bind('click', eventParam, event.proxy);
@@ -717,8 +720,8 @@
                 o.bind('mouseup', eventParam, event.proxy);
                 o.bind('contextmenu', eventParam, event.proxy);
             },
-            unbindTree: function (setting) {
-                var o = setting.treeObj;
+            unbindTree: function(setting) {
+                let o = setting.treeObj;
                 o.unbind('selectstart', handler.onSelectStart)
                     .unbind('click', event.proxy)
                     .unbind('dblclick', event.proxy)
@@ -728,10 +731,10 @@
                     .unbind('mouseup', event.proxy)
                     .unbind('contextmenu', event.proxy);
             },
-            doProxy: function (e) {
-                var results = [];
-                for (var i = 0, j = _init.proxys.length; i < j; i++) {
-                    var proxyResult = _init.proxys[i].apply(this, arguments);
+            doProxy: function(e) {
+                let results = [];
+                for (let i = 0, j = _init.proxys.length; i < j; i++) {
+                    let proxyResult = _init.proxys[i].apply(this, arguments);
                     results.push(proxyResult);
                     if (proxyResult.stop) {
                         break;
@@ -739,13 +742,13 @@
                 }
                 return results;
             },
-            proxy: function (e) {
-                var setting = data.getSetting(e.data.treeId);
+            proxy: function(e) {
+                let setting = data.getSetting(e.data.treeId);
                 if (!tools.uCanDo(setting, e)) return true;
-                var results = event.doProxy(e),
+                let results = event.doProxy(e),
                     r = true, x = false;
-                for (var i = 0, l = results.length; i < l; i++) {
-                    var proxyResult = results[i];
+                for (let i = 0, l = results.length; i < l; i++) {
+                    let proxyResult = results[i];
                     if (proxyResult.nodeEventCallback) {
                         x = true;
                         r = proxyResult.nodeEventCallback.apply(proxyResult, [e, proxyResult.node]) && r;
@@ -756,12 +759,12 @@
                     }
                 }
                 return r;
-            }
+            },
         },
-        //method of event handler
+        // method of event handler
         handler = {
-            onSwitchNode: function (event, node) {
-                var setting = data.getSetting(event.data.treeId);
+            onSwitchNode: function(event, node) {
+                let setting = data.getSetting(event.data.treeId);
                 if (node.open) {
                     if (tools.apply(setting.callback.beforeCollapse, [setting.treeId, node], true) == false) return true;
                     data.getRoot(setting).expandTriggerFlag = true;
@@ -773,8 +776,8 @@
                 }
                 return true;
             },
-            onClickNode: function (event, node) {
-                var setting = data.getSetting(event.data.treeId),
+            onClickNode: function(event, node) {
+                let setting = data.getSetting(event.data.treeId),
                     clickFlag = ( (setting.view.autoCancelSelected && (event.ctrlKey || event.metaKey)) && data.isSelectedNode(setting, node)) ? 0 : (setting.view.autoCancelSelected && (event.ctrlKey || event.metaKey) && setting.view.selectedMulti) ? 2 : 1;
                 if (tools.apply(setting.callback.beforeClick, [setting.treeId, node, clickFlag], true) == false) return true;
                 if (clickFlag === 0) {
@@ -785,86 +788,86 @@
                 setting.treeObj.trigger(consts.event.CLICK, [event, setting.treeId, node, clickFlag]);
                 return true;
             },
-            onZTreeMousedown: function (event, node) {
-                var setting = data.getSetting(event.data.treeId);
+            onZTreeMousedown: function(event, node) {
+                let setting = data.getSetting(event.data.treeId);
                 if (tools.apply(setting.callback.beforeMouseDown, [setting.treeId, node], true)) {
                     tools.apply(setting.callback.onMouseDown, [event, setting.treeId, node]);
                 }
                 return true;
             },
-            onZTreeMouseup: function (event, node) {
-                var setting = data.getSetting(event.data.treeId);
+            onZTreeMouseup: function(event, node) {
+                let setting = data.getSetting(event.data.treeId);
                 if (tools.apply(setting.callback.beforeMouseUp, [setting.treeId, node], true)) {
                     tools.apply(setting.callback.onMouseUp, [event, setting.treeId, node]);
                 }
                 return true;
             },
-            onZTreeDblclick: function (event, node) {
-                var setting = data.getSetting(event.data.treeId);
+            onZTreeDblclick: function(event, node) {
+                let setting = data.getSetting(event.data.treeId);
                 if (tools.apply(setting.callback.beforeDblClick, [setting.treeId, node], true)) {
                     tools.apply(setting.callback.onDblClick, [event, setting.treeId, node]);
                 }
                 return true;
             },
-            onZTreeContextmenu: function (event, node) {
-                var setting = data.getSetting(event.data.treeId);
+            onZTreeContextmenu: function(event, node) {
+                let setting = data.getSetting(event.data.treeId);
                 if (tools.apply(setting.callback.beforeRightClick, [setting.treeId, node], true)) {
                     tools.apply(setting.callback.onRightClick, [event, setting.treeId, node]);
                 }
-                return (typeof setting.callback.onRightClick) != "function";
+                return (typeof setting.callback.onRightClick) != 'function';
             },
-            onSelectStart: function (e) {
-                var n = e.originalEvent.srcElement.nodeName.toLowerCase();
-                return (n === "input" || n === "textarea" );
-            }
+            onSelectStart: function(e) {
+                let n = e.originalEvent.srcElement.nodeName.toLowerCase();
+                return (n === 'input' || n === 'textarea' );
+            },
         },
-        //method of tools for zTree
+        // method of tools for zTree
         tools = {
-            apply: function (fun, param, defaultValue) {
-                if ((typeof fun) == "function") {
+            apply: function(fun, param, defaultValue) {
+                if ((typeof fun) == 'function') {
                     return fun.apply(zt, param ? param : []);
                 }
                 return defaultValue;
             },
-            canAsync: function (setting, node) {
-                var childKey = setting.data.key.children;
+            canAsync: function(setting, node) {
+                let childKey = setting.data.key.children;
                 return (setting.async.enable && node && node.isParent && !(node.zAsync || (node[childKey] && node[childKey].length > 0)));
             },
-            clone: function (obj) {
+            clone: function(obj) {
                 if (obj === null) return null;
-                var o = tools.isArray(obj) ? [] : {};
-                for (var i in obj) {
-                    o[i] = (obj[i] instanceof Date) ? new Date(obj[i].getTime()) : (typeof obj[i] === "object" ? tools.clone(obj[i]) : obj[i]);
+                let o = tools.isArray(obj) ? [] : {};
+                for (let i in obj) {
+                    o[i] = (obj[i] instanceof Date) ? new Date(obj[i].getTime()) : (typeof obj[i] === 'object' ? tools.clone(obj[i]) : obj[i]);
                 }
                 return o;
             },
-            eqs: function (str1, str2) {
+            eqs: function(str1, str2) {
                 return str1.toLowerCase() === str2.toLowerCase();
             },
-            isArray: function (arr) {
-                return Object.prototype.toString.apply(arr) === "[object Array]";
+            isArray: function(arr) {
+                return Object.prototype.toString.apply(arr) === '[object Array]';
             },
-            isElement: function (o) {
+            isElement: function(o) {
                 return (
-                    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-                        o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
+                    typeof HTMLElement === 'object' ? o instanceof HTMLElement : // DOM2
+                        o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
                 );
             },
-            $: function (node, exp, setting) {
-                if (!!exp && typeof exp != "string") {
+            $: function(node, exp, setting) {
+                if (!!exp && typeof exp != 'string') {
                     setting = exp;
-                    exp = "";
+                    exp = '';
                 }
-                if (typeof node == "string") {
+                if (typeof node == 'string') {
                     return $(node, setting ? setting.treeObj.get(0).ownerDocument : null);
                 } else {
-                    return $("#" + node.tId + exp, setting ? setting.treeObj : null);
+                    return $('#' + node.tId + exp, setting ? setting.treeObj : null);
                 }
             },
-            getMDom: function (setting, curDom, targetExpr) {
+            getMDom: function(setting, curDom, targetExpr) {
                 if (!curDom) return null;
                 while (curDom && curDom.id !== setting.treeId) {
-                    for (var i = 0, l = targetExpr.length; curDom.tagName && i < l; i++) {
+                    for (let i = 0, l = targetExpr.length; curDom.tagName && i < l; i++) {
                         if (tools.eqs(curDom.tagName, targetExpr[i].tagName) && curDom.getAttribute(targetExpr[i].attrName) !== null) {
                             return curDom;
                         }
@@ -873,19 +876,19 @@
                 }
                 return null;
             },
-            getNodeMainDom: function (target) {
-                return ($(target).parent("li").get(0) || $(target).parentsUntil("li").parent().get(0));
+            getNodeMainDom: function(target) {
+                return ($(target).parent('li').get(0) || $(target).parentsUntil('li').parent().get(0));
             },
-            isChildOrSelf: function (dom, parentId) {
-                return ( $(dom).closest("#" + parentId).length > 0 );
+            isChildOrSelf: function(dom, parentId) {
+                return ( $(dom).closest('#' + parentId).length > 0 );
             },
-            uCanDo: function (setting, e) {
+            uCanDo: function(setting, e) {
                 return true;
-            }
+            },
         },
-        //method of operate ztree dom
+        // method of operate ztree dom
         view = {
-            addNodes: function (setting, parentNode, index, newNodes, isSilent) {
+            addNodes: function(setting, parentNode, index, newNodes, isSilent) {
                 if (setting.data.keep.leaf && parentNode && !parentNode.isParent) {
                     return;
                 }
@@ -896,7 +899,7 @@
                     newNodes = data.transformTozTreeFormat(setting, newNodes);
                 }
                 if (parentNode) {
-                    var target_switchObj = $$(parentNode, consts.id.SWITCH, setting),
+                    let target_switchObj = $$(parentNode, consts.id.SWITCH, setting),
                         target_icoObj = $$(parentNode, consts.id.ICON, setting),
                         target_ulObj = $$(parentNode, consts.id.UL, setting);
 
@@ -905,7 +908,7 @@
                         view.replaceIcoClass(parentNode, target_icoObj, consts.folder.CLOSE);
                         parentNode.open = false;
                         target_ulObj.css({
-                            "display": "none"
+                            'display': 'none',
                         });
                     }
 
@@ -919,12 +922,12 @@
                     view.createNodes(setting, 0, newNodes, null, index);
                 }
             },
-            appendNodes: function (setting, level, nodes, parentNode, index, initFlag, openFlag) {
+            appendNodes: function(setting, level, nodes, parentNode, index, initFlag, openFlag) {
                 if (!nodes) return [];
-                var html = [],
+                let html = [],
                     childKey = setting.data.key.children;
 
-                var tmpPNode = (parentNode) ? parentNode : data.getRoot(setting),
+                let tmpPNode = (parentNode) ? parentNode : data.getRoot(setting),
                     tmpPChild = tmpPNode[childKey],
                     isFirstNode, isLastNode;
 
@@ -932,8 +935,8 @@
                     index = -1;
                 }
 
-                for (var i = 0, l = nodes.length; i < l; i++) {
-                    var node = nodes[i];
+                for (let i = 0, l = nodes.length; i < l; i++) {
+                    let node = nodes[i];
                     if (initFlag) {
                         isFirstNode = ((index === 0 || tmpPChild.length == nodes.length) && (i == 0));
                         isLastNode = (index < 0 && i == (nodes.length - 1));
@@ -941,13 +944,12 @@
                         data.addNodeCache(setting, node);
                     }
 
-                    var childHtml = [];
+                    let childHtml = [];
                     if (node[childKey] && node[childKey].length > 0) {
-                        //make child html first, because checkType
+                        // make child html first, because checkType
                         childHtml = view.appendNodes(setting, level + 1, node[childKey], node, -1, initFlag, openFlag && node.open);
                     }
                     if (openFlag) {
-
                         view.makeDOMNodeMainBefore(html, setting, node);
                         view.makeDOMNodeLine(html, setting, node);
                         data.getBeforeA(setting, node, html);
@@ -966,24 +968,24 @@
                 }
                 return html;
             },
-            appendParentULDom: function (setting, node) {
-                var html = [],
+            appendParentULDom: function(setting, node) {
+                let html = [],
                     nObj = $$(node, setting);
                 if (!nObj.get(0) && !!node.parentTId) {
                     view.appendParentULDom(setting, node.getParentNode());
                     nObj = $$(node, setting);
                 }
-                var ulObj = $$(node, consts.id.UL, setting);
+                let ulObj = $$(node, consts.id.UL, setting);
                 if (ulObj.get(0)) {
                     ulObj.remove();
                 }
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     childHtml = view.appendNodes(setting, node.level + 1, node[childKey], node, -1, false, true);
                 view.makeUlHtml(setting, node, html, childHtml.join(''));
                 nObj.append(html.join(''));
             },
-            asyncNode: function (setting, node, isSilent, callback) {
-                var i, l;
+            asyncNode: function(setting, node, isSilent, callback) {
+                let i, l;
                 if (node && !node.isParent) {
                     tools.apply(callback);
                     return false;
@@ -995,13 +997,13 @@
                 }
                 if (node) {
                     node.isAjaxing = true;
-                    var icoObj = $$(node, consts.id.ICON, setting);
-                    icoObj.attr({"style": "", "class": consts.className.BUTTON + " " + consts.className.ICO_LOADING});
+                    let icoObj = $$(node, consts.id.ICON, setting);
+                    icoObj.attr({'style': '', 'class': consts.className.BUTTON + ' ' + consts.className.ICO_LOADING});
                 }
 
-                var tmpParam = {};
+                let tmpParam = {};
                 for (i = 0, l = setting.async.autoParam.length; node && i < l; i++) {
-                    var pKey = setting.async.autoParam[i].split("="), spKey = pKey;
+                    let pKey = setting.async.autoParam[i].split('='), spKey = pKey;
                     if (pKey.length > 1) {
                         spKey = pKey[1];
                         pKey = pKey[0];
@@ -1013,12 +1015,12 @@
                         tmpParam[setting.async.otherParam[i]] = setting.async.otherParam[i + 1];
                     }
                 } else {
-                    for (var p in setting.async.otherParam) {
+                    for (let p in setting.async.otherParam) {
                         tmpParam[p] = setting.async.otherParam[p];
                     }
                 }
 
-                var _tmpV = data.getRoot(setting)._ver;
+                let _tmpV = data.getRoot(setting)._ver;
                 $.ajax({
                     contentType: setting.async.contentType,
                     cache: false,
@@ -1026,16 +1028,16 @@
                     url: tools.apply(setting.async.url, [setting.treeId, node], setting.async.url),
                     data: setting.async.contentType.indexOf('application/json') > -1 ? JSON.stringify(tmpParam) : tmpParam,
                     dataType: setting.async.dataType,
-                    success: function (msg) {
+                    success: function(msg) {
                         if (_tmpV != data.getRoot(setting)._ver) {
                             return;
                         }
-                        var newNodes = [];
+                        let newNodes = [];
                         try {
                             if (!msg || msg.length == 0) {
                                 newNodes = [];
-                            } else if (typeof msg == "string") {
-                                newNodes = eval("(" + msg + ")");
+                            } else if (typeof msg == 'string') {
+                                newNodes = eval('(' + msg + ')');
                             } else {
                                 newNodes = msg;
                             }
@@ -1048,7 +1050,7 @@
                             node.zAsync = true;
                         }
                         view.setNodeLineIcos(setting, node);
-                        if (newNodes && newNodes !== "") {
+                        if (newNodes && newNodes !== '') {
                             newNodes = tools.apply(setting.async.dataFilter, [setting.treeId, node, newNodes], newNodes);
                             view.addNodes(setting, node, -1, !!newNodes ? tools.clone(newNodes) : [], !!isSilent);
                         } else {
@@ -1057,19 +1059,19 @@
                         setting.treeObj.trigger(consts.event.ASYNC_SUCCESS, [setting.treeId, node, msg]);
                         tools.apply(callback);
                     },
-                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
                         if (_tmpV != data.getRoot(setting)._ver) {
                             return;
                         }
                         if (node) node.isAjaxing = null;
                         view.setNodeLineIcos(setting, node);
                         setting.treeObj.trigger(consts.event.ASYNC_ERROR, [setting.treeId, node, XMLHttpRequest, textStatus, errorThrown]);
-                    }
+                    },
                 });
                 return true;
             },
-            cancelPreSelectedNode: function (setting, node, excludeNode) {
-                var list = data.getRoot(setting).curSelectedList,
+            cancelPreSelectedNode: function(setting, node, excludeNode) {
+                let list = data.getRoot(setting).curSelectedList,
                     i, n;
                 for (i = list.length - 1; i >= 0; i--) {
                     n = list[i];
@@ -1085,11 +1087,11 @@
                     }
                 }
             },
-            createNodeCallback: function (setting) {
+            createNodeCallback: function(setting) {
                 if (!!setting.callback.onNodeCreated || !!setting.view.addDiyDom) {
-                    var root = data.getRoot(setting);
+                    let root = data.getRoot(setting);
                     while (root.createdNodes.length > 0) {
-                        var node = root.createdNodes.shift();
+                        let node = root.createdNodes.shift();
                         tools.apply(setting.view.addDiyDom, [setting.treeId, node]);
                         if (!!setting.callback.onNodeCreated) {
                             setting.treeObj.trigger(consts.event.NODECREATED, [setting.treeId, node]);
@@ -1097,23 +1099,23 @@
                     }
                 }
             },
-            createNodes: function (setting, level, nodes, parentNode, index) {
+            createNodes: function(setting, level, nodes, parentNode, index) {
                 if (!nodes || nodes.length == 0) return;
-                var root = data.getRoot(setting),
+                let root = data.getRoot(setting),
                     childKey = setting.data.key.children,
                     openFlag = !parentNode || parentNode.open || !!$$(parentNode[childKey][0], setting).get(0);
                 root.createdNodes = [];
-                var zTreeHtml = view.appendNodes(setting, level, nodes, parentNode, index, true, openFlag),
+                let zTreeHtml = view.appendNodes(setting, level, nodes, parentNode, index, true, openFlag),
                     parentObj, nextObj;
 
                 if (!parentNode) {
                     parentObj = setting.treeObj;
-                    //setting.treeObj.append(zTreeHtml.join(''));
+                    // setting.treeObj.append(zTreeHtml.join(''));
                 } else {
-                    var ulObj = $$(parentNode, consts.id.UL, setting);
+                    let ulObj = $$(parentNode, consts.id.UL, setting);
                     if (ulObj.get(0)) {
                         parentObj = ulObj;
-                        //ulObj.append(zTreeHtml.join(''));
+                        // ulObj.append(zTreeHtml.join(''));
                     }
                 }
                 if (parentObj) {
@@ -1129,7 +1131,7 @@
 
                 view.createNodeCallback(setting);
             },
-            destroy: function (setting) {
+            destroy: function(setting) {
                 if (!setting) return;
                 data.initCache(setting);
                 data.initRoot(setting);
@@ -1138,17 +1140,17 @@
                 setting.treeObj.empty();
                 delete settings[setting.treeId];
             },
-            expandCollapseNode: function (setting, node, expandFlag, animateFlag, callback) {
-                var root = data.getRoot(setting),
+            expandCollapseNode: function(setting, node, expandFlag, animateFlag, callback) {
+                let root = data.getRoot(setting),
                     childKey = setting.data.key.children;
-                var tmpCb, _callback;
+                let tmpCb, _callback;
                 if (!node) {
                     tools.apply(callback, []);
                     return;
                 }
                 if (root.expandTriggerFlag) {
                     _callback = callback;
-                    tmpCb = function () {
+                    tmpCb = function() {
                         if (_callback) _callback();
                         if (node.open) {
                             setting.treeObj.trigger(consts.event.EXPAND, [setting.treeId, node]);
@@ -1167,20 +1169,20 @@
                     tools.apply(callback, []);
                     return;
                 }
-                var ulObj = $$(node, consts.id.UL, setting),
+                let ulObj = $$(node, consts.id.UL, setting),
                     switchObj = $$(node, consts.id.SWITCH, setting),
                     icoObj = $$(node, consts.id.ICON, setting);
 
                 if (node.isParent) {
                     node.open = !node.open;
                     if (node.iconOpen && node.iconClose) {
-                        icoObj.attr("style", view.makeNodeIcoStyle(setting, node));
+                        icoObj.attr('style', view.makeNodeIcoStyle(setting, node));
                     }
 
                     if (node.open) {
                         view.replaceSwitchClass(node, switchObj, consts.folder.OPEN);
                         view.replaceIcoClass(node, icoObj, consts.folder.OPEN);
-                        if (animateFlag == false || setting.view.expandSpeed == "") {
+                        if (animateFlag == false || setting.view.expandSpeed == '') {
                             ulObj.show();
                             tools.apply(callback, []);
                         } else {
@@ -1194,7 +1196,7 @@
                     } else {
                         view.replaceSwitchClass(node, switchObj, consts.folder.CLOSE);
                         view.replaceIcoClass(node, icoObj, consts.folder.CLOSE);
-                        if (animateFlag == false || setting.view.expandSpeed == "" || !(node[childKey] && node[childKey].length > 0)) {
+                        if (animateFlag == false || setting.view.expandSpeed == '' || !(node[childKey] && node[childKey].length > 0)) {
                             ulObj.hide();
                             tools.apply(callback, []);
                         } else {
@@ -1205,7 +1207,7 @@
                     tools.apply(callback, []);
                 }
             },
-            expandCollapseParentNode: function (setting, node, expandFlag, animateFlag, callback) {
+            expandCollapseParentNode: function(setting, node, expandFlag, animateFlag, callback) {
                 if (!node) return;
                 if (!node.parentTId) {
                     view.expandCollapseNode(setting, node, expandFlag, animateFlag, callback);
@@ -1217,26 +1219,26 @@
                     view.expandCollapseParentNode(setting, node.getParentNode(), expandFlag, animateFlag, callback);
                 }
             },
-            expandCollapseSonNode: function (setting, node, expandFlag, animateFlag, callback) {
-                var root = data.getRoot(setting),
+            expandCollapseSonNode: function(setting, node, expandFlag, animateFlag, callback) {
+                let root = data.getRoot(setting),
                     childKey = setting.data.key.children,
                     treeNodes = (node) ? node[childKey] : root[childKey],
                     selfAnimateSign = (node) ? false : animateFlag,
                     expandTriggerFlag = data.getRoot(setting).expandTriggerFlag;
                 data.getRoot(setting).expandTriggerFlag = false;
                 if (treeNodes) {
-                    for (var i = 0, l = treeNodes.length; i < l; i++) {
+                    for (let i = 0, l = treeNodes.length; i < l; i++) {
                         if (treeNodes[i]) view.expandCollapseSonNode(setting, treeNodes[i], expandFlag, selfAnimateSign);
                     }
                 }
                 data.getRoot(setting).expandTriggerFlag = expandTriggerFlag;
                 view.expandCollapseNode(setting, node, expandFlag, animateFlag, callback);
             },
-            isSelectedNode: function (setting, node) {
+            isSelectedNode: function(setting, node) {
                 if (!node) {
                     return false;
                 }
-                var list = data.getRoot(setting).curSelectedList,
+                let list = data.getRoot(setting).curSelectedList,
                     i;
                 for (i = list.length - 1; i >= 0; i--) {
                     if (node === list[i]) {
@@ -1245,72 +1247,72 @@
                 }
                 return false;
             },
-            makeDOMNodeIcon: function (html, setting, node) {
-                var nameStr = data.getNodeName(setting, node),
+            makeDOMNodeIcon: function(html, setting, node) {
+                let nameStr = data.getNodeName(setting, node),
                     name = setting.view.nameIsHTML ? nameStr : nameStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                html.push("<span id='", node.tId, consts.id.ICON,
-                    "' title='' treeNode", consts.id.ICON, " class='", view.makeNodeIcoClass(setting, node),
-                    "' style='", view.makeNodeIcoStyle(setting, node), "'></span><span id='", node.tId, consts.id.SPAN,
-                    "' class='", consts.className.NAME,
-                    "'>", name, "</span>");
+                html.push('<span id=\'', node.tId, consts.id.ICON,
+                    '\' title=\'\' treeNode', consts.id.ICON, ' class=\'', view.makeNodeIcoClass(setting, node),
+                    '\' style=\'', view.makeNodeIcoStyle(setting, node), '\'></span><span id=\'', node.tId, consts.id.SPAN,
+                    '\' class=\'', consts.className.NAME,
+                    '\'>', name, '</span>');
             },
-            makeDOMNodeLine: function (html, setting, node) {
-                html.push("<span id='", node.tId, consts.id.SWITCH, "' title='' class='", view.makeNodeLineClass(setting, node), "' treeNode", consts.id.SWITCH, "></span>");
+            makeDOMNodeLine: function(html, setting, node) {
+                html.push('<span id=\'', node.tId, consts.id.SWITCH, '\' title=\'\' class=\'', view.makeNodeLineClass(setting, node), '\' treeNode', consts.id.SWITCH, '></span>');
             },
-            makeDOMNodeMainAfter: function (html, setting, node) {
-                html.push("</li>");
+            makeDOMNodeMainAfter: function(html, setting, node) {
+                html.push('</li>');
             },
-            makeDOMNodeMainBefore: function (html, setting, node) {
-                html.push("<li id='", node.tId, "' class='", consts.className.LEVEL, node.level, "' tabindex='0' hidefocus='true' treenode>");
+            makeDOMNodeMainBefore: function(html, setting, node) {
+                html.push('<li id=\'', node.tId, '\' class=\'', consts.className.LEVEL, node.level, '\' tabindex=\'0\' hidefocus=\'true\' treenode>');
             },
-            makeDOMNodeNameAfter: function (html, setting, node) {
-                html.push("</a>");
+            makeDOMNodeNameAfter: function(html, setting, node) {
+                html.push('</a>');
             },
-            makeDOMNodeNameBefore: function (html, setting, node) {
-                var title = data.getNodeTitle(setting, node),
+            makeDOMNodeNameBefore: function(html, setting, node) {
+                let title = data.getNodeTitle(setting, node),
                     url = view.makeNodeUrl(setting, node),
                     fontcss = view.makeNodeFontCss(setting, node),
                     fontStyle = [];
-                for (var f in fontcss) {
-                    fontStyle.push(f, ":", fontcss[f], ";");
+                for (let f in fontcss) {
+                    fontStyle.push(f, ':', fontcss[f], ';');
                 }
-                html.push("<a id='", node.tId, consts.id.A, "' class='", consts.className.LEVEL, node.level, "' treeNode", consts.id.A, " onclick=\"", (node.click || ''),
-                    "\" ", ((url != null && url.length > 0) ? "href='" + url + "'" : ""), " target='", view.makeNodeTarget(node), "' style='", fontStyle.join(''),
-                    "'");
+                html.push('<a id=\'', node.tId, consts.id.A, '\' class=\'', consts.className.LEVEL, node.level, '\' treeNode', consts.id.A, ' onclick="', (node.click || ''),
+                    '" ', ((url != null && url.length > 0) ? 'href=\'' + url + '\'' : ''), ' target=\'', view.makeNodeTarget(node), '\' style=\'', fontStyle.join(''),
+                    '\'');
                 if (tools.apply(setting.view.showTitle, [setting.treeId, node], setting.view.showTitle) && title) {
-                    html.push("title='", title.replace(/'/g, "&#39;").replace(/</g, '&lt;').replace(/>/g, '&gt;'), "'");
+                    html.push('title=\'', title.replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'), '\'');
                 }
-                html.push(">");
+                html.push('>');
             },
-            makeNodeFontCss: function (setting, node) {
-                var fontCss = tools.apply(setting.view.fontCss, [setting.treeId, node], setting.view.fontCss);
-                return (fontCss && ((typeof fontCss) != "function")) ? fontCss : {};
+            makeNodeFontCss: function(setting, node) {
+                let fontCss = tools.apply(setting.view.fontCss, [setting.treeId, node], setting.view.fontCss);
+                return (fontCss && ((typeof fontCss) != 'function')) ? fontCss : {};
             },
-            makeNodeIcoClass: function (setting, node) {
-                var icoCss = ["ico"];
+            makeNodeIcoClass: function(setting, node) {
+                let icoCss = ['ico'];
                 if (!node.isAjaxing) {
-                    icoCss[0] = (node.iconSkin ? node.iconSkin + "_" : "") + icoCss[0];
+                    icoCss[0] = (node.iconSkin ? node.iconSkin + '_' : '') + icoCss[0];
                     if (node.isParent) {
                         icoCss.push(node.open ? consts.folder.OPEN : consts.folder.CLOSE);
                     } else {
                         icoCss.push(consts.folder.DOCU);
                     }
                 }
-                return consts.className.BUTTON + " " + icoCss.join('_');
+                return consts.className.BUTTON + ' ' + icoCss.join('_');
             },
-            makeNodeIcoStyle: function (setting, node) {
-                var icoStyle = [];
+            makeNodeIcoStyle: function(setting, node) {
+                let icoStyle = [];
                 if (!node.isAjaxing) {
-                    var icon = (node.isParent && node.iconOpen && node.iconClose) ? (node.open ? node.iconOpen : node.iconClose) : node[setting.data.key.icon];
-                    if (icon) icoStyle.push("background:url(", icon, ") 0 0 no-repeat;");
+                    let icon = (node.isParent && node.iconOpen && node.iconClose) ? (node.open ? node.iconOpen : node.iconClose) : node[setting.data.key.icon];
+                    if (icon) icoStyle.push('background:url(', icon, ') 0 0 no-repeat;');
                     if (setting.view.showIcon == false || !tools.apply(setting.view.showIcon, [setting.treeId, node], true)) {
-                        icoStyle.push("width:0px;height:0px;");
+                        icoStyle.push('width:0px;height:0px;');
                     }
                 }
                 return icoStyle.join('');
             },
-            makeNodeLineClass: function (setting, node) {
-                var lineClass = [];
+            makeNodeLineClass: function(setting, node) {
+                let lineClass = [];
                 if (setting.view.showLine) {
                     if (node.level == 0 && node.isFirstNode && node.isLastNode) {
                         lineClass.push(consts.line.ROOT);
@@ -1331,31 +1333,31 @@
                 }
                 return view.makeNodeLineClassEx(node) + lineClass.join('_');
             },
-            makeNodeLineClassEx: function (node) {
-                return consts.className.BUTTON + " " + consts.className.LEVEL + node.level + " " + consts.className.SWITCH + " ";
+            makeNodeLineClassEx: function(node) {
+                return consts.className.BUTTON + ' ' + consts.className.LEVEL + node.level + ' ' + consts.className.SWITCH + ' ';
             },
-            makeNodeTarget: function (node) {
-                return (node.target || "_blank");
+            makeNodeTarget: function(node) {
+                return (node.target || '_blank');
             },
-            makeNodeUrl: function (setting, node) {
-                var urlKey = setting.data.key.url;
+            makeNodeUrl: function(setting, node) {
+                let urlKey = setting.data.key.url;
                 return node[urlKey] ? node[urlKey] : null;
             },
-            makeUlHtml: function (setting, node, html, content) {
-                html.push("<ul id='", node.tId, consts.id.UL, "' class='", consts.className.LEVEL, node.level, " ", view.makeUlLineClass(setting, node), "' style='display:", (node.open ? "block" : "none"), "'>");
+            makeUlHtml: function(setting, node, html, content) {
+                html.push('<ul id=\'', node.tId, consts.id.UL, '\' class=\'', consts.className.LEVEL, node.level, ' ', view.makeUlLineClass(setting, node), '\' style=\'display:', (node.open ? 'block' : 'none'), '\'>');
                 html.push(content);
-                html.push("</ul>");
+                html.push('</ul>');
             },
-            makeUlLineClass: function (setting, node) {
-                return ((setting.view.showLine && !node.isLastNode) ? consts.line.LINE : "");
+            makeUlLineClass: function(setting, node) {
+                return ((setting.view.showLine && !node.isLastNode) ? consts.line.LINE : '');
             },
-            removeChildNodes: function (setting, node) {
+            removeChildNodes: function(setting, node) {
                 if (!node) return;
-                var childKey = setting.data.key.children,
+                let childKey = setting.data.key.children,
                     nodes = node[childKey];
                 if (!nodes) return;
 
-                for (var i = 0, l = nodes.length; i < l; i++) {
+                for (let i = 0, l = nodes.length; i < l; i++) {
                     data.removeNodeCache(setting, nodes[i]);
                 }
                 data.removeSelectedNode(setting);
@@ -1364,7 +1366,7 @@
                 if (!setting.data.keep.parent) {
                     node.isParent = false;
                     node.open = false;
-                    var tmp_switchObj = $$(node, consts.id.SWITCH, setting),
+                    let tmp_switchObj = $$(node, consts.id.SWITCH, setting),
                         tmp_icoObj = $$(node, consts.id.ICON, setting);
                     view.replaceSwitchClass(node, tmp_switchObj, consts.folder.DOCU);
                     view.replaceIcoClass(node, tmp_icoObj, consts.folder.DOCU);
@@ -1373,13 +1375,13 @@
                     $$(node, consts.id.UL, setting).empty();
                 }
             },
-            scrollIntoView: function (dom) {
+            scrollIntoView: function(dom) {
                 if (!dom) {
                     return;
                 }
                 // code src: http://jsfiddle.net/08u6cxwj/
                 if (!Element.prototype.scrollIntoViewIfNeeded) {
-                    Element.prototype.scrollIntoViewIfNeeded = function (centerIfNeeded) {
+                    Element.prototype.scrollIntoViewIfNeeded = function(centerIfNeeded) {
                         function withinBounds(value, min, max, extent) {
                             if (false === centerIfNeeded || max <= value + extent && value <= min + extent) {
                                 return Math.min(max, Math.max(min, value));
@@ -1390,13 +1392,13 @@
 
                         function makeArea(left, top, width, height) {
                             return {
-                                "left": left, "top": top, "width": width, "height": height
-                                , "right": left + width, "bottom": top + height
-                                , "translate": function (x, y) {
+                                'left': left, 'top': top, 'width': width, 'height': height,
+                                'right': left + width, 'bottom': top + height,
+                                'translate': function(x, y) {
                                     return makeArea(x + left, y + top, width, height);
-                                }
-                                , "relativeFromTo": function (lhs, rhs) {
-                                    var newLeft = left, newTop = top;
+                                },
+                                'relativeFromTo': function(lhs, rhs) {
+                                    let newLeft = left, newTop = top;
                                     lhs = lhs.offsetParent;
                                     rhs = rhs.offsetParent;
                                     if (lhs === rhs) {
@@ -1411,7 +1413,7 @@
                                         newTop -= rhs.offsetTop + rhs.clientTop;
                                     }
                                     return makeArea(newLeft, newTop, width, height);
-                                }
+                                },
                             };
                         }
 
@@ -1419,8 +1421,8 @@
                             this.offsetLeft, this.offsetTop,
                             this.offsetWidth, this.offsetHeight);
                         while (tools.isElement(parent = elem.parentNode)) {
-                            var clientLeft = parent.offsetLeft + parent.clientLeft;
-                            var clientTop = parent.offsetTop + parent.clientTop;
+                            let clientLeft = parent.offsetLeft + parent.clientLeft;
+                            let clientTop = parent.offsetTop + parent.clientTop;
 
                             // Make area relative to parent's client area.
                             area = area.relativeFromTo(elem, parent).translate(-clientLeft, -clientTop);
@@ -1444,29 +1446,29 @@
                 }
                 dom.scrollIntoViewIfNeeded();
             },
-            setFirstNode: function (setting, parentNode) {
-                var childKey = setting.data.key.children, childLength = parentNode[childKey].length;
+            setFirstNode: function(setting, parentNode) {
+                let childKey = setting.data.key.children, childLength = parentNode[childKey].length;
                 if (childLength > 0) {
                     parentNode[childKey][0].isFirstNode = true;
                 }
             },
-            setLastNode: function (setting, parentNode) {
-                var childKey = setting.data.key.children, childLength = parentNode[childKey].length;
+            setLastNode: function(setting, parentNode) {
+                let childKey = setting.data.key.children, childLength = parentNode[childKey].length;
                 if (childLength > 0) {
                     parentNode[childKey][childLength - 1].isLastNode = true;
                 }
             },
-            removeNode: function (setting, node) {
-                var root = data.getRoot(setting),
+            removeNode: function(setting, node) {
+                let root = data.getRoot(setting),
                     childKey = setting.data.key.children,
                     parentNode = (node.parentTId) ? node.getParentNode() : root;
 
                 node.isFirstNode = false;
                 node.isLastNode = false;
-                node.getPreNode = function () {
+                node.getPreNode = function() {
                     return null;
                 };
-                node.getNextNode = function () {
+                node.getNextNode = function() {
                     return null;
                 };
 
@@ -1478,7 +1480,7 @@
                 data.removeNodeCache(setting, node);
                 data.removeSelectedNode(setting, node);
 
-                for (var i = 0, l = parentNode[childKey].length; i < l; i++) {
+                for (let i = 0, l = parentNode[childKey].length; i < l; i++) {
                     if (parentNode[childKey][i].tId == node.tId) {
                         parentNode[childKey].splice(i, 1);
                         break;
@@ -1487,12 +1489,12 @@
                 view.setFirstNode(setting, parentNode);
                 view.setLastNode(setting, parentNode);
 
-                var tmp_ulObj, tmp_switchObj, tmp_icoObj,
+                let tmp_ulObj, tmp_switchObj, tmp_icoObj,
                     childLength = parentNode[childKey].length;
 
-                //repair nodes old parent
+                // repair nodes old parent
                 if (!setting.data.keep.parent && childLength == 0) {
-                    //old parentNode has no child nodes
+                    // old parentNode has no child nodes
                     parentNode.isParent = false;
                     parentNode.open = false;
                     tmp_ulObj = $$(parentNode, consts.id.UL, setting);
@@ -1500,20 +1502,19 @@
                     tmp_icoObj = $$(parentNode, consts.id.ICON, setting);
                     view.replaceSwitchClass(parentNode, tmp_switchObj, consts.folder.DOCU);
                     view.replaceIcoClass(parentNode, tmp_icoObj, consts.folder.DOCU);
-                    tmp_ulObj.css("display", "none");
-
+                    tmp_ulObj.css('display', 'none');
                 } else if (setting.view.showLine && childLength > 0) {
-                    //old parentNode has child nodes
-                    var newLast = parentNode[childKey][childLength - 1];
+                    // old parentNode has child nodes
+                    let newLast = parentNode[childKey][childLength - 1];
                     tmp_ulObj = $$(newLast, consts.id.UL, setting);
                     tmp_switchObj = $$(newLast, consts.id.SWITCH, setting);
                     tmp_icoObj = $$(newLast, consts.id.ICON, setting);
                     if (parentNode == root) {
                         if (parentNode[childKey].length == 1) {
-                            //node was root, and ztree has only one root after move node
+                            // node was root, and ztree has only one root after move node
                             view.replaceSwitchClass(newLast, tmp_switchObj, consts.line.ROOT);
                         } else {
-                            var tmp_first_switchObj = $$(parentNode[childKey][0], consts.id.SWITCH, setting);
+                            let tmp_first_switchObj = $$(parentNode[childKey][0], consts.id.SWITCH, setting);
                             view.replaceSwitchClass(parentNode[childKey][0], tmp_first_switchObj, consts.line.ROOTS);
                             view.replaceSwitchClass(newLast, tmp_switchObj, consts.line.BOTTOM);
                         }
@@ -1523,47 +1524,47 @@
                     tmp_ulObj.removeClass(consts.line.LINE);
                 }
             },
-            replaceIcoClass: function (node, obj, newName) {
+            replaceIcoClass: function(node, obj, newName) {
                 if (!obj || node.isAjaxing) return;
-                var tmpName = obj.attr("class");
+                let tmpName = obj.attr('class');
                 if (tmpName == undefined) return;
-                var tmpList = tmpName.split("_");
+                let tmpList = tmpName.split('_');
                 switch (newName) {
-                    case consts.folder.OPEN:
-                    case consts.folder.CLOSE:
-                    case consts.folder.DOCU:
-                        tmpList[tmpList.length - 1] = newName;
-                        break;
+                case consts.folder.OPEN:
+                case consts.folder.CLOSE:
+                case consts.folder.DOCU:
+                    tmpList[tmpList.length - 1] = newName;
+                    break;
                 }
-                obj.attr("class", tmpList.join("_"));
+                obj.attr('class', tmpList.join('_'));
             },
-            replaceSwitchClass: function (node, obj, newName) {
+            replaceSwitchClass: function(node, obj, newName) {
                 if (!obj) return;
-                var tmpName = obj.attr("class");
+                let tmpName = obj.attr('class');
                 if (tmpName == undefined) return;
-                var tmpList = tmpName.split("_");
+                let tmpList = tmpName.split('_');
                 switch (newName) {
-                    case consts.line.ROOT:
-                    case consts.line.ROOTS:
-                    case consts.line.CENTER:
-                    case consts.line.BOTTOM:
-                    case consts.line.NOLINE:
-                        tmpList[0] = view.makeNodeLineClassEx(node) + newName;
-                        break;
-                    case consts.folder.OPEN:
-                    case consts.folder.CLOSE:
-                    case consts.folder.DOCU:
-                        tmpList[1] = newName;
-                        break;
+                case consts.line.ROOT:
+                case consts.line.ROOTS:
+                case consts.line.CENTER:
+                case consts.line.BOTTOM:
+                case consts.line.NOLINE:
+                    tmpList[0] = view.makeNodeLineClassEx(node) + newName;
+                    break;
+                case consts.folder.OPEN:
+                case consts.folder.CLOSE:
+                case consts.folder.DOCU:
+                    tmpList[1] = newName;
+                    break;
                 }
-                obj.attr("class", tmpList.join("_"));
+                obj.attr('class', tmpList.join('_'));
                 if (newName !== consts.folder.DOCU) {
-                    obj.removeAttr("disabled");
+                    obj.removeAttr('disabled');
                 } else {
-                    obj.attr("disabled", "disabled");
+                    obj.attr('disabled', 'disabled');
                 }
             },
-            selectNode: function (setting, node, addFlag) {
+            selectNode: function(setting, node, addFlag) {
                 if (!addFlag) {
                     view.cancelPreSelectedNode(setting, null, node);
                 }
@@ -1571,16 +1572,16 @@
                 data.addSelectedNode(setting, node);
                 setting.treeObj.trigger(consts.event.SELECTED, [setting.treeId, node]);
             },
-            setNodeFontCss: function (setting, treeNode) {
-                var aObj = $$(treeNode, consts.id.A, setting),
+            setNodeFontCss: function(setting, treeNode) {
+                let aObj = $$(treeNode, consts.id.A, setting),
                     fontCss = view.makeNodeFontCss(setting, treeNode);
                 if (fontCss) {
                     aObj.css(fontCss);
                 }
             },
-            setNodeLineIcos: function (setting, node) {
+            setNodeLineIcos: function(setting, node) {
                 if (!node) return;
-                var switchObj = $$(node, consts.id.SWITCH, setting),
+                let switchObj = $$(node, consts.id.SWITCH, setting),
                     ulObj = $$(node, consts.id.UL, setting),
                     icoObj = $$(node, consts.id.ICON, setting),
                     ulLine = view.makeUlLineClass(setting, node);
@@ -1589,18 +1590,18 @@
                 } else {
                     ulObj.addClass(ulLine);
                 }
-                switchObj.attr("class", view.makeNodeLineClass(setting, node));
+                switchObj.attr('class', view.makeNodeLineClass(setting, node));
                 if (node.isParent) {
-                    switchObj.removeAttr("disabled");
+                    switchObj.removeAttr('disabled');
                 } else {
-                    switchObj.attr("disabled", "disabled");
+                    switchObj.attr('disabled', 'disabled');
                 }
-                icoObj.removeAttr("style");
-                icoObj.attr("style", view.makeNodeIcoStyle(setting, node));
-                icoObj.attr("class", view.makeNodeIcoClass(setting, node));
+                icoObj.removeAttr('style');
+                icoObj.attr('style', view.makeNodeIcoStyle(setting, node));
+                icoObj.attr('class', view.makeNodeIcoClass(setting, node));
             },
-            setNodeName: function (setting, node) {
-                var title = data.getNodeTitle(setting, node),
+            setNodeName: function(setting, node) {
+                let title = data.getNodeTitle(setting, node),
                     nObj = $$(node, consts.id.SPAN, setting);
                 nObj.empty();
                 if (setting.view.nameIsHTML) {
@@ -1609,24 +1610,24 @@
                     nObj.text(data.getNodeName(setting, node));
                 }
                 if (tools.apply(setting.view.showTitle, [setting.treeId, node], setting.view.showTitle)) {
-                    var aObj = $$(node, consts.id.A, setting);
-                    aObj.attr("title", !title ? "" : title);
+                    let aObj = $$(node, consts.id.A, setting);
+                    aObj.attr('title', !title ? '' : title);
                 }
             },
-            setNodeTarget: function (setting, node) {
-                var aObj = $$(node, consts.id.A, setting);
-                aObj.attr("target", view.makeNodeTarget(node));
+            setNodeTarget: function(setting, node) {
+                let aObj = $$(node, consts.id.A, setting);
+                aObj.attr('target', view.makeNodeTarget(node));
             },
-            setNodeUrl: function (setting, node) {
-                var aObj = $$(node, consts.id.A, setting),
+            setNodeUrl: function(setting, node) {
+                let aObj = $$(node, consts.id.A, setting),
                     url = view.makeNodeUrl(setting, node);
                 if (url == null || url.length == 0) {
-                    aObj.removeAttr("href");
+                    aObj.removeAttr('href');
                 } else {
-                    aObj.attr("href", url);
+                    aObj.attr('href', url);
                 }
             },
-            switchNode: function (setting, node) {
+            switchNode: function(setting, node) {
                 if (node.open || !tools.canAsync(setting, node)) {
                     view.expandCollapseNode(setting, node, !node.open);
                 } else if (setting.async.enable) {
@@ -1637,7 +1638,7 @@
                 } else if (node) {
                     view.expandCollapseNode(setting, node, !node.open);
                 }
-            }
+            },
         };
     // zTree defind
     $.fn.zTree = {
@@ -1646,34 +1647,34 @@
             tools: tools,
             view: view,
             event: event,
-            data: data
+            data: data,
         },
-        getZTreeObj: function (treeId) {
-            var o = data.getZTreeTools(treeId);
+        getZTreeObj: function(treeId) {
+            let o = data.getZTreeTools(treeId);
             return o ? o : null;
         },
-        destroy: function (treeId) {
+        destroy: function(treeId) {
             if (!!treeId && treeId.length > 0) {
                 view.destroy(data.getSetting(treeId));
             } else {
-                for (var s in settings) {
+                for (let s in settings) {
                     view.destroy(settings[s]);
                 }
             }
         },
-        init: function (obj, zSetting, zNodes) {
-            var setting = tools.clone(_setting);
+        init: function(obj, zSetting, zNodes) {
+            let setting = tools.clone(_setting);
             $.extend(true, setting, zSetting);
-            setting.treeId = obj.attr("id");
+            setting.treeId = obj.attr('id');
             setting.treeObj = obj;
             setting.treeObj.empty();
             settings[setting.treeId] = setting;
-            //For some older browser,(e.g., ie6)
-            if (typeof document.body.style.maxHeight === "undefined") {
-                setting.view.expandSpeed = "";
+            // For some older browser,(e.g., ie6)
+            if (typeof document.body.style.maxHeight === 'undefined') {
+                setting.view.expandSpeed = '';
             }
             data.initRoot(setting);
-            var root = data.getRoot(setting),
+            let root = data.getRoot(setting),
                 childKey = setting.data.key.children;
             zNodes = zNodes ? tools.clone(tools.isArray(zNodes) ? zNodes : [zNodes]) : [];
             if (setting.data.simpleData.enable) {
@@ -1690,11 +1691,11 @@
 
             var zTreeTools = {
                 setting: setting,
-                addNodes: function (parentNode, index, newNodes, isSilent) {
+                addNodes: function(parentNode, index, newNodes, isSilent) {
                     if (!parentNode) parentNode = null;
                     if (parentNode && !parentNode.isParent && setting.data.keep.leaf) return null;
 
-                    var i = parseInt(index, 10);
+                    let i = parseInt(index, 10);
                     if (isNaN(i)) {
                         isSilent = !!newNodes;
                         newNodes = index;
@@ -1705,7 +1706,7 @@
                     if (!newNodes) return null;
 
 
-                    var xNewNodes = tools.clone(tools.isArray(newNodes) ? newNodes : [newNodes]);
+                    let xNewNodes = tools.clone(tools.isArray(newNodes) ? newNodes : [newNodes]);
 
                     function addCallback() {
                         view.addNodes(setting, parentNode, index, xNewNodes, (isSilent == true));
@@ -1718,18 +1719,18 @@
                     }
                     return xNewNodes;
                 },
-                cancelSelectedNode: function (node) {
+                cancelSelectedNode: function(node) {
                     view.cancelPreSelectedNode(setting, node);
                 },
-                destroy: function () {
+                destroy: function() {
                     view.destroy(setting);
                 },
-                expandAll: function (expandFlag) {
+                expandAll: function(expandFlag) {
                     expandFlag = !!expandFlag;
                     view.expandCollapseSonNode(setting, null, expandFlag, true);
                     return expandFlag;
                 },
-                expandNode: function (node, expandFlag, sonSign, focus, callbackFlag) {
+                expandNode: function(node, expandFlag, sonSign, focus, callbackFlag) {
                     if (!node || !node.isParent) return null;
                     if (expandFlag !== true && expandFlag !== false) {
                         expandFlag = !node.open;
@@ -1759,75 +1760,75 @@
                     return expandFlag;
 
                     function showNodeFocus() {
-                        var a = $$(node, setting).get(0);
+                        let a = $$(node, setting).get(0);
                         if (a && focus !== false) {
                             view.scrollIntoView(a);
                         }
                     }
                 },
-                getNodes: function () {
+                getNodes: function() {
                     return data.getNodes(setting);
                 },
-                getNodeByParam: function (key, value, parentNode) {
+                getNodeByParam: function(key, value, parentNode) {
                     if (!key) return null;
                     return data.getNodeByParam(setting, parentNode ? parentNode[setting.data.key.children] : data.getNodes(setting), key, value);
                 },
-                getNodeByTId: function (tId) {
+                getNodeByTId: function(tId) {
                     return data.getNodeCache(setting, tId);
                 },
-                getNodesByParam: function (key, value, parentNode) {
+                getNodesByParam: function(key, value, parentNode) {
                     if (!key) return null;
                     return data.getNodesByParam(setting, parentNode ? parentNode[setting.data.key.children] : data.getNodes(setting), key, value);
                 },
-                getNodesByParamFuzzy: function (key, value, parentNode) {
+                getNodesByParamFuzzy: function(key, value, parentNode) {
                     if (!key) return null;
                     return data.getNodesByParamFuzzy(setting, parentNode ? parentNode[setting.data.key.children] : data.getNodes(setting), key, value);
                 },
-                getNodesByFilter: function (filter, isSingle, parentNode, invokeParam) {
+                getNodesByFilter: function(filter, isSingle, parentNode, invokeParam) {
                     isSingle = !!isSingle;
-                    if (!filter || (typeof filter != "function")) return (isSingle ? null : []);
+                    if (!filter || (typeof filter != 'function')) return (isSingle ? null : []);
                     return data.getNodesByFilter(setting, parentNode ? parentNode[setting.data.key.children] : data.getNodes(setting), filter, isSingle, invokeParam);
                 },
-                getNodeIndex: function (node) {
+                getNodeIndex: function(node) {
                     if (!node) return null;
-                    var childKey = setting.data.key.children,
+                    let childKey = setting.data.key.children,
                         parentNode = (node.parentTId) ? node.getParentNode() : data.getRoot(setting);
-                    for (var i = 0, l = parentNode[childKey].length; i < l; i++) {
+                    for (let i = 0, l = parentNode[childKey].length; i < l; i++) {
                         if (parentNode[childKey][i] == node) return i;
                     }
                     return -1;
                 },
-                getSelectedNodes: function () {
-                    var r = [], list = data.getRoot(setting).curSelectedList;
-                    for (var i = 0, l = list.length; i < l; i++) {
+                getSelectedNodes: function() {
+                    let r = [], list = data.getRoot(setting).curSelectedList;
+                    for (let i = 0, l = list.length; i < l; i++) {
                         r.push(list[i]);
                     }
                     return r;
                 },
-                isSelectedNode: function (node) {
+                isSelectedNode: function(node) {
                     return data.isSelectedNode(setting, node);
                 },
-                reAsyncChildNodesPromise: function (parentNode, reloadType, isSilent) {
-                    var promise = new Promise(function(resolve, reject) {
+                reAsyncChildNodesPromise: function(parentNode, reloadType, isSilent) {
+                    let promise = new Promise(function(resolve, reject) {
                         try {
                             zTreeTools.reAsyncChildNodes(parentNode, reloadType, isSilent, function() {
                                 resolve(parentNode);
                             });
-                        } catch(e) {
+                        } catch (e) {
                             reject(e);
                         }
                     });
                     return promise;
                 },
-                reAsyncChildNodes: function (parentNode, reloadType, isSilent, callback) {
+                reAsyncChildNodes: function(parentNode, reloadType, isSilent, callback) {
                     if (!this.setting.async.enable) return;
-                    var isRoot = !parentNode;
+                    let isRoot = !parentNode;
                     if (isRoot) {
                         parentNode = data.getRoot(setting);
                     }
-                    if (reloadType == "refresh") {
-                        var childKey = this.setting.data.key.children;
-                        for (var i = 0, l = parentNode[childKey] ? parentNode[childKey].length : 0; i < l; i++) {
+                    if (reloadType == 'refresh') {
+                        let childKey = this.setting.data.key.children;
+                        for (let i = 0, l = parentNode[childKey] ? parentNode[childKey].length : 0; i < l; i++) {
                             data.removeNodeCache(setting, parentNode[childKey][i]);
                         }
                         data.removeSelectedNode(setting);
@@ -1835,29 +1836,29 @@
                         if (isRoot) {
                             this.setting.treeObj.empty();
                         } else {
-                            var ulObj = $$(parentNode, consts.id.UL, setting);
+                            let ulObj = $$(parentNode, consts.id.UL, setting);
                             ulObj.empty();
                         }
                     }
                     view.asyncNode(this.setting, isRoot ? null : parentNode, !!isSilent, callback);
                 },
-                refresh: function () {
+                refresh: function() {
                     this.setting.treeObj.empty();
-                    var root = data.getRoot(setting),
-                        nodes = root[setting.data.key.children]
+                    let root = data.getRoot(setting),
+                        nodes = root[setting.data.key.children];
                     data.initRoot(setting);
-                    root[setting.data.key.children] = nodes
+                    root[setting.data.key.children] = nodes;
                     data.initCache(setting);
                     view.createNodes(setting, 0, root[setting.data.key.children], null, -1);
                 },
-                removeChildNodes: function (node) {
+                removeChildNodes: function(node) {
                     if (!node) return null;
-                    var childKey = setting.data.key.children,
+                    let childKey = setting.data.key.children,
                         nodes = node[childKey];
                     view.removeChildNodes(setting, node);
                     return nodes ? nodes : null;
                 },
-                removeNode: function (node, callbackFlag) {
+                removeNode: function(node, callbackFlag) {
                     if (!node) return;
                     callbackFlag = !!callbackFlag;
                     if (callbackFlag && tools.apply(setting.callback.beforeRemove, [setting.treeId, node], true) == false) return;
@@ -1866,7 +1867,7 @@
                         this.setting.treeObj.trigger(consts.event.REMOVE, [setting.treeId, node]);
                     }
                 },
-                selectNode: function (node, addFlag, isSilent) {
+                selectNode: function(node, addFlag, isSilent) {
                     if (!node) return;
                     if (tools.uCanDo(setting)) {
                         addFlag = setting.view.selectedMulti && addFlag;
@@ -1885,19 +1886,19 @@
                         if (isSilent) {
                             return;
                         }
-                        var a = $$(node, setting).get(0);
+                        let a = $$(node, setting).get(0);
                         view.scrollIntoView(a);
                     }
                 },
-                transformTozTreeNodes: function (simpleNodes) {
+                transformTozTreeNodes: function(simpleNodes) {
                     return data.transformTozTreeFormat(setting, simpleNodes);
                 },
-                transformToArray: function (nodes) {
+                transformToArray: function(nodes) {
                     return data.transformToArrayFormat(setting, nodes);
                 },
-                updateNode: function (node, checkTypeFlag) {
+                updateNode: function(node, checkTypeFlag) {
                     if (!node) return;
-                    var nObj = $$(node, setting);
+                    let nObj = $$(node, setting);
                     if (nObj.get(0) && tools.uCanDo(setting)) {
                         view.setNodeName(setting, node);
                         view.setNodeTarget(setting, node);
@@ -1905,8 +1906,8 @@
                         view.setNodeLineIcos(setting, node);
                         view.setNodeFontCss(setting, node);
                     }
-                }
-            }
+                },
+            };
             root.treeTools = zTreeTools;
             data.setZTreeTools(setting, zTreeTools);
 
@@ -1916,7 +1917,7 @@
                 view.asyncNode(setting);
             }
             return zTreeTools;
-        }
+        },
     };
 
     var zt = $.fn.zTree,

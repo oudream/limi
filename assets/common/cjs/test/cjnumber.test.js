@@ -36,7 +36,6 @@
  twentieth	20th
 
 
-
  01.
  twenty-first	21st	11.
  fiftieth	50th
@@ -77,59 +76,57 @@
  *
  */
 require('./../cjnumber');
-var expect = require('./../../3rd/chai-3.5.0').expect;
+let expect = require('./../../3rd/chai-3.5.0').expect;
 
 
-describe("CjNumber", function () {
-    it("1st", function () {
+describe('CjNumber', function() {
+    it('1st', function() {
         expect((1).toOrdinal()).to.equal('1st');
     });
 
-    it("2nd", function () {
+    it('2nd', function() {
         expect((2).toOrdinal()).to.equal('2nd');
     });
 
-    it("3rd", function () {
+    it('3rd', function() {
         expect((3).toOrdinal()).to.equal('3rd');
     });
 
-    it("4th", function () {
+    it('4th', function() {
         expect((4).toOrdinal()).to.equal('4th');
     });
 
 
-    it("11th", function () {
+    it('11th', function() {
         expect((11).toOrdinal()).to.equal('11th');
     });
 
-    it("12th", function () {
+    it('12th', function() {
         expect((12).toOrdinal()).to.equal('12th');
     });
 
-    it("13th", function () {
+    it('13th', function() {
         expect((13).toOrdinal()).to.equal('13th');
     });
 
-    it("14th", function () {
+    it('14th', function() {
         expect((14).toOrdinal()).to.equal('14th');
     });
 
 
-    it("21st", function () {
+    it('21st', function() {
         expect((21).toOrdinal()).to.equal('21st');
     });
 
-    it("22nd", function () {
+    it('22nd', function() {
         expect((22).toOrdinal()).to.equal('22nd');
     });
 
-    it("23rd", function () {
+    it('23rd', function() {
         expect((23).toOrdinal()).to.equal('23rd');
     });
 
-    it("24th", function () {
+    it('24th', function() {
         expect((24).toOrdinal()).to.equal('24th');
     });
-
-
 });

@@ -5,43 +5,41 @@
 (function($) {
     window.cjExtEasyui = {};
 
-    var cjExtEasyui = window.cjExtEasyui;
+    let cjExtEasyui = window.cjExtEasyui;
 
     cjExtEasyui.datagrid = {};
 
-    cjExtEasyui.datagrid.adjustColWidth = function (parent, fieldName, width) {
+    cjExtEasyui.datagrid.adjustColWidth = function(parent, fieldName, width) {
+        let dataTable = parent.find('div.datagrid-view2');
 
-        var dataTable = parent.find("div.datagrid-view2");
+        let tds = dataTable.find('td');
 
-        var tds = dataTable.find('td')
-
-        tds.each(function (index,td) {
-            var field = $(td).attr('field');
+        tds.each(function(index, td) {
+            let field = $(td).attr('field');
             if (field == fieldName) {
-                $(td).css('width',width);
-                $(td).children('.datagrid-cell').css('width',width);
+                $(td).css('width', width);
+                $(td).children('.datagrid-cell').css('width', width);
             }
         });
+    };
 
-    }
 
-
-    function setTabTitle (container, param) {
-        var pp = param.tab;	// the tab panel
-        var opts = pp.panel('options');	// get the tab panel options
-        var tab = opts.tab;
+    function setTabTitle(container, param) {
+        let pp = param.tab;	// the tab panel
+        let opts = pp.panel('options');	// get the tab panel options
+        let tab = opts.tab;
         opts.title = param.title;
-        var titleObj = tab.find("span.tabs-title");
+        let titleObj = tab.find('span.tabs-title');
         titleObj.html(param.title);
     }
 
-    function getTabIcs (container, id) {
-        var tabs = $.data(container, 'tabs').tabs;
-        var tab = null;
+    function getTabIcs(container, id) {
+        let tabs = $.data(container, 'tabs').tabs;
+        let tab = null;
 
-        for(var i=0; i<tabs.length; i++) {
-            var pp = tabs[i];
-            var opts = pp.panel('options');	// get the tab panel options
+        for (let i=0; i<tabs.length; i++) {
+            let pp = tabs[i];
+            let opts = pp.panel('options');	// get the tab panel options
             if (opts.id == id) {
                 tab = pp;
                 break;
@@ -55,15 +53,14 @@
         return getTabIcs(container, which) != null;
     }
 
-    function selectTab(container, which){
-        var p = getTabIcs(container, which);
-        if (p && !p.is(':visible')){
-
-            $(container).children('div.tabs-panels').each(function(){
+    function selectTab(container, which) {
+        let p = getTabIcs(container, which);
+        if (p && !p.is(':visible')) {
+            $(container).children('div.tabs-panels').each(function() {
                 $(this).stop(true, true);
             });
 
-            if (!p.panel('options').disabled){
+            if (!p.panel('options').disabled) {
                 p.panel('open');
             }
         }
@@ -71,33 +68,29 @@
 
 
     $.extend($.fn.tabs.methods, {
-        setTabTitle: function (jq, options) {
-            return jq.each(function(){
+        setTabTitle: function(jq, options) {
+            return jq.each(function() {
                 setTabTitle(this, options);
             });
         },
 
-        getTabById: function (jq, which) {
-            var tab;
-            jq.each(function(){
+        getTabById: function(jq, which) {
+            let tab;
+            jq.each(function() {
                 tab = getTabIcs(this, which);
             });
             return tab;
         },
 
-        isExist: function (jq, which) {
+        isExist: function(jq, which) {
             return exists(jq[0], which);
         },
 
-        selectById: function (jq, which) {
-            return jq.each(function(){
+        selectById: function(jq, which) {
+            return jq.each(function() {
                 selectTab(this, which);
             });
-        }
+        },
 
     });
-
-
-
-
-})(jQuery)
+})(jQuery);

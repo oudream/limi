@@ -1,4 +1,4 @@
-var system = require('system');
+let system = require('system');
 
 /**
  * Wait until the test condition is true or a timeout occurs. Useful for waiting
@@ -13,26 +13,26 @@ var system = require('system');
  * @param timeOutMillis the max amount of time to wait. If not specified, 3 sec is used.
  */
 function waitFor(testFx, onReady, timeOutMillis) {
-    var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 10001, //< Default Max Timout is 3s
+    var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 10001, // < Default Max Timout is 3s
         start = new Date().getTime(),
         condition = false,
         interval = setInterval(function() {
             if ( (new Date().getTime() - start < maxtimeOutMillis) && !condition ) {
                 // If not time-out yet and condition not yet fulfilled
-                condition = (typeof(testFx) === "string" ? eval(testFx) : testFx()); //< defensive code
+                condition = (typeof(testFx) === 'string' ? eval(testFx) : testFx()); // < defensive code
             } else {
-                if(!condition) {
+                if (!condition) {
                     // If condition still not fulfilled (timeout but condition is 'false')
-                    console.log("'waitFor()' timeout");
+                    console.log('\'waitFor()\' timeout');
                     phantom.exit(1);
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
-                    //console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");
-                    typeof(onReady) === "string" ? eval(onReady) : onReady(); //< Do what it's supposed to do once the condition is fulfilled
-                    clearInterval(interval); //< Stop this interval
+                    // console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");
+                    typeof(onReady) === 'string' ? eval(onReady) : onReady(); // < Do what it's supposed to do once the condition is fulfilled
+                    clearInterval(interval); // < Stop this interval
                 }
             }
-        }, 100); //< repeat check every 100ms
+        }, 100); // < repeat check every 100ms
 };
 
 if (system.args.length !== 2) {
@@ -40,85 +40,91 @@ if (system.args.length !== 2) {
     phantom.exit(1);
 }
 
-var fs = require('fs');
-var page = require('webpage').create();
+let fs = require('fs');
+let page = require('webpage').create();
 
 // Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
 page.onConsoleMessage = function(msg) {
     console.log(msg);
 };
-page.onError = function (msg, trace) {
+page.onError = function(msg, trace) {
     console.log(msg);
     trace.forEach(function(item) {
         console.log('  ', item.file, ':', item.line);
-    })
-}
+    });
+};
 
-var _openPath = phantom.args[0].replace(/^.*(\\|\/)/, '');
-var openPath = _openPath;
-var origdir = '../js/';
-var basedir = '../instrumented/';
-var coverageBase = fs.read('_coverage.html');
+let _openPath = phantom.args[0].replace(/^.*(\\|\/)/, '');
+let openPath = _openPath;
+let origdir = '../js/';
+let basedir = '../instrumented/';
+let coverageBase = fs.read('_coverage.html');
 
-if (fs.exists(basedir)){
+if (fs.exists(basedir)) {
     var script = /<script.*><\/script>/g,
         src = /src=(["'])(.*?)\1/,
         contents = fs.read(openPath),
         _contents = contents,
         srcs = [],
         s;
-    while (script.exec(contents)){
+    while (script.exec(contents)) {
         s = src.exec(RegExp.lastMatch)[2];
-        if (s && s.indexOf(origdir) != -1)
-            _contents = _contents.replace(s, s.replace(origdir, basedir))
+        if (s && s.indexOf(origdir) != -1) {
+            _contents = _contents.replace(s, s.replace(origdir, basedir));
+        }
     }
-    if (_contents != contents){
+    if (_contents != contents) {
         openPath += '.cov.html';
         fs.write(openPath, _contents);
     }
 }
 
-page.open(openPath, function(status){
-    if (status !== "success") {
-        console.log("Unable to access network");
+page.open(openPath, function(status) {
+    if (status !== 'success') {
+        console.log('Unable to access network');
         phantom.exit(1);
     } else {
         // Inject instrumented sources if they exist
-        if (fs.exists(basedir))
-            for (var i=0; i<srcs.length; i++)
+        if (fs.exists(basedir)) {
+            for (let i=0; i<srcs.length; i++) {
                 page.includeJs(srcs[i]);
-        waitFor(function(){
-            return page.evaluate(function(){
-                var el = document.getElementById('qunit-testresult');
+            }
+        }
+        waitFor(function() {
+            return page.evaluate(function() {
+                let el = document.getElementById('qunit-testresult');
                 if (el && el.innerText.match('completed')) {
                     return true;
                 }
                 return false;
             });
-        }, function(){
+        }, function() {
             // output colorized code coverage
             // reach into page context and pull out coverage info. stringify to pass context boundaries.
-            var coverageInfo = JSON.parse(page.evaluate(function() { return JSON.stringify(getCoverageByLine()); }));
-            if (coverageInfo.key){
-                var lineCoverage = coverageInfo.lines;
-                var originalFile = origdir + fs.separator + coverageInfo.key;
-                var source = coverageInfo.source;
-                var fileLines = readFileLines(originalFile);
+            let coverageInfo = JSON.parse(page.evaluate(function() {
+                return JSON.stringify(getCoverageByLine());
+            }));
+            if (coverageInfo.key) {
+                let lineCoverage = coverageInfo.lines;
+                let originalFile = origdir + fs.separator + coverageInfo.key;
+                let source = coverageInfo.source;
+                let fileLines = readFileLines(originalFile);
 
-                var colorized = '';
+                let colorized = '';
 
-                for (var idx=0; idx < lineCoverage.length; idx++) {
-                    //+1: coverage lines count from 1.
-                    var cvg = lineCoverage[idx + 1];
-                    var hitmiss = '';
+                for (let idx=0; idx < lineCoverage.length; idx++) {
+                    // +1: coverage lines count from 1.
+                    let cvg = lineCoverage[idx + 1];
+                    let hitmiss = '';
                     if (typeof cvg === 'number') {
                         hitmiss = ' ' + (cvg>0 ? 'hit' : 'miss');
                     } else {
                         hitmiss = ' ' + 'undef';
                     }
-                    var htmlLine = fileLines[idx]
-                    if (!source)
+                    let htmlLine = fileLines[idx];
+                    if (!source) {
                         htmlLine = htmlLine.replace('<', '&lt;').replace('>', '&gt;');
+                    }
                     colorized += '<div class="code' + hitmiss + '">' + htmlLine + '</div>\n';
                 };
                 colorized = coverageBase.replace('COLORIZED_LINE_HTML', colorized);
@@ -127,11 +133,12 @@ page.open(openPath, function(status){
 
                 console.log('Coverage for ' + coverageInfo.key + ' in coverage.html');
             }
-            if (_openPath != openPath)
+            if (_openPath != openPath) {
                 fs.remove(openPath);
+            }
 
-            var failedNum = page.evaluate(function(){
-                var el = document.getElementById('qunit-testresult');
+            let failedNum = page.evaluate(function() {
+                let el = document.getElementById('qunit-testresult');
                 console.log(el.innerText);
                 try {
                     return el.getElementsByClassName('failed')[0].innerHTML;
@@ -144,9 +151,9 @@ page.open(openPath, function(status){
 });
 
 function readFileLines(filename) {
-    var stream = fs.open(filename, 'r');
-    var lines = [];
-    var line;
+    let stream = fs.open(filename, 'r');
+    let lines = [];
+    let line;
     while (!stream.atEnd()) {
         lines.push(stream.readLine());
     }

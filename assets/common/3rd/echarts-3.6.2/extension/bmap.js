@@ -1,64 +1,64 @@
 (function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("echarts"));
-	else if(typeof define === 'function' && define.amd)
-		define(["echarts"], factory);
-	else if(typeof exports === 'object')
-		exports["bmap"] = factory(require("echarts"));
-	else
-		root["echarts"] = root["echarts"] || {}, root["echarts"]["bmap"] = factory(root["echarts"]);
+    if (typeof exports === 'object' && typeof module === 'object') {
+        module.exports = factory(require('echarts'));
+    } else if (typeof define === 'function' && define.amd) {
+        define(['echarts'], factory);
+    } else if (typeof exports === 'object') {
+        exports['bmap'] = factory(require('echarts'));
+    } else		{
+        root['echarts'] = root['echarts'] || {}, root['echarts']['bmap'] = factory(root['echarts']);
+    }
 })(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
+    return /** ****/ (function(modules) { // webpackBootstrap
+/** ****/ 	// The module cache
+        /** ****/ 	let installedModules = {};
 
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+/** ****/ 	// The require function
+        /** ****/ 	function __webpack_require__(moduleId) {
+/** ****/ 		// Check if module is in cache
+            /** ****/ 		if (installedModules[moduleId])
+    /** ****/ 			{
+                return installedModules[moduleId].exports;
+            }
 
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+/** ****/ 		// Create a new module (and put it into the cache)
+            /** ****/ 		let module = installedModules[moduleId] = {
+                /** ****/ 			exports: {},
+                /** ****/ 			id: moduleId,
+                /** ****/ 			loaded: false,
+            /** ****/ 		};
 
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
+/** ****/ 		// Execute the module function
+            /** ****/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/** ****/ 		// Flag the module as loaded
+            /** ****/ 		module.loaded = true;
 
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
+/** ****/ 		// Return the exports of the module
+            /** ****/ 		return module.exports;
+        /** ****/}
 
 
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
+/** ****/ 	// expose the modules object (__webpack_modules__)
+        /** ****/ 	__webpack_require__.m = modules;
 
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
+/** ****/ 	// expose the module cache
+        /** ****/ 	__webpack_require__.c = installedModules;
 
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/** ****/ 	// __webpack_public_path__
+        /** ****/ 	__webpack_require__.p = '';
 
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
+/** ****/ 	// Load entry module and return exports
+        /** ****/ 	return __webpack_require__(0);
+    /** ****/ })
+/** **********************************************************************/
+/** ****/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/**
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * BMap component extension
 	 */
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
+        !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	    __webpack_require__(1).registerCoordinateSystem(
 	        'bmap', __webpack_require__(2)
 	    );
@@ -69,34 +69,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    __webpack_require__(1).registerAction({
 	        type: 'bmapRoam',
 	        event: 'bmapRoam',
-	        update: 'updateLayout'
-	    }, function (payload, ecModel) {
-	        ecModel.eachComponent('bmap', function (bMapModel) {
-	            var bmap = bMapModel.getBMap();
-	            var center = bmap.getCenter();
+	        update: 'updateLayout',
+	    }, function(payload, ecModel) {
+	        ecModel.eachComponent('bmap', function(bMapModel) {
+	            let bmap = bMapModel.getBMap();
+	            let center = bmap.getCenter();
 	            bMapModel.setCenterAndZoom([center.lng, center.lat], bmap.getZoom());
 	        });
 	    });
 
 	    return {
-	        version: '1.0.0'
+	        version: '1.0.0',
 	    };
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 1 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ },
+    /** */ function(module, exports) {
+        module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+    /** */},
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
-	    var echarts = __webpack_require__(1);
-	    var zrUtil = echarts.util;
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__; !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
+	    let echarts = __webpack_require__(1);
+	    let zrUtil = echarts.util;
 
 	    function BMapCoordSys(bmap, api) {
 	        this._bmap = bmap;
@@ -110,24 +105,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    BMapCoordSys.prototype.dimensions = ['lng', 'lat'];
 
-	    BMapCoordSys.prototype.setZoom = function (zoom) {
+	    BMapCoordSys.prototype.setZoom = function(zoom) {
 	        this._zoom = zoom;
 	    };
 
-	    BMapCoordSys.prototype.setCenter = function (center) {
+	    BMapCoordSys.prototype.setCenter = function(center) {
 	        this._center = this._projection.lngLatToPoint(new BMap.Point(center[0], center[1]));
 	    };
 
-	    BMapCoordSys.prototype.setMapOffset = function (mapOffset) {
+	    BMapCoordSys.prototype.setMapOffset = function(mapOffset) {
 	        this._mapOffset = mapOffset;
 	    };
 
-	    BMapCoordSys.prototype.getBMap = function () {
+	    BMapCoordSys.prototype.getBMap = function() {
 	        return this._bmap;
 	    };
 
-	    BMapCoordSys.prototype.dataToPoint = function (data) {
-	        var point = new BMap.Point(data[0], data[1]);
+	    BMapCoordSys.prototype.dataToPoint = function(data) {
+	        let point = new BMap.Point(data[0], data[1]);
 	        // TODO mercator projection is toooooooo slow
 	        // var mercatorPoint = this._projection.lngLatToPoint(point);
 
@@ -138,31 +133,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //     Math.round((mercatorPoint.x - this._center.x) / divider + width / 2),
 	        //     Math.round((this._center.y - mercatorPoint.y) / divider + height / 2)
 	        // ];
-	        var px = this._bmap.pointToOverlayPixel(point);
-	        var mapOffset = this._mapOffset;
+	        let px = this._bmap.pointToOverlayPixel(point);
+	        let mapOffset = this._mapOffset;
 	        return [px.x - mapOffset[0], px.y - mapOffset[1]];
 	    };
 
-	    BMapCoordSys.prototype.pointToData = function (pt) {
-	        var mapOffset = this._mapOffset;
+	    BMapCoordSys.prototype.pointToData = function(pt) {
+	        let mapOffset = this._mapOffset;
 	        var pt = this._bmap.overlayPixelToPoint({
 	            x: pt[0] + mapOffset[0],
-	            y: pt[1] + mapOffset[1]
+	            y: pt[1] + mapOffset[1],
 	        });
 	        return [pt.lng, pt.lat];
 	    };
 
-	    BMapCoordSys.prototype.getViewRect = function () {
-	        var api = this._api;
+	    BMapCoordSys.prototype.getViewRect = function() {
+	        let api = this._api;
 	        return new echarts.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
 	    };
 
-	    BMapCoordSys.prototype.getRoamTransform = function () {
+	    BMapCoordSys.prototype.getRoamTransform = function() {
 	        return echarts.matrix.create();
 	    };
 
-	    BMapCoordSys.prototype.prepareCustoms = function (data) {
-	        var rect = this.getViewRect();
+	    BMapCoordSys.prototype.prepareCustoms = function(data) {
+	        let rect = this.getViewRect();
 	        return {
 	            coordSys: {
 	                // The name exposed to user is always 'cartesian2d' but not 'grid'.
@@ -170,22 +165,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                x: rect.x,
 	                y: rect.y,
 	                width: rect.width,
-	                height: rect.height
+	                height: rect.height,
 	            },
 	            api: {
 	                coord: zrUtil.bind(this.dataToPoint, this),
-	                size: zrUtil.bind(dataToCoordSize, this)
-	            }
+	                size: zrUtil.bind(dataToCoordSize, this),
+	            },
 	        };
 	    };
 
 	    function dataToCoordSize(dataSize, dataItem) {
 	        dataItem = dataItem || [0, 0];
-	        return zrUtil.map([0, 1], function (dimIdx) {
-	            var val = dataItem[dimIdx];
-	            var halfSize = dataSize[dimIdx] / 2;
-	            var p1 = [];
-	            var p2 = [];
+	        return zrUtil.map([0, 1], function(dimIdx) {
+	            let val = dataItem[dimIdx];
+	            let halfSize = dataSize[dimIdx] / 2;
+	            let p1 = [];
+	            let p2 = [];
 	            p1[dimIdx] = val - halfSize;
 	            p2[dimIdx] = val + halfSize;
 	            p1[1 - dimIdx] = p2[1 - dimIdx] = dataItem[1 - dimIdx];
@@ -193,7 +188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, this);
 	    }
 
-	    var Overlay;
+	    let Overlay;
 
 	    // For deciding which dimensions to use when creating list data
 	    BMapCoordSys.dimensions = BMapCoordSys.prototype.dimensions;
@@ -210,25 +205,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {BMap.Map} map
 	         * @override
 	         */
-	        Overlay.prototype.initialize = function (map) {
+	        Overlay.prototype.initialize = function(map) {
 	            map.getPanes().labelPane.appendChild(this._root);
 	            return this._root;
 	        };
 	        /**
 	         * @override
 	         */
-	        Overlay.prototype.draw = function () {};
+	        Overlay.prototype.draw = function() {};
 
 	        return Overlay;
 	    }
 
-	    BMapCoordSys.create = function (ecModel, api) {
-	        var bmapCoordSys;
-	        var root = api.getDom();
+	    BMapCoordSys.create = function(ecModel, api) {
+	        let bmapCoordSys;
+	        let root = api.getDom();
 
 	        // TODO Dispose
-	        ecModel.eachComponent('bmap', function (bmapModel) {
-	            var viewportRoot = api.getZr().painter.getViewportRoot();
+	        ecModel.eachComponent('bmap', function(bmapModel) {
+	            let viewportRoot = api.getZr().painter.getViewportRoot();
 	            if (typeof BMap === 'undefined') {
 	                throw new Error('BMap api is not loaded');
 	            }
@@ -238,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            if (!bmapModel.__bmap) {
 	                // Not support IE8
-	                var bmapRoot = root.querySelector('.ec-extension-bmap');
+	                let bmapRoot = root.querySelector('.ec-extension-bmap');
 	                if (bmapRoot) {
 	                    // Reset viewport left and top, which will be changed
 	                    // in moving handler in BMapView
@@ -253,17 +248,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                root.appendChild(bmapRoot);
 	                var bmap = bmapModel.__bmap = new BMap.Map(bmapRoot);
 
-	                var overlay = new Overlay(viewportRoot);
+	                let overlay = new Overlay(viewportRoot);
 	                bmap.addOverlay(overlay);
 	            }
 	            var bmap = bmapModel.__bmap;
 
 	            // Set bmap options
 	            // centerAndZoom before layout and render
-	            var center = bmapModel.get('center');
-	            var zoom = bmapModel.get('zoom');
+	            let center = bmapModel.get('center');
+	            let zoom = bmapModel.get('zoom');
 	            if (center && zoom) {
-	                var pt = new BMap.Point(center[0], center[1]);
+	                let pt = new BMap.Point(center[0], center[1]);
 	                bmap.centerAndZoom(pt, zoom);
 	            }
 
@@ -275,7 +270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            bmapModel.coordinateSystem = bmapCoordSys;
 	        });
 
-	        ecModel.eachSeries(function (seriesModel) {
+	        ecModel.eachSeries(function(seriesModel) {
 	            if (seriesModel.get('coordinateSystem') === 'bmap') {
 	                seriesModel.coordinateSystem = bmapCoordSys;
 	            }
@@ -283,14 +278,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    return BMapCoordSys;
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__; !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	    function v2Equal(a, b) {
 	        return a && b && a[0] === b[0] && a[1] === b[1];
 	    }
@@ -298,18 +290,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return __webpack_require__(1).extendComponentModel({
 	        type: 'bmap',
 
-	        getBMap: function () {
+	        getBMap: function() {
 	            // __bmap is injected when creating BMapCoordSys
 	            return this.__bmap;
 	        },
 
-	        setCenterAndZoom: function (center, zoom) {
+	        setCenterAndZoom: function(center, zoom) {
 	            this.option.center = center;
 	            this.option.zoom = zoom;
 	        },
 
-	        centerOrZoomChanged: function (center, zoom) {
-	            var option = this.option;
+	        centerOrZoomChanged: function(center, zoom) {
+	            let option = this.option;
 	            return !(v2Equal(center, option.center) && zoom === option.zoom);
 	        },
 
@@ -321,34 +313,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            mapStyle: {},
 
-	            roam: false
-	        }
+	            roam: false,
+	        },
 	    });
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ },
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
-
+    /** */ function(module, exports, __webpack_require__) {
+        let __WEBPACK_AMD_DEFINE_RESULT__; !(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	    return __webpack_require__(1).extendComponentView({
 	        type: 'bmap',
 
-	        render: function (bMapModel, ecModel, api) {
-	            var rendering = true;
+	        render: function(bMapModel, ecModel, api) {
+	            let rendering = true;
 
-	            var bmap = bMapModel.getBMap();
-	            var viewportRoot = api.getZr().painter.getViewportRoot();
-	            var coordSys = bMapModel.coordinateSystem;
-	            var moveHandler = function (type, target) {
+	            let bmap = bMapModel.getBMap();
+	            let viewportRoot = api.getZr().painter.getViewportRoot();
+	            let coordSys = bMapModel.coordinateSystem;
+	            let moveHandler = function(type, target) {
 	                if (rendering) {
 	                    return;
 	                }
-	                var offsetEl = viewportRoot.parentNode.parentNode.parentNode;
-	                var mapOffset = [
+	                let offsetEl = viewportRoot.parentNode.parentNode.parentNode;
+	                let mapOffset = [
 	                    -parseInt(offsetEl.style.left, 10) || 0,
-	                    -parseInt(offsetEl.style.top, 10) || 0
+	                    -parseInt(offsetEl.style.top, 10) || 0,
 	                ];
 	                viewportRoot.style.left = mapOffset[0] + 'px';
 	                viewportRoot.style.top = mapOffset[1] + 'px';
@@ -357,7 +346,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                bMapModel.__mapOffset = mapOffset;
 
 	                api.dispatchAction({
-	                    type: 'bmapRoam'
+	                    type: 'bmapRoam',
 	                });
 	            };
 
@@ -366,7 +355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return;
 	                }
 	                api.dispatchAction({
-	                    type: 'bmapRoam'
+	                    type: 'bmapRoam',
 	                });
 	            }
 
@@ -382,29 +371,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._oldMoveHandler = moveHandler;
 	            this._oldZoomEndHandler = zoomEndHandler;
 
-	            var roam = bMapModel.get('roam');
+	            let roam = bMapModel.get('roam');
 	            if (roam && roam !== 'scale') {
 	                bmap.enableDragging();
-	            }
-	            else {
+	            } else {
 	                bmap.disableDragging();
 	            }
 	            if (roam && roam !== 'move') {
 	                bmap.enableScrollWheelZoom();
 	                bmap.enableDoubleClickZoom();
 	                bmap.enablePinchToZoom();
-	            }
-	            else {
+	            } else {
 	                bmap.disableScrollWheelZoom();
 	                bmap.disableDoubleClickZoom();
 	                bmap.disablePinchToZoom();
 	            }
 
-	            var originalStyle = bMapModel.__mapStyle;
+	            let originalStyle = bMapModel.__mapStyle;
 
-	            var newMapStyle = bMapModel.get('mapStyle') || {};
+	            let newMapStyle = bMapModel.get('mapStyle') || {};
 	            // FIXME, Not use JSON methods
-	            var mapStyleStr = JSON.stringify(newMapStyle);
+	            let mapStyleStr = JSON.stringify(newMapStyle);
 	            if (JSON.stringify(originalStyle) !== mapStyleStr) {
 	                // FIXME May have blank tile when dragging if setMapStyle
 	                if (Object.keys(newMapStyle).length) {
@@ -414,11 +401,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            rendering = false;
-	        }
+	        },
 	    });
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-/***/ }
-/******/ ])
+        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    /** */},
+/** ****/ ]);
 });
 ;

@@ -1,9 +1,9 @@
 
-'use strict'
+'use strict';
 
 const path = require('path');
 
-let testPath11 = function () {
+let testPath11 = function() {
     let sDir = __dirname;
     console.log(sDir);
     console.log(path.normalize(path.join(sDir, '../..')));
@@ -11,7 +11,7 @@ let testPath11 = function () {
 // testPath11();
 
 
-let testPath12 = function () {
+let testPath12 = function() {
     let fs = require('fs');
 
     function scantDir(sDir, bContainDir = false) {
@@ -29,7 +29,7 @@ let testPath12 = function () {
     function walk(sDir, outList, bContainDir = false) {
         let dirList = fs.readdirSync(sDir);
 
-        dirList.forEach(function (item) {
+        dirList.forEach(function(item) {
             let stat = fs.statSync(sDir + '/' + item);
             if (stat.isFile()) {
                 outList.push(sDir + '/' + item);
@@ -39,7 +39,7 @@ let testPath12 = function () {
             }
         });
 
-        dirList.forEach(function (item) {
+        dirList.forEach(function(item) {
             if (fs.statSync(sDir + '/' + item).isDirectory()) {
                 walk(sDir + '/' + item, outList, bContainDir);
             }
@@ -54,10 +54,9 @@ let testPath12 = function () {
 // testPath12();
 
 
-let testPath13 = function () {
+let testPath13 = function() {
     let sPath = 'c:\\sdfasdf/asdfasdf/asdfadf//fdsfaf\\\\sdfasdf/aa/../bb';
     console.log(path.normalize(sPath).split(path.sep));
-
 };
 testPath13();
 

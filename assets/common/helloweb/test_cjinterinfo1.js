@@ -1,7 +1,7 @@
 
-require('./../cjs/cjinterinfo.js')
+require('./../cjs/cjinterinfo.js');
 
-cjs.debug('xxxxxxxxxxxx-debug')
-cjs.info('xxxxxxxxxxxx-info')
-cjs.info('xxxxxxxxxxxx-info2')
-cjs.info('xxxxxxxxxxxx-info3')
+cjs.debug('xxxxxxxxxxxx-debug');
+cjs.info('xxxxxxxxxxxx-info');
+cjs.info('xxxxxxxxxxxx-info2');
+cjs.info('xxxxxxxxxxxx-info3');

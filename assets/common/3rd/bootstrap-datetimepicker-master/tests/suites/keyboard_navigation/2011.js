@@ -1,5 +1,5 @@
 module('Keyboard Navigation 2011', {
-    setup: function(){
+    setup: function() {
         /*
             Tests start with picker on March 31, 2011.  Fun facts:
 
@@ -8,18 +8,18 @@ module('Keyboard Navigation 2011', {
         */
         this.input = $('<input type="text" value="31-03-2011">')
                         .appendTo('#qunit-fixture')
-                        .datetimepicker({format: "dd-mm-yyyy"})
+                        .datetimepicker({format: 'dd-mm-yyyy'})
                         .focus(); // Activate for visibility checks
-        this.dp = this.input.data('datetimepicker')
+        this.dp = this.input.data('datetimepicker');
         this.picker = this.dp.picker;
     },
-    teardown: function(){
+    teardown: function() {
         this.picker.remove();
-    }
+    },
 });
 
-test('Regression: by week (up/down arrows); up from Mar 6, 2011 should go to Feb 27, 2011', function(){
-    var target;
+test('Regression: by week (up/down arrows); up from Mar 6, 2011 should go to Feb 27, 2011', function() {
+    let target;
 
     this.input.val('06-03-2011').datetimepicker('update');
 
@@ -32,7 +32,7 @@ test('Regression: by week (up/down arrows); up from Mar 6, 2011 should go to Feb
     // Navigation: -1 week, up arrow key
     this.input.trigger({
         type: 'keydown',
-        keyCode: 38
+        keyCode: 38,
     });
     datesEqual(this.dp.viewDate, UTCDate(2011, 1, 27));
     datesEqual(this.dp.date, UTCDate(2011, 1, 27));
@@ -40,8 +40,8 @@ test('Regression: by week (up/down arrows); up from Mar 6, 2011 should go to Feb
     equal(target.text(), 'February 2011', 'Title is "February 2011"');
 });
 
-test('Regression: by day (left/right arrows); left from Mar 1, 2011 should go to Feb 28, 2011', function(){
-    var target;
+test('Regression: by day (left/right arrows); left from Mar 1, 2011 should go to Feb 28, 2011', function() {
+    let target;
 
     this.input.val('01-03-2011').datetimepicker('update');
 
@@ -54,7 +54,7 @@ test('Regression: by day (left/right arrows); left from Mar 1, 2011 should go to
     // Navigation: -1 day left arrow key
     this.input.trigger({
         type: 'keydown',
-        keyCode: 37
+        keyCode: 37,
     });
     datesEqual(this.dp.viewDate, UTCDate(2011, 1, 28));
     datesEqual(this.dp.date, UTCDate(2011, 1, 28));
@@ -62,8 +62,8 @@ test('Regression: by day (left/right arrows); left from Mar 1, 2011 should go to
     equal(target.text(), 'February 2011', 'Title is "February 2011"');
 });
 
-test('Regression: by month (shift + left/right arrows); left from Mar 15, 2011 should go to Feb 15, 2011', function(){
-    var target;
+test('Regression: by month (shift + left/right arrows); left from Mar 15, 2011 should go to Feb 15, 2011', function() {
+    let target;
 
     this.input.val('15-03-2011').datetimepicker('update');
 
@@ -77,7 +77,7 @@ test('Regression: by month (shift + left/right arrows); left from Mar 15, 2011 s
     this.input.trigger({
         type: 'keydown',
         keyCode: 37,
-        shiftKey: true
+        shiftKey: true,
     });
     datesEqual(this.dp.viewDate, UTCDate(2011, 1, 15));
     datesEqual(this.dp.date, UTCDate(2011, 1, 15));

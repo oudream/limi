@@ -3,14 +3,14 @@
  */
 
 (function() {
-    "use strict";
+    'use strict';
 
     var CjEnv = CjEnv || {};
 
-    if ( typeof window === "object" ) {
+    if ( typeof window === 'object' ) {
         window.cjs = window.cjs || {};
     } else {
-        throw Error("cjs only run at  web browser");
+        throw Error('cjs only run at  web browser');
     }
 
     cjs.CjEnv = CjEnv;
@@ -21,10 +21,8 @@
      * @returns {*}
      */
     CjEnv.getUrlParam = function getUrlParam(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-        var r = window.location.search.substr(1).match(reg);
+        let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        let r = window.location.search.substr(1).match(reg);
         if (r != null) return decodeURI(r[2]); return null;
-    }
-
-
+    };
 })();
