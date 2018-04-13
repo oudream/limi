@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>RTLOG-DIRS</title>
-	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
-	<script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
-	<script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
-	<script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <title>RTLOG-DIRS</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
+    <script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
+    <script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
 
 <table class="table table-hover">
-	<caption>RTLOG-DIRS</caption>
-	<thead>
-	<tr>
-		<th>目录名称</th>
-		<th>创建时间</th>
-		<th>修改时间</th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr>
-		<td>Tanmay</td>
-		<td>Bangalore</td>
-		<td>560001</td>
-	</tr>
-	<tr>
-		<td>Sachin</td>
-		<td>Mumbai</td>
-		<td>400003</td>
-	</tr>
-	<tr>
-		<td>Uma</td>
-		<td>Pune</td>
-		<td>411027</td>
-	</tr>
-	</tbody>
+    <caption>RTLOG-DIRS</caption>
+    <thead>
+    <tr>
+        <th>目录名称</th>
+        <th>创建时间</th>
+        <th>修改时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Tanmay</td>
+        <td>Bangalore</td>
+        <td>560001</td>
+    </tr>
+    <tr>
+        <td>Sachin</td>
+        <td>Mumbai</td>
+        <td>400003</td>
+    </tr>
+    <tr>
+        <td>Uma</td>
+        <td>Pune</td>
+        <td>411027</td>
+    </tr>
+    </tbody>
 </table>
 
 </body>
@@ -44,7 +44,7 @@
     window.icsTest = {};
     var icsTest = window.icsTest;
 
-    icsTest.timeOut = function() {
+    icsTest.timeOut = function () {
         icsTest.req_resp_memu();
         icsTest.timeOut1000 = window.setTimeout(icsTest.timeOut, 1000);
     }
@@ -52,43 +52,39 @@
     icsTest.timeOut1000 = window.setTimeout(icsTest.timeOut, 1000);
 
     icsTest.reqData = {
-        "session":"sbid=0001;xxx=adfadsf",
-        "structtype": "rtdata_v101",
-        "params":
+        session: "sbid=0001;xxx=adfadsf",
+        structtype: "fs_path_list_v101",
+        params:
             [
                 {
-                    "url": "ygct/asm01/fgj01/rfid"
-                },
-                {
-                    "url": "ygct/asm01/fgj01/ypmm"
+                    urltype: "deploy",
+                    url: "ygct/asm01/fgj01/ypmm"
                 }
             ]
     };
 
-    icsTest.req_resp_memu = function() {
+    icsTest.req_resp_memu = function () {
         var xmlhttp;
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
         }
-        else if (window.ActiveXObject)  {
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        else if (window.ActiveXObject) {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        xmlhttp.open("post", "http://10.31.0.15:8821/ics.cgi?fncode=req.rtdata_v101&filetype=json", true);
+        xmlhttp.open("post", "xxx.filesystem?fncode=req.fs_path_list_v101&filetype=json", true);
         xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
         xmlhttp.setRequestHeader('Content-Type', 'json');
-        xmlhttp.onreadystatechange = function ()
-        {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200)
-            {
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 icsTest.dealRespMain(xmlhttp.responseText)
             }
-        }
+        };
         var r = xmlhttp.send(JSON.stringify(icsTest.reqData));
         document.getElementById("id02").innerHTML = "send：" + Date() + "  " + r;
 //            return {"r":r,"datetime":Date()}
     }
 
-    icsTest.dealRespMain =  function (response) {
+    icsTest.dealRespMain = function (response) {
         var arr = JSON.parse(response);
         var measures = arr.data;
         var i;
@@ -101,7 +97,7 @@
             "</td><td>state" +
             "</td></tr>";
 
-        for(i = 0; i < measures.length; i++) {
+        for (i = 0; i < measures.length; i++) {
             var measure = measures[i];
             out += "<tr><td>" +
                 measure.url +
