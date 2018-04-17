@@ -111,4 +111,96 @@
 
         return dest;
     };
+
+    /**
+     * 对象和数组复制
+     * @param elem：对象或数组
+     * @returns {*}
+     */
+    CjMeta.clone = function(elem) {
+        if (elem && typeof elem === 'object') {
+            if (elem.length) {
+                var _elem = [];
+                for (let i = 0; i < elem.length; i++) {
+                    _elem[i] = elem[i];
+                }
+
+                return _elem;
+            } else {
+                var _elem = {};
+                for (let attr in elem) {
+                    _elem[attr] = elem[attr];
+                }
+
+                return _elem;
+            }
+        }
+
+        return null;
+    };
+
+    /**
+     * 判断对象是否有属性（或者指定属性）
+     * @param obj：待判断对象
+     * @param propertyName：特定属性，如不传入，将判断是否空对象
+     * @returns {boolean}
+     */
+    CjMeta.hasProperty = function(obj, propertyName) {
+        for (let attr in obj) {
+            if (propertyName != undefined) {
+                if (attr == propertyName) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    /**
+     * 新建标签元素
+     * @param tagName：标签名，input,button...
+     * @param attrs：属性对象,{'id':'xx','className':'xxx'...}
+     * @param parent：父标签对象
+     * @returns {Element}：元素对象
+     */
+    CjMeta.createElement = function(tagName, attrs, parent) {
+        let elem = document.createElement(tagName);
+        let ret;
+
+        for (let attr in attrs) {
+            if (typeof(attrs[attr]) != 'function') {
+                elem[attr] = attrs[attr];
+            }
+        }
+
+        /** 针对父对象是Dom对象 */
+        if (parent && ((typeof HTMLElement==='object' && parent instanceof HTMLElement) || (parent.nodeType && parent.nodeType===1))) {
+            parent.appendChild(elem);
+            ret = elem;
+        }
+        /** 针对父对象是jQuery对象 */
+        else if (parent && parent.length && (typeof jQuery==='function' || typeof jQuery==='object') && parent instanceof jQuery) {
+            ret = $(elem);
+            parent.append(ret);
+        } else if (parent == undefined || parent == null) {
+            ret = elem;
+        }
+
+        return ret;
+    };
+
+    /**
+     * 检测对象是否为空
+     * @param obj: 对象
+     * @returns {boolean}
+     */
+    CjMeta.isEmptyObject = function(obj) {
+        let t;
+        for (t in obj) {
+            return !1;
+        }
+        return !0;
+    };
 })();

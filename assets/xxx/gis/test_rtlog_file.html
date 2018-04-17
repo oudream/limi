@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>RTLOG-DIRS</title>
-    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
-    <script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<meta charset="utf-8">
+	<title>RTLOG-FILES</title>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
+	<script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="./../../common/cjs/web/cjenv.js"></script>
+	<script>
+		let CjEnv = cjs.CjEnv;
+	</script>
+
 </head>
 <body>
 
 <table class="table table-hover">
-    <caption>RTLOG-DIRS</caption>
-    <tbody id="tbody-rtlog-dirs">
-    </tbody>
+	<caption>RTLOG-FILES</caption>
+	</thead>
+	<tbody id="tbody-rtlog-dirs">
+	</tbody>
 </table>
 
 </body>
@@ -21,15 +28,35 @@
     window.gclRtLog = window.gclRtLog || {};
     let gclRtLog = window.gclRtLog;
 
-//    gclRtLog.timeOut = function () {
-//        gclRtLog.reqRtlogDir();
-//        window.clearTimeout(gclRtLog.timeOut1000);
-////        icsTest.timeOut1000 = window.setTimeout(icsTest.timeOut, 1000);
-//    };
+    let f_sLogDir = CjEnv.getUrlParam('logdir');
+    let f_sFileName = CjEnv.getUrlParam('filename');
 
-//    gclRtLog.timeOut1000 = window.setTimeout(gclRtLog.timeOut, 1000);
+    gclRtLog.reqRtlogFile = function (sLogDir, sFileName) {
+        $.ajax({
+            method: "POST",
+            url: "xxx.rtlog?fncode=req.rtlog_v101&filetype=json",
+            headers: {
+                'POWERED-BY-AID': 'Approve',
+                'Content-Type': 'json'
+            },
+            data: {
+                session: "sbid=0001;xxx=adfadsf",
+                structtype: "req.rtlog_v101",
+                params:
+                    [
+                        {
+                            mid: Number(sFileName),
+                            url: "data/gcl_svr_rtdbs/" + sLogdir + "/" + sFileName
+                        }
+                    ]
+            }
+        }).done(function( msg ) {
+            alert( "Data Saved: " + msg );
+        });
+	};
 
-    gclRtLog.reqRtlogDir = function () {
+    gclRtLog.reqRtlogFiles = function (sLogdir) {
+        if (! sLogdir) return;
         let xmlhttp;
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
@@ -42,7 +69,7 @@
         xmlhttp.setRequestHeader('Content-Type', 'json');
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                gclRtLog.dealRtlogDir(xmlhttp.responseText)
+                gclRtLog.dealRtlogFiles(xmlhttp.responseText)
             }
         };
         let joReq = {
@@ -52,7 +79,7 @@
                 [
                     {
                         urltype: "deploy",
-                        url: "data/gcl_svr_rtdbs"
+                        url: "data/gcl_svr_rtdbs/" + sLogdir
                     }
                 ]
         };
@@ -60,19 +87,20 @@
         console.log("send req fs_path_list_v101：" + Date() + ", result: " + r)
     };
 
-    gclRtLog.dealRtlogDir = function (response) {
+    gclRtLog.dealRtlogFiles = function (response) {
         let arr = JSON.parse(response);
         let pathInfos = arr.data;
         let i;
         let out = "<thead><tr><td>行号" +
-            "</td><td>目录名称-fileName" +
+            "</td><td>文件名称-fileName" +
+            "</td><td>文件大小-fileSize" +
             "</td><td>创建时间-creationTime" +
             "</td><td>修改时间-lastWriteTime" +
             "</td></tr></thead>";
 
         for (i = 0; i < pathInfos.length; i++) {
             let pathInfo = pathInfos[i];
-            if (pathInfo.pathType !== 'directory') {
+            if (pathInfo.pathType !== 'file') {
                 console.log('dealRtlogDir do not show- pathInfo.pathType:' + pathInfo.pathType);
                 continue;
             }
@@ -80,6 +108,8 @@
                 String(i) +
                 "</td><td>" +
                 pathInfo.fileName +
+                "</td><td>" +
+                String((pathInfo.fileSize / 1024).toFixed(1)) + 'KB' +
                 "</td><td>" +
                 (new Date(pathInfo.creationTime)).toString() +
                 "</td><td>" +
@@ -89,24 +119,24 @@
         out += "</table>";
         document.getElementById("tbody-rtlog-dirs").innerHTML = out;
 
-        gclRtLog.updateDirsEvents();
+        gclRtLog.updateFilesEvents();
     };
 
-    gclRtLog.updateDirsEvents = function () {
+    gclRtLog.updateFilesEvents = function () {
         $("#tbody-rtlog-dirs tr").click(function (event) {
             if (event.currentTarget instanceof HTMLTableRowElement) {
                 let row = event.currentTarget;
-                if (row.cells.length > 1) {
-                    let cell0 = row.cells[1];
+                if (row.cells.length > 0) {
+                    let cell0 = row.cells[0];
                     let sDirName = cell0.innerText;
-                    window.open('./test_rtlog_files.html?logdir=' + sDirName);
+
                 }
                 console.log('#tbody-rtlog-dirs tr click!');
             }
         });
     };
 
-    gclRtLog.reqRtlogDir();
+    gclRtLog.reqRtlogFiles(CjEnv.getUrlParam('logdir'));
 </script>
 
 </html>

@@ -105,3 +105,14 @@ let testJson11 = function() {
   // console.log( s2 );
 };
 testJson11();
+
+
+let testJson12Array = function () {
+    let arr1 = [
+        [16777376, 180, 1, 1522071251000, 37123, 0],
+        [16777376, 180, 1, 1522071251000, 37123, 0],
+        [16777376, 180, 1, 1522071251000, 37123, 0]
+    ];
+    console.log(JSON.stringify(arr1));
+};
+testJson12Array();

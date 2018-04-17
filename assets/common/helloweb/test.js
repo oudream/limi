@@ -23,7 +23,7 @@ console.log(path.dirname(sPath))
 // require('./test_check_sum1');
 // require('./test_tcpclient1');
 // require('./test_buffer1');
-require('./test_function1');
+// require('./test_function1');
 // require('./test_path1');
 // require('./test_argument1');
 
