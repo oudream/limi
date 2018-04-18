@@ -33,7 +33,7 @@ console.log(path.dirname(sPath))
 // require('./../csm/http_server');
 // require('./test_udp1');}
 
-// require('./test_json1')
+require('./test_json1')
 // require('./test_array1')
 // require('./test_object2');
 

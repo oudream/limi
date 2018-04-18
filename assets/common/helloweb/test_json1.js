@@ -104,7 +104,7 @@ let testJson11 = function() {
   // let s2 = JSON.stringify(obj1);
   // console.log( s2 );
 };
-testJson11();
+// testJson11();
 
 
 let testJson12Array = function () {
@@ -114,5 +114,12 @@ let testJson12Array = function () {
         [16777376, 180, 1, 1522071251000, 37123, 0]
     ];
     console.log(JSON.stringify(arr1));
+
+    let sJson = '[[16777376,180,1,1522071251000,37123,0],[16777376,180,1,1522071251000,37123,0],[16777376,180,1,1522071251000,37123,0]]';
+    try {
+        let obj1 = JSON.parse(sJson);
+        console.log(obj1);
+    } catch (e) {
+    }
 };
 testJson12Array();

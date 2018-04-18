@@ -70,10 +70,10 @@ filetype = json
 
 (function () {
 
-    if (window.gclRtlog) {
+    if (window.gclRtLog) {
         return;
     }
-    window.gclRtlog = function () {
+    window.gclRtLog = function () {
 
         var gis = {};
 
@@ -128,11 +128,11 @@ filetype = json
             return "";
         }
 
-        var timeOut1000 = window.setTimeout("gclRtlog.timeOut()", 1000);
+        var timeOut1000 = window.setTimeout("gclRtLog.timeOut()", 1000);
 
         gis.timeOut = function () {
             req_resp_measures();
-            timeOut1000 = window.setTimeout("gclRtlog.timeOut()", 1000);
+            timeOut1000 = window.setTimeout("gclRtLog.timeOut()", 1000);
         }
 
         var req_resp_measures = function () {

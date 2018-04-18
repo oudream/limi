@@ -3,9 +3,15 @@
 <head>
 	<meta charset="utf-8">
 	<title>RTLOG-FILES</title>
-	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+
 	<script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
+
+	<link rel="stylesheet" href="./../../common/3rd/bootstrap-3.3.7/css/bootstrap.min.css">
 	<script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="./../../common/3rd/highcharts-6.0.7/code/highcharts.js"></script>
+	<script src="./../../common/3rd/highcharts-6.0.7/code/modules/series-label.js"></script>
+	<script src="./../../common/3rd/highcharts-6.0.7/code/modules/exporting.js"></script>
 
 	<script src="./../../common/cjs/web/cjenv.js"></script>
 	<script>
@@ -16,8 +22,13 @@
 <body>
 
 <table class="table table-hover">
-	<caption>RTLOG-FILES</caption>
-	</thead>
+	<caption>RTLOG-HOURS-TABLE</caption>
+	<tbody id="tbody-rtlog-hours">
+	</tbody>
+</table>
+
+<table class="table table-hover">
+	<caption>RTLOG-HOURS-CHART</caption>
 	<tbody id="tbody-rtlog-dirs">
 	</tbody>
 </table>
@@ -31,112 +42,174 @@
     let f_sLogDir = CjEnv.getUrlParam('logdir');
     let f_sFileName = CjEnv.getUrlParam('filename');
 
+    let f_logObjs = [];
+    for (let i = 0; i < 24; i++) {
+        f_logObjs.push([]);
+    }
+
+    // 0 oChangedData->changedTime,
+    // 1 oChangedData->value,
+    // 2 oChangedData->quality,
+    // 3 oChangedData->changedSourceId,
+    // 4 oChangedData->changedReasonId
+    gclRtLog.receivedLogObjArray = function (logObjArray) {
+        if (logObjArray.length < 5) {
+			return;
+        }
+        let dt1 = new Date(logObjArray[0]);
+        let logObj = {
+            changedTime: dt1,
+            data: logObjArray
+        };
+        f_logObjs[dt1.getHours()].push(logObj);
+    };
+
     gclRtLog.reqRtlogFile = function (sLogDir, sFileName) {
         $.ajax({
-            method: "POST",
-            url: "xxx.rtlog?fncode=req.rtlog_v101&filetype=json",
+            method: "post",
+//            url: 'http://' + window.location.host + '/data/gcl_svr_rtdbs/' + sLogDir + "/" + sFileName,
+            url: 'xxx.filesystem?fncode=req.fs_file_load_v101&filetype=json',
             headers: {
                 'POWERED-BY-AID': 'Approve',
                 'Content-Type': 'json'
             },
-            data: {
+			data: JSON.stringify({
                 session: "sbid=0001;xxx=adfadsf",
-                structtype: "req.rtlog_v101",
+                structtype: "fs_file_load_v101",
                 params:
                     [
                         {
-                            mid: Number(sFileName),
-                            url: "data/gcl_svr_rtdbs/" + sLogdir + "/" + sFileName
+                            urltype: "deploy",
+                            url: "data/gcl_svr_rtdbs/" + sLogDir + "/" + sFileName
                         }
                     ]
-            }
+            })
         }).done(function( msg ) {
-            alert( "Data Saved: " + msg );
+            let logObjArray = [];
+            let sLogObjArrayJson = "[";
+            if (msg.length>0 && msg.charAt(0) === ',') {
+                sLogObjArrayJson += msg.substring(1) + ']';
+            }
+			else {
+                console.log('received invalid msg: ', msg);
+                return;
+			}
+            try {
+                logObjArray = JSON.parse(sLogObjArrayJson);
+                console.log(logObjArray);
+            } catch (e) {
+                console.log(sLogObjArrayJson);
+                console.log(e);
+            }
+
+            let i;
+            for (i = 0; i < logObjArray.length; i++) {
+                gclRtLog.receivedLogObjArray(logObjArray[i]);
+            }
+
+            gclRtLog.refreshHoursTable();
+            gclRtLog.refreshHoursChart();
         });
 	};
 
-    gclRtLog.reqRtlogFiles = function (sLogdir) {
-        if (! sLogdir) return;
-        let xmlhttp;
-        if (window.XMLHttpRequest) {
-            xmlhttp = new XMLHttpRequest();
-        }
-        else if (window.ActiveXObject) {
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.open("post", "xxx.filesystem?fncode=req.fs_path_list_v101&filetype=json", true);
-        xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
-        xmlhttp.setRequestHeader('Content-Type', 'json');
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                gclRtLog.dealRtlogFiles(xmlhttp.responseText)
+    gclRtLog.refreshHoursTable = function () {
+        let out = "";
+        let logObjs = [];
+        let logObj = [];
+        let iRowCellCount = 6;
+        let i;
+        for (i = 0; i < f_logObjs.length; i++) {
+            logObjs = f_logObjs[i];
+            if (i % iRowCellCount === 0) {
+                out += "<tr><td>";
             }
-        };
-        let joReq = {
-            session: "sbid=0001;xxx=adfadsf",
-            structtype: "fs_path_list_v101",
-            params:
-                [
-                    {
-                        urltype: "deploy",
-                        url: "data/gcl_svr_rtdbs/" + sLogdir
-                    }
-                ]
-        };
-        let r = xmlhttp.send(JSON.stringify(joReq));
-        console.log("send req fs_path_list_v101：" + Date() + ", result: " + r)
+            out += '<a href="#show-log-curve-' + String(i) + '">';
+            out += String(i+1) + 'Hour Has [ ' + String(logObjs.length) + " ] Log </a></td><td>";
+            if (i % iRowCellCount === iRowCellCount-1) {
+                out += "</td></tr>";
+            }
+        }
+        out += "</table>";
+        document.getElementById("tbody-rtlog-hours").innerHTML = out;
     };
 
-    gclRtLog.dealRtlogFiles = function (response) {
-        let arr = JSON.parse(response);
-        let pathInfos = arr.data;
+    gclRtLog.refreshHoursChart = function () {
+        let out = "";
+        let logObjs = [];
+        let logObj = [];
+        let iRowCellCount = 2;
         let i;
-        let out = "<thead><tr><td>行号" +
-            "</td><td>文件名称-fileName" +
-            "</td><td>文件大小-fileSize" +
-            "</td><td>创建时间-creationTime" +
-            "</td><td>修改时间-lastWriteTime" +
-            "</td></tr></thead>";
-
-        for (i = 0; i < pathInfos.length; i++) {
-            let pathInfo = pathInfos[i];
-            if (pathInfo.pathType !== 'file') {
-                console.log('dealRtlogDir do not show- pathInfo.pathType:' + pathInfo.pathType);
-                continue;
+        for (i = 0; i < f_logObjs.length; i++) {
+            logObjs = f_logObjs[i];
+            if (i % iRowCellCount === 0) {
+                out += "<tr>";
             }
-            out += "<tr><td>" +
-                String(i) +
-                "</td><td>" +
-                pathInfo.fileName +
-                "</td><td>" +
-                String((pathInfo.fileSize / 1024).toFixed(1)) + 'KB' +
-                "</td><td>" +
-                (new Date(pathInfo.creationTime)).toString() +
-                "</td><td>" +
-                (new Date(pathInfo.lastWriteTime)).toString() +
-                "</td></tr>";
+            out += '<td id="show-log-curve-' + String(i) + '" style="width: 600px"><div style="min-width: 310px; height: 300px; margin: 0 auto"></div></td>';
+            if (i % iRowCellCount === iRowCellCount-1) {
+                out += "</tr>";
+            }
         }
         out += "</table>";
         document.getElementById("tbody-rtlog-dirs").innerHTML = out;
-
-        gclRtLog.updateFilesEvents();
+        gclRtLog.refreshHoursHighCharts();
     };
 
-    gclRtLog.updateFilesEvents = function () {
-        $("#tbody-rtlog-dirs tr").click(function (event) {
-            if (event.currentTarget instanceof HTMLTableRowElement) {
-                let row = event.currentTarget;
-                if (row.cells.length > 0) {
-                    let cell0 = row.cells[0];
-                    let sDirName = cell0.innerText;
+    gclRtLog.refreshHoursHighCharts = function () {
+        let logObjs = [];
+        let i;
+        let sUiShowId;
+        for (i = 0; i < f_logObjs.length; i++) {
+            logObjs = f_logObjs[i];
+            sUiShowId = 'show-log-curve-' + String(i);
+            gclRtLog.refreshHourHighCharts(sUiShowId, logObjs);
+        }
+    };
 
-                }
-                console.log('#tbody-rtlog-dirs tr click!');
-            }
+	gclRtLog.refreshHourHighCharts = function (sUiShowId, logObjs) {
+
+        Highcharts.chart(sUiShowId, {
+
+            chart: {
+                zoomType: 'x'
+            },
+
+            title: {
+                text: sUiShowId + ' drawing ' + logObjs.length + ' points'
+            },
+
+            subtitle: {
+                text: 'Using the Boost module'
+            },
+
+            tooltip: {
+                valueDecimals: 2
+            },
+
+            xAxis: {
+                type: 'datetime'
+            },
+
+            series: [{
+                data: (function () {
+                    let data = [],
+                        logObj,
+                        i;
+                    for (i = 0; i < logObjs.length; ++i) {
+                        logObj = logObjs[i];
+                        data.push([
+                            logObj.changedTime,
+                            logObj.data[1]]);
+                    }
+                    return data;
+                }()),
+                lineWidth: 0.5,
+                name: 'Hourly data points'
+            }]
+
         });
     };
 
-    gclRtLog.reqRtlogFiles(CjEnv.getUrlParam('logdir'));
+    gclRtLog.reqRtlogFile(f_sLogDir, f_sFileName);
 </script>
 
 </html>
