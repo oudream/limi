@@ -1,10 +1,10 @@
-console.log('run test.js', 1)
+console.log('run test.js', 1);
 
-var fs = require('fs')
-var path = require('path')
+let fs = require('fs');
+let path = require('path');
 
-let sPath = 'c:/temp/'
-console.log(path.dirname(sPath))
+let sPath = 'c:/temp/';
+console.log(path.dirname(sPath));
 
 // require('./test1');
 // require('./test2');
@@ -33,7 +33,7 @@ console.log(path.dirname(sPath))
 // require('./../csm/http_server');
 // require('./test_udp1');}
 
-require('./test_json1')
+// require('./json1');
 // require('./test_array1')
 // require('./test_object2');
 
@@ -52,10 +52,10 @@ require('./test_json1')
 
 // require('./test_meta1');
 
-console.log(' --- --- --- ')
-console.log(__filename)
-console.log(__dirname)
-console.log(path.normalize(path.join(__dirname, '..')))
-console.log(path.normalize('D:\\ICS4000\\deploy/win32/b\\win32/bin_qt/./../bi\\bin_d/ha.exe'))
+console.log(' --- --- --- ');
+console.log(__filename);
+console.log(__dirname);
+console.log(path.normalize(path.join(__dirname, '..')));
+console.log(path.normalize('D:\\ICS4000\\deploy/win32/b\\win32/bin_qt/./../bi\\bin_d/ha.exe'));
 
 console.log('111', 222, '333', Date());
