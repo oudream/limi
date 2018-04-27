@@ -1,4 +1,4 @@
-/*!
+/* !
 // ICS实时数据请求的 json格式：支持散列请求：rtdata_v101；数组请求是：rtdata_v102；返回时都统一用：rtdata_v001
 // url 是全局统一资源名（可以通用在容器对象或实体对象中）
 // mid 是实时库的实时点全局唯一id
@@ -24,7 +24,6 @@ filetype = json
     }
   ]
 }
-
 
 
 // ics.json 数组请求
@@ -86,22 +85,21 @@ filetype = json
 
  */
 
-(function () {
-
+(function() {
     window.gcl = window.gcl || {};
     window.gcl.rtdb = window.gcl.rtdb || {};
 
     let rtdb = window.gcl.rtdb;
 
-    let myDebug = function () {
-        console.log.apply(null, arguments);
+    let myDebug = function(...args) {
+        console.log.apply(null, args);
     };
 
     let EnumMeasureType = {
         none: 0,
         monsb: 1,
         ycadd: 2,
-        straw: 3
+        straw: 3,
     };
     rtdb.EnumMeasureType = EnumMeasureType;
 
@@ -109,43 +107,38 @@ filetype = json
         let iId = Number(measureId);
         if (iId >= 0x01000000 && iId < 0x02000000) {
             return EnumMeasureType.monsb;
-        }
-        else if (iId >= 0x02000000 && iId < 0x03000000) {
+        } else if (iId >= 0x02000000 && iId < 0x03000000) {
             return EnumMeasureType.ycadd;
-        }
-        else if (iId >= 0x03000000 && iId < 0x04000000) {
+        } else if (iId >= 0x03000000 && iId < 0x04000000) {
             return EnumMeasureType.straw;
-        }
-        else {
+        } else {
             return EnumMeasureType.none;
         }
     };
     rtdb.getMeasureTypeById = getMeasureTypeById;
 
-    let MeasureBase = function MeasureBase() {
+    let MeasureBase = function MeasureBase(...args) {
         let iId = 0;
         let sUrl = '';
-        if (arguments.length > 0) {
-            let arg0 = arguments[0];
+        if (args.length > 0) {
+            let arg0 = args[0];
             if (typeof arg0 === 'number') {
                 iId = arg0;
-                if (arguments.length > 1) {
-                    let arg1 = arguments[1];
+                if (args.length > 1) {
+                    let arg1 = args[1];
                     if (typeof arg0 === 'string') {
                         sUrl = arg1;
                     }
                 }
-            }
-            else if (typeof arg0 === 'string') {
+            } else if (typeof arg0 === 'string') {
                 sUrl = arg0;
-                if (arguments.length > 1) {
-                    let arg1 = arguments[1];
+                if (args.length > 1) {
+                    let arg1 = args[1];
                     if (typeof arg0 === 'number') {
                         iId = arg1;
                     }
                 }
-            }
-            else if (arg0 !== null && typeof value === 'object') {
+            } else if (arg0 !== null && typeof value === 'object') {
                 this.id = arg0.id ? arg0.id : iId;
                 this.url = arg0.url ? arg0.url : sUrl;
                 this.value = arg0.value ? arg0.value : null;
@@ -188,17 +181,17 @@ filetype = json
     };
     rtdb.MeasureBase = MeasureBase;
 
-    MeasureBase.prototype.setValue = function (v) {
+    MeasureBase.prototype.setValue = function(v) {
         myDebug('!!!error. setValue is abstract method!');
     };
 
-    MeasureBase.prototype.setVQT = function (v, q, t) {
+    MeasureBase.prototype.setVQT = function(v, q, t) {
         myDebug('!!!error. setValue is abstract method!');
     };
 
-    let MeasureManagerBase = function () {
+    let MeasureManagerBase = function() {
         this.measures = [];
-        this.measureClass = MeasureBase;
+        this.MeasureClass = MeasureBase;
     };
     rtdb.MeasureManagerBase = MeasureManagerBase;
 
@@ -229,34 +222,31 @@ filetype = json
             let bId = (typeof measure.id === 'number' && measure.id > 0 && this.findById(measure.id) === null);
             let bUrl = (typeof measure.url === 'string' && this.findByUrl(measure.url) === null);
             if (bId || bUrl) {
-                let measure = new this.measureClass(measure);
+                let measure = new this.MeasureClass(measure);
                 this.measures.push(measure);
                 return measure;
             }
-        }
-        else {
+        } else {
             return null;
         }
     };
 
     MeasureManagerBase.prototype.appendById = function appendById(iId) {
         if (typeof iId === 'number' && iId > 0 && this.findById(iId) === null) {
-            let measure = new this.measureClass(iId);
+            let measure = new this.MeasureClass(iId);
             this.measures.push(measure);
             return measure;
-        }
-        else {
+        } else {
             return null;
         }
     };
 
     MeasureManagerBase.prototype.appendByUrl = function appendByUrl(sUrl) {
         if (typeof sUrl === 'string' && this.findByUrl(sUrl) === null) {
-            let measure = new this.measureClass(sUrl);
+            let measure = new this.MeasureClass(sUrl);
             this.measures.push(measure);
             return measure;
-        }
-        else {
+        } else {
             return null;
         }
     };
@@ -309,7 +299,7 @@ filetype = json
             let measure = measures[i];
             let reqMeasure = {
                 mid: measure.id,
-                url: measure.url
+                url: measure.url,
             };
             r.push(reqMeasure);
         }
@@ -317,22 +307,22 @@ filetype = json
     };
 
     // # monsb
-    let MonsbMeasure = function MonsbMeasure() {
-        MeasureBase.apply(this, arguments);
+    let MonsbMeasure = function MonsbMeasure(...args) {
+        MeasureBase.apply(this, args);
         this.value = -1;
     };
     MonsbMeasure.prototype = Object.create(MeasureBase.prototype);
     MonsbMeasure.prototype.constructor = MonsbMeasure;
     rtdb.MonsbMeasure = MonsbMeasure;
 
-    MonsbMeasure.prototype.setValue = function (v) {
+    MonsbMeasure.prototype.setValue = function(v) {
         let newValue = Number(v);
         if (newValue !== this.value) {
             this.value = newValue;
         }
     };
 
-    MonsbMeasure.prototype.setVQT = function (v, q, t) {
+    MonsbMeasure.prototype.setVQT = function(v, q, t) {
         this.setValue(v);
         if (q !== this.quality) {
             this.quality = q;
@@ -345,29 +335,29 @@ filetype = json
     let MonsbManager = function MonsbManager() {
         MeasureManagerBase.call(this);
         this.monsbs = this.measures;
-        this.measureClass = MonsbMeasure;
+        this.MeasureClass = MonsbMeasure;
     };
     MonsbManager.prototype = Object.create(MeasureManagerBase.prototype);
     MonsbManager.prototype.constructor = MonsbManager;
     rtdb.MonsbManager = MonsbManager;
 
     // # ycadd
-    let YcaddMeasure = function YcaddMeasure() {
-        MeasureBase.apply(this, arguments);
+    let YcaddMeasure = function YcaddMeasure(...args) {
+        MeasureBase.apply(this, args);
         this.value = -1;
     };
     YcaddMeasure.prototype = Object.create(MeasureBase.prototype);
     YcaddMeasure.prototype.constructor = YcaddMeasure;
     rtdb.YcaddMeasure = YcaddMeasure;
 
-    YcaddMeasure.prototype.setValue = function (v) {
+    YcaddMeasure.prototype.setValue = function(v) {
         let newValue = Number(v);
         if (newValue !== this.value) {
             this.value = newValue;
         }
     };
 
-    YcaddMeasure.prototype.setVQT = function (v, q, t) {
+    YcaddMeasure.prototype.setVQT = function(v, q, t) {
         this.setValue(v);
         if (q !== this.quality) {
             this.quality = q;
@@ -380,29 +370,29 @@ filetype = json
     let YcaddManager = function YcaddManager() {
         MeasureManagerBase.call(this);
         this.ycadds = this.measures;
-        this.measureClass = YcaddMeasure;
+        this.MeasureClass = YcaddMeasure;
     };
     YcaddManager.prototype = Object.create(MeasureManagerBase.prototype);
     YcaddManager.prototype.constructor = YcaddManager;
     rtdb.YcaddManager = YcaddManager;
 
     // # straw
-    let StrawMeasure = function StrawMeasure() {
-        MeasureBase.apply(this, arguments);
+    let StrawMeasure = function StrawMeasure(...args) {
+        MeasureBase.apply(this, args);
         this.value = -1;
     };
     StrawMeasure.prototype = Object.create(MeasureBase.prototype);
     StrawMeasure.prototype.constructor = StrawMeasure;
     rtdb.StrawMeasure = StrawMeasure;
 
-    StrawMeasure.prototype.setValue = function (v) {
+    StrawMeasure.prototype.setValue = function(v) {
         let newValue = String(v);
         if (newValue !== this.value) {
             this.value = newValue;
         }
     };
 
-    YcaddMeasure.prototype.setVQT = function (v, q, t) {
+    YcaddMeasure.prototype.setVQT = function(v, q, t) {
         this.setValue(v);
         if (q !== this.quality) {
             this.quality = q;
@@ -415,7 +405,7 @@ filetype = json
     let StrawManager = function StrawManager() {
         MeasureManagerBase.call(this);
         this.straws = this.measures;
-        this.measureClass = StrawMeasure;
+        this.MeasureClass = StrawMeasure;
     };
     StrawManager.prototype = Object.create(MeasureManagerBase.prototype);
     StrawManager.prototype.constructor = StrawManager;
@@ -434,17 +424,17 @@ filetype = json
         let iId = Number(measureId);
         let r = null;
         switch (getMeasureTypeById(iId)) {
-            case EnumMeasureType.monsb:
-                r = monsbManager.findById(iId);
-                break;
-            case EnumMeasureType.ycadd:
-                r = ycaddManager.findById(iId);
-                break;
-            case EnumMeasureType.straw:
-                r = strawManager.findById(iId);
-                break;
-            default:
-                break;
+        case EnumMeasureType.monsb:
+            r = monsbManager.findById(iId);
+            break;
+        case EnumMeasureType.ycadd:
+            r = ycaddManager.findById(iId);
+            break;
+        case EnumMeasureType.straw:
+            r = strawManager.findById(iId);
+            break;
+        default:
+            break;
         }
         return r;
     };
@@ -457,21 +447,21 @@ filetype = json
     };
     rtdb.findMeasureByUrl = findMeasureByUrl;
 
-    let appendMeasureById = function (measureId) {
+    let appendMeasureById = function(measureId) {
         let iId = Number(measureId);
         let r = null;
         switch (getMeasureTypeById(iId)) {
-            case EnumMeasureType.monsb:
-                r = monsbManager.appendById(iId);
-                break;
-            case EnumMeasureType.ycadd:
-                r = ycaddManager.appendById(iId);
-                break;
-            case EnumMeasureType.straw:
-                r = strawManager.appendById(iId);
-                break;
-            default:
-                break;
+        case EnumMeasureType.monsb:
+            r = monsbManager.appendById(iId);
+            break;
+        case EnumMeasureType.ycadd:
+            r = ycaddManager.appendById(iId);
+            break;
+        case EnumMeasureType.straw:
+            r = strawManager.appendById(iId);
+            break;
+        default:
+            break;
         }
         return r;
     };
@@ -482,7 +472,9 @@ filetype = json
         return JSON.stringify({
             session: '',
             structtype: 'rtdata_v101',
-            params: (((monsbManager.getReqMeasures()).concat(ycaddManager.getReqMeasures())).concat(strawManager.getReqMeasures()))
+            params: (((monsbManager.getReqMeasures()).concat(
+                ycaddManager.getReqMeasures())).concat(
+                    strawManager.getReqMeasures())),
         });
     };
     rtdb.getReqMeasuresJson = getReqMeasuresJson;
@@ -490,7 +482,7 @@ filetype = json
     let retReqMeasuresJson = '';
     rtdb.retReqMeasuresJson = retReqMeasuresJson;
 
-    let dealRespMeasures = function (response) {
+    let dealRespMeasures = function(response) {
         let arr = JSON.parse(response);
         let measures = arr.data;
         for (let i = 0; i < measures.length; i++) {
@@ -503,38 +495,36 @@ filetype = json
         }
     };
 
-    let startSyncMeasures = function () {
+    let startSyncMeasures = function() {
         retReqMeasuresJson = getReqMeasuresJson();
-        let req_resp_rtdatas = function () {
+        let reqRespRtdatas = function() {
             let xmlhttp;
             if (window.XMLHttpRequest) {
                 xmlhttp = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
             }
-            else if (window.ActiveXObject) {
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.open("post", "xxx.rtdata", true);
-            xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
+            xmlhttp.open('post', 'xxx.rtdata', true);
+            xmlhttp.setRequestHeader('POWERED-BY-AID', 'Approve');
             xmlhttp.setRequestHeader('Content-Type', 'json');
-            xmlhttp.onreadystatechange = function () {
+            xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                    myDebug('接收：RespMeasures - ' + Date() + ' ' + xmlhttp.response.length);
-                    dealRespMeasures(xmlhttp.responseText)
+                    myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
+                    dealRespMeasures(xmlhttp.responseText);
                 }
             };
             retReqMeasuresJson = getReqMeasuresJson();
             let r = xmlhttp.send(retReqMeasuresJson);
-            myDebug('发送：ReqMeasures - ' + Date() + ' ' + r);
+            myDebug('发送：ReqMeasures - ' + new Date() + ' ' + r);
         };
 
         if (retReqMeasuresJson.length > 0) {
-            setInterval(req_resp_rtdatas, 1000);
+            setInterval(reqRespRtdatas, 1000);
             return true;
-        }
-        else {
-            console.log('!!! warnning: retReqMeasuresJson is empty!!!')
+        } else {
+            console.log('!!! warnning: retReqMeasuresJson is empty!!!');
             return false;
         }
     };
     rtdb.startSyncMeasures = startSyncMeasures;
-})(typeof window !== "undefined" ? window : this);
+})(typeof window !== 'undefined' ? window : this);
