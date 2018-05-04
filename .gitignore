@@ -26,3 +26,4 @@
 /config/vxd_modbus_tcp.config.ini
 /config/vxd_modbus_tcp.ini
 /config/ycadd.measure.txt
+/*.log

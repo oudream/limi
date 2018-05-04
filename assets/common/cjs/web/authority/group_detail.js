@@ -20,7 +20,7 @@ define(['jquery', 'server', 'async', 'global', 'jqGrid', 'ztree', 'cjcommon', 'c
       {name: 'rowID', hidden: true},
     ]; // newTag,OldTag为增加，修改标记，其余为数据库字段名，根据jqGrid文档配置相关属性
 
-    let loadMainSql = 'SELECT ID,UserName,Name FROM sinopec_User order by UserName;';
+    let loadMainSql = 'SELECT ID,UserName,Name FROM omc_sys_User order by UserName;';
 
     let action = {
         init: function() {
@@ -150,11 +150,11 @@ define(['jquery', 'server', 'async', 'global', 'jqGrid', 'ztree', 'cjcommon', 'c
                     if (UID[j] === UNO[t]) {
                         break;
                     } else if (t === UNO.length - 1) {
-                        insertSql = insertSql + 'insert into sinopec_user_group (UID,GID) values(' + UID[j] + ',' + GID + ');';
+                        insertSql = insertSql + 'insert into omc_sys_user_group (UID,GID) values(' + UID[j] + ',' + GID + ');';
                     }
                 }
                 if (UNO.length === 0) {
-                    insertSql = insertSql + 'insert into sinopec_user_group (UID,GID) values(' + UID[j] + ',' + GID + ');';
+                    insertSql = insertSql + 'insert into omc_sys_user_group (UID,GID) values(' + UID[j] + ',' + GID + ');';
                 }
             }
             gDb.loadT(insertSql, function(err, vals) {

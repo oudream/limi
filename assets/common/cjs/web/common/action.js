@@ -15,7 +15,11 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             break;
         case 'omcAddAction':omcAddAction(def, tbName, data.assistAction, data.reload, data.para, g);
             break;
+        case 'omcRTDataCfgAddAction':omcRTDataCfgAddAction(data.para, g);
+            break;
         case 'delAction': delAction(tbID, tbName, def);
+            break;
+        case 'omcRTDataCfgDelAction': omcRTDataCfgDelAction(tbID, tbName, def);
             break;
         case 'omcCommunicationUpdateAction': omcCommunicationUpdateAction(data, tbID, def);
             break;
@@ -83,17 +87,28 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             break;
         }
     };
-    action.queryAction = function(id) {
+    action.queryAction = function(id, timeType) {
         let data = getFormData(id);
         let sql = '';
+        let time;
         for (let i = 0; i < data.length; i++) {
             if (data[i].value !== '') {
                 for (let j = i + 1; j < data.length; j++) {
                     if (data[j].value !== '') {
                         if ($.trim(data[i].name) === 'StartTime') {
-                            sql = sql + 'F_T > ' + '\'' + data[i].value + '\'' + ' and ';
+                            if (timeType === 'utc') {
+                                time = utils.time.locale2Utc(data[i].value);
+                            } else {
+                                time = data[i].value;
+                            }
+                            sql = sql + 'F_T > ' + '\'' + time + '\'' + ' and ';
                         } else if ($.trim(data[i].name) === 'EndTime') {
-                            sql = sql + 'F_T < ' + '\'' + data[i].value + '\'' + ' and ';
+                            if (timeType === 'utc') {
+                                time = utils.time.locale2Utc(data[i].value);
+                            } else {
+                                time = data[i].value;
+                            }
+                            sql = sql + 'F_T < ' + '\'' + time + '\'' + ' and ';
                         } else {
                             sql = sql + data[i].name + ' = ' + '\'' + data[i].value + '\'' + ' and ';
                         }
@@ -102,9 +117,19 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
                     if (j === data.length - 1) {
                         if (data[j].value === '') {
                             if ($.trim(data[i].name) === 'StartTime') {
-                                sql = sql + 'F_T > ' + '\'' + data[i].value + '\'';
+                                if (timeType === 'utc') {
+                                    time = utils.time.locale2Utc(data[i].value);
+                                } else {
+                                    time = data[i].value;
+                                }
+                                sql = sql + 'F_T > ' + '\'' + time + '\'';
                             } else if ($.trim(data[i].name) === 'EndTime') {
-                                sql = sql + 'F_T < ' + '\'' + data[i].value + '\'';
+                                if (timeType === 'utc') {
+                                    time = utils.time.locale2Utc(data[i].value);
+                                } else {
+                                    time = data[i].value;
+                                }
+                                sql = sql + 'F_T < ' + '\'' + time + '\'';
                             } else {
                                 sql = sql + data[i].name + ' = ' + '\'' + data[i].value + '\'';
                             }
@@ -113,9 +138,19 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
                 }
                 if (i === data.length - 1) {
                     if ($.trim(data[i].name) === 'StartTime') {
-                        sql = sql + 'F_T > ' + '\'' + data[i].value + '\'';
+                        if (timeType === 'utc') {
+                            time = utils.time.locale2Utc(data[i].value);
+                        } else {
+                            time = data[i].value;
+                        }
+                        sql = sql + 'F_T > ' + '\'' + time + '\'';
                     } else if ($.trim(data[i].name) === 'EndTime') {
-                        sql = sql + 'F_T < ' + '\'' + data[i].value + '\'';
+                        if (timeType === 'utc') {
+                            time = utils.time.locale2Utc(data[i].value);
+                        } else {
+                            time = data[i].value;
+                        }
+                        sql = sql + 'F_T < ' + '\'' + time + '\'';
                     } else {
                         sql = sql + data[i].name + ' = ' + '\'' + data[i].value + '\'';
                     }
@@ -254,6 +289,25 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             url: g.url(u),
         });
     }
+  /**
+   * omcRTDataConfig添加操作(未使用json文件配置)
+   * @param g : obj 全局对象
+   */
+    function omcRTDataCfgAddAction(para, g) {
+        let u = 'ics/omc/html/dataShow/add-config.html?index=' + para;
+
+        g.iframe({
+            title: '新增',
+            ajaxWindow: false,
+            show: true,
+      // backdrop: true,
+            type: 'iframe', // iframe / html / alert / confirm
+            width: 1200,
+            height: 400,
+            footerButtonAlign: 'right',
+            url: g.url(u),
+        });
+    }
 
   /**
    * 删除操作
@@ -285,6 +339,31 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
         let deleteSql = 'DELETE FROM ' + tableName + ' WHERE ID = ' + '\'' + del + '\'';
         if (window.confirm('确认删除？')) {
             executeSql(deleteSql, log);
+        }
+    }
+
+  /**
+   * omcRtData配置删除操作
+   * @param tbID : num 单表id
+   * @param tableName : string 数据库表名
+   * @param def : obj 表定义表中配置
+   */
+    function omcRTDataCfgDelAction(tbID, tableName, def) {
+        let propConfGrid = tbID;
+        let aID = [];
+        let deleteSql = '';
+        let records = propConfGrid.jqGrid('getRowData');
+        for (let i = 0; i < records.length; i++) {
+            if (records[i].isCheck === '1') {
+                aID.push(records[i].ID);
+            }
+        }
+        for (let i = 0; i < aID.length; i++) {
+            deleteSql = deleteSql + 'DELETE FROM ' + tableName + ' WHERE ID = ' + aID[i] + ';';
+        }
+        // console.log(deleteSql);
+        if (window.confirm('确认删除？')) {
+            executeSql(deleteSql);
         }
     }
 

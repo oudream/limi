@@ -4,7 +4,7 @@
 
 'use strict';
 
-define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'action', 'alarmModal', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
+define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'action', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
     let gDb = null;
     let netype; // 表定义表中的NeType
     let tableName; // 表名

@@ -35,6 +35,7 @@ define(['jquery', 'echart3'], function($, echarts) {
                     color: '#008ACD',
                 },
             },
+            color: config.color,
             tooltip: {
                 trigger: 'axis',
             },
@@ -115,6 +116,7 @@ define(['jquery', 'echart3'], function($, echarts) {
                     color: '#008ACD',
                 },
             },
+            color: config.color,
             tooltip: {
                 trigger: 'axis',
             },
@@ -215,6 +217,7 @@ define(['jquery', 'echart3'], function($, echarts) {
                 type: 'scroll',
                 data: config.legend, // 图例
             },
+            color: config.color,
             toolbox: {
                 feature: {
                     saveAsImage: {},
@@ -224,6 +227,71 @@ define(['jquery', 'echart3'], function($, echarts) {
             series: series,
         };
 
+        myChart.setOption(option);
+    };
+
+    /**
+     * 配置混合图
+     * @param ID : string echart id
+     * @param config : obj 配置
+     */
+    echartsConfig.mixConfig = function(ID, config) {
+        let myChart = echarts.init($('#' + ID)[0]); // 基于准备好的dom，初始化echarts实例
+        // 指定图表的配置项和数据
+        let option = {
+            title: {
+                text: config.title, // 标题
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#008ACD',
+                },
+            },
+            color: config.color,
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999',
+                    },
+                },
+            },
+            legend: {
+                type: 'scroll',
+                data: config.legend, // 图例
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {},
+                    magicType: {
+                        type: ['line', 'bar'],
+                    },
+                    right: '3%',
+                },
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: config.xData,
+                axisPointer: {
+                    type: 'shadow',
+                },
+            },
+            yAxis: config.yAxis,
+            series: config.seriesData,
+        };
+        if (config.xData === 'day') {
+            option.xAxis.data = xAxisDay();
+            option.dataZoom = [
+                {
+                    type: 'slider',
+                    show: true,
+                    startValue: xAxisDay().length - 7,
+                    endValue: xAxisDay().length - 1,
+                    filterMode: 'filter',
+                },
+            ];
+        }
         myChart.setOption(option);
     };
 

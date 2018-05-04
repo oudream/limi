@@ -304,7 +304,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             for (let i = 0; i <= recordLength; i++) {
                 if (i < recordLength) {
                     if (vals[i].F_T !== undefined) {
-                        if ((typeof vals[i].F_T) === 'number') {
+                        if (!isNaN(Number(vals[i].F_T))) {
                             vals[i].F_T = utils.time.utc2Locale(vals[i].F_T);
                         }
                     }

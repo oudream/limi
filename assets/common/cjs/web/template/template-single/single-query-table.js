@@ -4,7 +4,7 @@
 
 'use strict';
 
-define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alarmModal', 'panelConfig', 'action', 'alarmModal', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
+define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'panelConfig', 'action', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
     let gDb = null;
     let netype; // 表定义表中的NeType
     let tableName; // 表名
@@ -16,6 +16,7 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
     let def = []; // 表定义表相关定义
     let operationData; // 操作按钮
     let queryCfg; // 查询面板配置
+    let timeType; // 时间类型
 
     let gReqParam = null;
     let tbID = $('#tbList');
@@ -46,6 +47,11 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
             netype = data.neType;
             tableName = data.tbName;
             queryCfg = data.queryPanel.items;
+            for (let i = 0; i <queryCfg.length; i++) {
+                if (queryCfg[i].name === 'F_T') {
+                    timeType = queryCfg[i].timeType || 'str';
+                }
+            }
             multi = data.multi;
             def = data.def;
             if (data.operationPanel !== undefined) {
@@ -68,8 +74,8 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'alar
             }
             jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span');
             $('#queryBtn').click(function() {
-                jqGridExtend.countNum(loadSql, action.queryAction(formID), tableName, group, 40, 'data_record_count_span');
-                jqGridExtend.paging(tbID, loadSql, action.queryAction(formID), tableName, group, sort, 40, 'pager');
+                jqGridExtend.countNum(loadSql, action.queryAction(formID, timeType), tableName, group, 40, 'data_record_count_span');
+                jqGridExtend.paging(tbID, loadSql, action.queryAction(formID, timeType), tableName, group, sort, 40, 'pager');
             });
             if (arrs[1] === undefined) {
                 loadPropertyDef(gDb, loadSql);

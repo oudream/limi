@@ -76,7 +76,12 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     aSelect = [];
                     oSelect = {};
                 } else {
-                    let obj = JSON.parse(exteriorValue);
+                    let obj = {};
+                    if (typeof (exteriorValue) === 'string') {
+                        obj = JSON.parse(exteriorValue);
+                    } else {
+                        obj = exteriorValue;
+                    }
                     let sName = def[i].colName;
                     if (obj.type === '1') {
 
@@ -149,6 +154,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     edittype: type,
                     hidden: hidden,
                     sortable: false,
+                    align: def[i].align || 'center',
                 };
             } else {
                 _model = {
@@ -158,6 +164,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     hidden: hidden,
                     width: def[i].width,
                     sortable: false,
+                    align: def[i].align || 'center',
                 };
             }
             colModel.push(_model);
@@ -283,7 +290,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 type = 'select';
                 let localValue = def[i].valueScopes;
                 let exteriorValue = def[i].foreignKey;
-                if (localValue !== '') {
+                if (localValue !== '' && localValue !== null && localValue !== undefined) {
                     aSelect = localValue.split(',');
                     if (aSelect[0] === '1') {
                         for (let n = 0; n < aSelect.length - 1; n++) {
@@ -315,7 +322,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 type = 'select';
                 let localValue = def[i].valueScopes;
                 let exteriorValue = def[i].foreignKey;
-                if (localValue !== '') {
+                if (localValue !== '' && localValue !== null && localValue !== undefined) {
                     aSelect = localValue.split(',');
                     for (let n = 0; n < aSelect.length; n++) {
                         oSelect[aSelect[n]] = aSelect[n];
@@ -507,7 +514,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 type = 'select';
                 let localValue = def[i].valueScopes;
                 let exteriorValue = def[i].foreignKey;
-                if (localValue !== '') {
+                if (localValue !== '' && localValue !== null && localValue !== undefined) {
                     aSelect = localValue.split(',');
                     if (aSelect[0] === '1') {
                         for (let n = 0; n < aSelect.length - 1; n++) {
@@ -539,7 +546,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 type = 'select';
                 let localValue = def[i].valueScopes;
                 let exteriorValue = def[i].foreignKey;
-                if (localValue !== '') {
+                if (localValue !== '' && localValue !== null && localValue !== undefined) {
                     aSelect = localValue.split(',');
                     for (let n = 0; n < aSelect.length; n++) {
                         oSelect[aSelect[n]] = aSelect[n];
@@ -608,7 +615,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             shrinkToFit: true,
             colNames: colNames,
             colModel: colModel,
-            pager: pager,
+            pager: '#' + pager,
       // rowList: [5, 10, 20],
             // multiPageSelection: true,
             rowNum: 20,
