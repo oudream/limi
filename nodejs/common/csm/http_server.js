@@ -4,8 +4,8 @@
 require('./../cjs/cjinterinfo');
 require('./../cjs/cjstring');
 
-let Route = require('./../cjs/nodejs/cjhttp_route');
-let FileServer = require('./../cjs/nodejs/cjhttp_file_server');
+let Route = require('./../cjs/cjhttp_route');
+let FileServer = require('./../cjs/cjhttp_file_server');
 let path = require('path');
 let http = require('http');
 

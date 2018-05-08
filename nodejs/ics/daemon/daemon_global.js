@@ -1,10 +1,10 @@
 'use strict';
 
-const cjLog = require('./../../../assets/cjs/cjs/nodejs/cjlog.js');
-const cjFs = require('./../../../assets/cjs/cjs/nodejs/cjfs.js');
-const cjString = require('./../../../assets/cjs/cjs/cjstring.js');
-const cjDate = require('./../../../assets/cjs/cjs/cjdate.js');
-const cjJson = require('./../../../assets/cjs/cjs/cjjson.js');
+const cjLog = require('./../../common/cjs/cjlog.js');
+const cjFs = require('./../../common/cjs/cjfs.js');
+const cjString = require('./../../common/cjs/cjstring.js');
+const cjDate = require('./../../../assets/common/cjs/cjdate.js');
+const cjJson = require('./../../../assets/common/cjs/cjjson.js');
 const ci = cjs.daemon ? cjs.daemon : cjs;
 
 const path = require('path');

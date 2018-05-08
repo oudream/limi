@@ -1,6 +1,7 @@
 'use strict';
 
-let CjChannelTcpclient = require('./../cjs/nodejs/cjchannel_tcpclient');
+let CjChannelTcpclient = require('./../cjs/cjchannel_tcpclient');
+let CjChannelUdp = require('./../cjs/cjchannel_udp');
 let fs = require('fs');
 
 exports = module.exports = BasProtocol;
@@ -26,6 +27,7 @@ BasDefine.PACKAGE_SIMPLE_REQ_LEN = 512;
 BasDefine.PACKAGE_MAX_REQ_LEN = 2048;
 // 接收缓冲池打消
 BasDefine.PACKAGE_MAX_BUF_SIZE = 30000;
+
 // 无基本信息
 BasDefine.OMC_OK_WITHINFO = 100;
 BasDefine.OMC_ERROR = 300;
@@ -61,9 +63,72 @@ BasDefine.OMC_ERASE_ALARM = 3;  // 告警清除
 BasDefine.OMC_SET_ALARM = 4;  // 告警同步
 BasDefine.OMC_CLEAR_ALARM = 5;  // 告警恢复
 
+// rt 命令
+BasDefine.RTDB_REQ_HEARTBEAT = 23;
+BasDefine.RTDB_REQ_OPEN_TABLE = 1;
+BasDefine.RTDB_REQ_SAVE_TABLE = 17;
+BasDefine.RTDB_REQ_CLOSE_TABLE = 18;
+BasDefine.RTDB_REQ_RCDCNT = 2;
+BasDefine.RTDB_REQ_RCDLEN = 3;
+BasDefine.RTDB_REQ_ADDRCD = 4;
+BasDefine.RTDB_REQ_DELRCD_BY_KEY = 5;
+BasDefine.RTDB_REQ_DELRCD_BY_IDX = 6;
+BasDefine.RTDB_REQ_DELALL = 7;
+BasDefine.RTDB_REQ_UPDRCD_BY_KEY = 8;
+BasDefine.RTDB_REQ_UPDRCD_BY_IDX = 9;
+BasDefine.RTDB_REQ_GETRCD_BY_KEY = 10;
+BasDefine.RTDB_REQ_GETRCD_BY_IDX = 11;
+BasDefine.RTDB_REQ_GET_RCD_SEG = 12;
+BasDefine.RTDB_REQ_GET_ALL_RCD = 13;
+BasDefine.RTDB_REQ_GET_RCD_LIST = 26;
+BasDefine.RTDB_REQ_SUBSCRIBE = 14;
+// BasDefine.RTDB_REQ_RAW_SUBSCRIBE         = 23;
+BasDefine.RTDB_REQ_SYNC = 16;
+BasDefine.RTDB_REQ_GET_COLUMN_INFO = 19;
+BasDefine.RTDB_REQ_GETRCD_BY_COND = 20;
+BasDefine.RTDB_REQ_UPDRCD_BY_COND = 21;
+BasDefine.RTDB_REQ_DELRCD_BY_COND = 22;
+BasDefine.RTDB_REQ_UPD_RCD_LIST = 27;
+BasDefine.RTDB_REQ_LOGIN = 25;
+BasDefine.RTDB_REQ_UPD_CFG = 28;
+
+// rt 命令回复
+BasDefine.RTDB_ANS_HEARTBEAT = 43;
+BasDefine.RTDB_ANS_OPEN_TABLE = 21;
+BasDefine.RTDB_ANS_SAVE_TABLE = 37;
+BasDefine.RTDB_ANS_CLOSE_TABLE = 38;
+BasDefine.RTDB_ANS_RCDCNT = 22;
+BasDefine.RTDB_ANS_RCDLEN = 23;
+BasDefine.RTDB_ANS_ADDRCD = 24;
+BasDefine.RTDB_ANS_DELRCD_BY_KEY = 25;
+BasDefine.RTDB_ANS_DELRCD_BY_IDX = 26;
+BasDefine.RTDB_ANS_DELALL = 27;
+BasDefine.RTDB_ANS_UPDRCD_BY_KEY = 28;
+BasDefine.RTDB_ANS_UPDRCD_BY_IDX = 29;
+BasDefine.RTDB_ANS_GETRCD_BY_KEY = 30;
+BasDefine.RTDB_ANS_GETRCD_BY_IDX = 31;
+BasDefine.RTDB_ANS_GET_RCD_SEG = 32;
+BasDefine.RTDB_ANS_GET_RCD_LIST = 46;
+BasDefine.RTDB_ANS_FIRST_RCD_SEG = 33;
+BasDefine.RTDB_ANS_NEXT_RCD_SEG = 34;
+BasDefine.RTDB_ANS_SUBSCRIBE = 35;
+// BasDefine.RTDB_ANS_RAW_SUBSCRIBE         = 43;
+BasDefine.RTDB_ANS_SYNC = 36;
+BasDefine.RTDB_ANS_GET_COLUMN_INFO = 39;
+BasDefine.RTDB_ANS_GETRCD_BY_COND = 40;
+BasDefine.RTDB_ANS_UPDRCD_BY_COND = 41;
+BasDefine.RTDB_ANS_DELRCD_BY_COND = 42;
+BasDefine.RTDB_ANS_UPD_RCD_LIST = 47;
+BasDefine.RTDB_ANS_LOGIN = 45;
+BasDefine.RTDB_ANS_UPD_CFG = 48;
+
+// rt
+BasDefine.RTDB_MAX_TABLE_NAME = 64;
+BasDefine.RTDB_MAX_COLUMN_NAME = 64;
+
 /**
  * UserException
- * @param message
+ * @param {String}message
  * @constructor
  */
 function UserException(message) {
@@ -73,10 +138,10 @@ function UserException(message) {
 
 /**
  * BasAttr
- * @param name
- * @param size
- * @param type
- * @param encoding
+ * @param {String}name
+ * @param {Number}size
+ * @param {Number}type
+ * @param {String}encoding
  * @constructor
  */
 function BasAttr(name, size, type, encoding) {
@@ -99,19 +164,19 @@ BasAttr.CI_Type_string = 3;
  * @constructor
  */
 function BasPacket() {
-    this.stack = [];
+    this.commandAttrs = [];
     this.commandSeq = 0;
-    this.command = 0;
+    this.commandCode = 0;
     this.request = 0;
 }
 
 BasPacket.packets = new Map();
 
-BasPacket.prototype.toBuffer = function() {
+BasPacket.prototype.toBuffer = function(...args) {
     let self = this;
-    let stack = self.stack;
-  // :todo.best : compatible : arguments.length != stack.length
-    if (arguments.length !== stack.length) {
+    let commandAttrs = self.commandAttrs;
+  // :todo.best : compatible : arguments.length != commandAttrs.length
+    if (arguments.length !== commandAttrs.length) {
         return Buffer.alloc(0);
     }
     let iTotalSize = self.getTotalSize();
@@ -123,9 +188,9 @@ BasPacket.prototype.toBuffer = function() {
     let value;
     let idx = 0;
     let iOffset = 0;
-    while (idx < stack.length) {
-        attr = stack[idx];
-        value = arguments[idx];
+    while (idx < commandAttrs.length) {
+        attr = commandAttrs[idx];
+        value = args[idx];
         switch (attr.type) {
         case BasAttr.CI_Type_int:
             rBuf.writeIntLE(value, iOffset, attr.size, true);
@@ -149,7 +214,7 @@ BasPacket.prototype.toBuffer = function() {
 
 BasPacket.prototype.fromBuffer = function(buf, iStart) {
     let self = this;
-    let stack = self.stack;
+    let commandAttrs = self.commandAttrs;
     let r = {};
     let iTotalSize = self.getTotalSize();
     if (!buf || iStart + iTotalSize > buf.length - 2) {
@@ -161,8 +226,8 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
     let idx = 0;
     let iOffset = iStart;
     let iZeroIndex = 0;
-    while (idx < stack.length) {
-        attr = stack[idx];
+    while (idx < commandAttrs.length) {
+        attr = commandAttrs[idx];
         switch (attr.type) {
         case BasAttr.CI_Type_int:
             value = buf.readIntLE(iOffset, attr.size, true);
@@ -186,21 +251,23 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
         iOffset += attr.size;
         ++idx;
     }
+    r.buffer = buf;
+    r.offset = iOffset;
     return r;
 };
 
-BasPacket.prototype.add = function() {
+BasPacket.prototype.add = function(...args) {
     if (arguments.length < 1) {
         throw new UserException('BasPacket.prototype.add arguments length<1!');
     }
-    let name = arguments[0];
+    let name = args[0];
     let size = 4;
     if (arguments.length > 1) {
-        size = arguments[1];
+        size = args[1];
     }
     let type;
     if (arguments.length > 2) {
-        type = arguments[2];
+        type = args[2];
     } else {
         if (size === 4) {
             type = BasAttr.CI_Type_int;
@@ -212,20 +279,20 @@ BasPacket.prototype.add = function() {
     }
     let encoding = 'ascii';
     if (arguments.length > 3) {
-        encoding = arguments[3];
+        encoding = args[3];
     }
 
-    this.stack.push(new BasAttr(name, size, type, encoding));
+    this.commandAttrs.push(new BasAttr(name, size, type, encoding));
 };
 
 BasPacket.prototype.getTotalSize = function() {
     let iSize = 0;
     let self = this;
-    let stack = self.stack;
+    let commandAttrs = self.commandAttrs;
     let attr;
     let idx = 0;
-    while (idx < stack.length) {
-        attr = stack[idx++];
+    while (idx < commandAttrs.length) {
+        attr = commandAttrs[idx++];
         iSize += attr.size;
     }
     return iSize;
@@ -277,7 +344,7 @@ BasPacket.prototype.encodePacket = function(buf) {
     r.writeIntLE(this.commandSeq, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-    r.writeIntLE(this.command, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+    r.writeIntLE(this.commandCode, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     r.writeIntLE(this.request, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
@@ -297,13 +364,13 @@ BasPacket.prototype.encodePacket = function(buf) {
 
 BasPacket.prototype.setCommand = function(iCommandSeq, iCommand) {
     this.commandSeq = iCommandSeq;
-    this.command = iCommand;
+    this.commandCode = iCommand;
     this.request = this.getTotalSize();
     BasPacket.packets.set(iCommand, this);
 };
 
-BasPacket.prototype.toPacket = function() {
-    return this.encodePacket(this.toBuffer.apply(this, arguments));
+BasPacket.prototype.toPacket = function(...args) {
+    return this.encodePacket(BasPacket.prototype.toBuffer.apply(this, args));
 };
 
 /**
@@ -389,7 +456,8 @@ BasParser.prototype.repairMsg = function(iStartPos, iEndPos) {
     let buf = this.recvCache;
     let msgBuf = this.msgCache;
     msgBuf[0] = buf[iStartPos];
-    let i = iStartPos + 1, j = 1;
+    let i = iStartPos + 1;
+    let j = 1;
     for (; i < iEndPos - 1; i++, j++) {
         if (buf[i] === BasDefine.PACKAGE_REQ_TRANS) {
             msgBuf[j] = buf[i] + buf[i + 1];
@@ -406,8 +474,8 @@ BasParser.prototype.repairMsg = function(iStartPos, iEndPos) {
         iCrc = (iCrc + msgBuf[h]) & 0xff;
     }
     iCrc = BasDefine.PACKAGE_REQ_CRC - iCrc;
-    if (iCrc !== msgBuf[j - 2]) // 校验失败
-  {
+    if (iCrc !== msgBuf[j - 2]) {
+    // 校验失败
         console.log('BasParser.prototype.repairMsg(iStartPos, iEndPos), crc invalid!');
     }
     return j;
@@ -417,31 +485,36 @@ BasParser.prototype.repairMsg = function(iStartPos, iEndPos) {
  *
  * @constructor
  */
-function BasProtocol() {
+function BasProtocol(bIsTcp = true) {
     let self = this;
 
-    let tcpclient = new CjChannelTcpclient();
-    tcpclient.isAutoOpen = true;
-    tcpclient.isAutoHeartbeat = true;
+    let channelBase;
+    if (bIsTcp) {
+        channelBase = new CjChannelTcpclient();
+    } else {
+        channelBase = new CjChannelUdp();
+    }
+    channelBase.isAutoOpen = true;
+    channelBase.isAutoHeartbeat = true;
 
     let basParser = new BasParser();
     basParser.onReceivedMsg = function(buf, iEnd) {
         self.dealPacket(buf, iEnd);
     };
 
-    tcpclient.onReceived = function(data) {
+    channelBase.onReceived = function(data) {
         basParser.doReceived(data);
     };
 
     this.fns = new Map();
     this.fnAllPacket = null;
-    this.channel = tcpclient;
+    this.channel = channelBase;
     this.parser = basParser;
 }
 
 /**
- *
- * @param option = {RemoteIpAddress: '127.0.0,.1', RemotePort: 5556};
+ * start
+ * @param {Object}option = {RemoteIpAddress: '127.0.0,.1', RemotePort: 5556};
  */
 BasProtocol.prototype.start = function(option) {
     this.channel.open(option);
@@ -459,16 +532,16 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
     }
 
     let iOffset = 0;
-    let pkStart = buf[iOffset];// BasDefine.PACKAGE_REQ_START;
+  // let pkStart = buf[iOffset];// BasDefine.PACKAGE_REQ_START;
     iOffset += 1;
 
-    let pkCommandSeq = buf.readIntLE(iOffset, true);
+  // let pkCommandSeq = buf.readIntLE(iOffset, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     let pkCommand = buf.readIntLE(iOffset, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-    let pkRequest = buf.readIntLE(iOffset, true);
+  // let pkRequest = buf.readIntLE(iOffset, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     let packet = BasPacket.packets.get(pkCommand);
@@ -480,25 +553,25 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
         console.log('BasPacket.dealPacket : pkCommand [', pkCommand, '] is undefined!');
     }
 
-    let pkCrc = buf[iEnd - 2];// crc
+  // let pkCrc = buf[iEnd - 2];// crc
 
-    let pkEnd = buf[iEnd - 1];// = BasDefine.PACKAGE_REQ_END;
+  // let pkEnd = buf[iEnd - 1];// = BasDefine.PACKAGE_REQ_END;
 };
 
 BasProtocol.prototype.onAllPacket = function(fn) {
     this.fnAllPacket = fn;
 };
 
-BasProtocol.prototype.on = function(command, fn) {
-    this.fns.set(command, fn);
+BasProtocol.prototype.on = function(commandCode, fn) {
+    this.fns.set(commandCode, fn);
 };
 
-BasProtocol.prototype.dispatch = function(command, msgObj) {
-    let fn = this.fns.get(command);
+BasProtocol.prototype.dispatch = function(commandCode, msgObj) {
+    let fn = this.fns.get(commandCode);
     if (fn) {
         fn(msgObj);
     } else if (this.fnAllPacket) {
-        this.fnAllPacket(command, msgObj);
+        this.fnAllPacket(commandCode, msgObj);
     }
 };
 
@@ -577,45 +650,49 @@ if (true) {
     alarmAnsPacket.setCommand(1, BasDefine.OMC_ANS_MOD_ALARM);
     BasPacket.alarmAnsPacket = alarmAnsPacket;
 
-  // var confirmAlarm = new BasPacket();
-  // confirmAlarm.add("AlarmNo");
-  // confirmAlarm.add("Action");
-  // confirmAlarm.add("User", BasDefine.OMC_NORMAL_INFO_LEN);
-  // confirmAlarm.add("NeID");
-  // confirmAlarm.add("AlarmType");
-  // confirmAlarm.add("ModuleNo");
-  // confirmAlarm.add("CardNo");
-  // confirmAlarm.add("PortNo");
-  // confirmAlarm.setCommand(1, BasDefine.OMC_REQ_MOD_ALARM);
-  // BasPacket.confirmAlarm = confirmAlarm;
-  //
-  // var cancelConfirmAlarm = new BasPacket();
-  // cancelConfirmAlarm.add("AlarmNo");
-  // cancelConfirmAlarm.add("Action");
-  // cancelConfirmAlarm.add("User", BasDefine.OMC_NORMAL_INFO_LEN);
-  // cancelConfirmAlarm.add("NeID");
-  // cancelConfirmAlarm.add("AlarmType");
-  // cancelConfirmAlarm.add("ModuleNo");
-  // cancelConfirmAlarm.add("CardNo");
-  // cancelConfirmAlarm.add("PortNo");
-  // cancelConfirmAlarm.setCommand(1, BasDefine.OMC_REQ_MOD_ALARM);
-  // BasPacket.cancelConfirmAlarm = cancelConfirmAlarm;
+    let rtLoginPacket = new BasPacket();
+    rtLoginPacket.add('AppId');
+    rtLoginPacket.setCommand(1, BasDefine.RTDB_REQ_LOGIN);
+    BasPacket.rtLoginPacket = rtLoginPacket;
+
+    let rtUpdcfgPacket = new BasPacket();
+    rtUpdcfgPacket.add('AppId');
+    rtUpdcfgPacket.setCommand(1, BasDefine.RTDB_REQ_UPD_CFG);
+    BasPacket.rtUpdcfgPacket = rtUpdcfgPacket;
+
+    let rtAnsFirstPacket = new BasPacket();
+    rtAnsFirstPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtAnsFirstPacket.add('Count');
+    rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_ANS_FIRST_RCD_SEG);
+    BasPacket.rtAnsFirstPacket = rtAnsFirstPacket;
+
+    let rtAnsNextPacket = new BasPacket();
+    rtAnsNextPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtAnsNextPacket.add('Count');
+    rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_ANS_NEXT_RCD_SEG);
+    BasPacket.rtAnsNextPacket = rtAnsNextPacket;
+
+    let rtReqUpdrcdPacket = new BasPacket();
+    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtReqUpdrcdPacket.add('Count');
+    rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
+    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
 }
 
 BasProtocol.test1 = function() {
     let basProtocol = new BasProtocol();
     basProtocol.start({port: 5556, host: '127.0.0.1'});
- // only command
-    basProtocol.on(BasPacket.userLoginPacket.command, function(msgObj) {
+  // only commandCode
+    basProtocol.on(BasPacket.userLoginPacket.commandCode, function(msgObj) {
         console.log(msgObj); // msgObj = {user: 'user1', password: 'password1'}
     });
- // all in
-    basProtocol.onAllPacket(function(command, msgObj) {
-        console.log(command, msgObj);
+  // all in
+    basProtocol.onAllPacket(function(commandCode, msgObj) {
+        console.log(commandCode, msgObj);
     });
 
     setTimeout(function() {
-   // send packet
+    // send packet
         let packet = BasPacket.userLoginPacket.toPacket('user1', 'password1', 'no1', 1001);
         basProtocol.sendPacket(packet);
 

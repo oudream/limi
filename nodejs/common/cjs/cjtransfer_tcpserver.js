@@ -3,10 +3,10 @@
 const net = require('net');
 const fs = require('fs');
 
-exports = module.exports = CjChannelTcpclient;
+exports = module.exports = CjTransferTcpServer;
 
-function CjChannelTcpclient() {
-    this.connectState = CjChannelTcpclient.CI_ConnectState_Null;
+function CjTransferTcpServer() {
+    this.connectState = CjTransferTcpServer.CI_ConnectState_Null;
     this._tcpSocket = null;
     this.isAutoOpen = false;
     this.isAutoHeartbeat = false;
@@ -14,7 +14,7 @@ function CjChannelTcpclient() {
     this.onReceived = null;
 }
 
-CjChannelTcpclient.prototype.receivedData = function(data) {
+CjTransferTcpServer.prototype.receivedData = function(data) {
     console.log('received data: ', data.length);
     if (this.onReceived) {
         this.onReceived(data);
@@ -27,33 +27,33 @@ CjChannelTcpclient.prototype.receivedData = function(data) {
   // });
 };
 
-CjChannelTcpclient.prototype.sendData = function(data) {
+CjTransferTcpServer.prototype.sendData = function(data) {
     if (this.isOpen()) {
         return this._tcpSocket.write(data);
     }
     return 0;
 };
 
-CjChannelTcpclient.CI_ConnectState_Null = 0;
-CjChannelTcpclient.CI_ConnectState_Disconnected = 1;
-CjChannelTcpclient.CI_ConnectState_Connecting = 2;
-CjChannelTcpclient.CI_ConnectState_ConnectTimeout = 3;
-CjChannelTcpclient.CI_ConnectState_Connected = 4;
+CjTransferTcpServer.CI_ConnectState_Null = 0;
+CjTransferTcpServer.CI_ConnectState_Disconnected = 1;
+CjTransferTcpServer.CI_ConnectState_Connecting = 2;
+CjTransferTcpServer.CI_ConnectState_ConnectTimeout = 3;
+CjTransferTcpServer.CI_ConnectState_Connected = 4;
 
-CjChannelTcpclient.CS_EntryRemoteIpAddress = 'RemoteIpAddress';
-CjChannelTcpclient.CS_EntryRemotePort = 'RemotePort';
-CjChannelTcpclient.CS_EntryLocalIpAddress = 'LocalIpAddress';
-CjChannelTcpclient.CS_EntryLocalPort = 'LocalPort';
+CjTransferTcpServer.CS_EntryRemoteIpAddress = 'RemoteIpAddress';
+CjTransferTcpServer.CS_EntryRemotePort = 'RemotePort';
+CjTransferTcpServer.CS_EntryLocalIpAddress = 'LocalIpAddress';
+CjTransferTcpServer.CS_EntryLocalPort = 'LocalPort';
 
 /**
  * @param option = {RemotePort:5555, RemoteIpAddress:'127.0.0.1'};
  */
-CjChannelTcpclient.prototype.open = function(option) {
+CjTransferTcpServer.prototype.open = function(option) {
   // var option = {port:5555, ip:'127.0.0.1'};
     if (this._tcpSocket) {
         return;
     }
-    if (this.connectState === CjChannelTcpclient.CI_ConnectState_Connecting) {
+    if (this.connectState === CjTransferTcpServer.CI_ConnectState_Connecting) {
         return;
     }
 
@@ -63,12 +63,12 @@ CjChannelTcpclient.prototype.open = function(option) {
         self.connectParams = option;
     }
 
-    self.connectState = CjChannelTcpclient.CI_ConnectState_Connecting;
+    self.connectState = CjTransferTcpServer.CI_ConnectState_Connecting;
 
     let tcpSocket = null;
 
     let connectTimeout = function() {
-        self.connectState = CjChannelTcpclient.CI_ConnectState_ConnectTimeout;
+        self.connectState = CjTransferTcpServer.CI_ConnectState_ConnectTimeout;
         self._tcpSocket = null;
         if (tcpSocket) {
             tcpSocket.end();
@@ -94,7 +94,7 @@ CjChannelTcpclient.prototype.open = function(option) {
             console.log('connected to server!');
 
             self._tcpSocket = tcpSocket;
-            self.connectState = CjChannelTcpclient.CI_ConnectState_Connected;
+            self.connectState = CjTransferTcpServer.CI_ConnectState_Connected;
         });
 
         tcpSocket.on('data', function(data) {
@@ -103,12 +103,12 @@ CjChannelTcpclient.prototype.open = function(option) {
 
         tcpSocket.on('end', function() {
             self._tcpSocket = null;
-            self.connectState = CjChannelTcpclient.CI_ConnectState_Disconnected;
+            self.connectState = CjTransferTcpServer.CI_ConnectState_Disconnected;
         });
 
         tcpSocket.on('error', function(err) {
             self._tcpSocket = null;
-            self.connectState = CjChannelTcpclient.CI_ConnectState_Disconnected;
+            self.connectState = CjTransferTcpServer.CI_ConnectState_Disconnected;
             console.log(err);
         });
     } catch (e) {
@@ -118,7 +118,7 @@ CjChannelTcpclient.prototype.open = function(option) {
     self.checkChannel(3000);
 };
 
-CjChannelTcpclient.prototype.close = function() {
+CjTransferTcpServer.prototype.close = function() {
     this.checkChannel(0);
     if (this._tcpSocket) {
         this._tcpSocket = null;
@@ -126,11 +126,11 @@ CjChannelTcpclient.prototype.close = function() {
     }
 };
 
-CjChannelTcpclient.prototype.isOpen = function() {
-    return this._tcpSocket && this.connectState === CjChannelTcpclient.CI_ConnectState_Connected;
+CjTransferTcpServer.prototype.isOpen = function() {
+    return this._tcpSocket && this.connectState === CjTransferTcpServer.CI_ConnectState_Connected;
 };
 
-CjChannelTcpclient.prototype.checkChannel = function(interval) {
+CjTransferTcpServer.prototype.checkChannel = function(interval) {
     let self = this;
     if (interval < 1000) {
         if (self.checkTimer) {

@@ -4,10 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-require('./../../../assets/cjs/cjs/nodejs/cjlog.js');
+require('./../../common/cjs/cjlog.js');
 const ci = cjs.daemon ? cjs.daemon : cjs;
 
-const cjJson = require('./../../../assets/cjs/cjs/cjjson.js');
+const cjJson = require('./../../../assets/common/cjs/cjjson.js');
 const fDaemonGloble = require('./daemon_global.js');
 
 const DaemonGlobal = fDaemonGloble[0];

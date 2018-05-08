@@ -4,7 +4,7 @@ const events = require('events');
 const log = require('./../../common/log.js');
 const utils = require('./../../common/utils.js').utils;
 const ShareCache = require('./../../common/share-cache.js').ShareCache;
-let DbManager = require('./../../../assets/common/cjs/nodejs/cj-database.js').DbManager;
+let DbManager = require('./../../common/cjs/cj-database.js').DbManager;
 
 let event = global.globalEvent;
 

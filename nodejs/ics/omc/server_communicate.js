@@ -5,27 +5,28 @@ const glob = require('glob');
 const fs = require('fs');
 const async = require('async');
 
-const CjLog = require('../../../assets/common/cjs/nodejs/cjlog.js');
+const CjLog = require('./../../common/cjs/cjlog.js');
 const ci = cjs.daemon ? cjs.daemon : cjs;
-const CjFs = require('../../../assets/common/cjs/nodejs/cjfs.js');
+const CjFs = require('./../../common/cjs/cjfs.js');
 
 const ShareCache = require('./../../common/share-cache.js').ShareCache;
-const configOpt = require('../../../assets/common/cjs/nodejs/cj-json-config.js');
-const Database = require('../../../assets/common/cjs/nodejs/cj-database.js').CjDatabase;
+const configOpt = require('./../../common/cjs/cj-json-config.js');
+const Database = require('./../../common/cjs/cj-database.js').CjDatabase;
 // const projDir = ShareCache.get('local-info', 'current_work_dir')
 
-const ProtocolCc4000 = require('../../../assets/common/csm/protocol_cc4000.js');
+const ProtocolCc4000 = require('./../../common/csm/protocol_cc4000.js');
 const BasProtocol = ProtocolCc4000;
 const BasDefine = ProtocolCc4000.BasDefine;
 const BasPacket = ProtocolCc4000.BasPacket;
 
-const ProtocolPsm = require('../../../assets/common/csm/protocol_psm.js');
+const ProtocolPsm = require('./../../common/csm/protocol_psm.js');
 const PsmProtocol = ProtocolPsm;
 const PsmDefine = ProtocolPsm.PsmDefine;
 const PsmRealtimeDataStruct = ProtocolPsm.PsmRealtimeDataStruct;
 
-let _basProtocol = new BasProtocol();
+let _omcProtocol = new BasProtocol();
 let _psmProtocol = new PsmProtocol();
+let _rtbusProtocol = new BasProtocol(false);
 let _event = global.globalEvent;
 let _alarmRecPlayLog = {};
 _alarmRecPlayLog.data = [];
@@ -101,11 +102,10 @@ function protocolListenerInit() {
         return false;
     }
 
-    const serverHost = serverConfig.host;
-    const serverPort = serverConfig.port;
+    const omcServerHost = serverConfig.host;
+    const omcServerPort = serverConfig.port;
 
-  // * _basProtocol
-    _basProtocol.onAllPacket(function(command, msgObj) {
+    _omcProtocol.onAllPacket(function(command, msgObj) {
     // console.log('msgObj: ' + msgObj['password']);
         console.log(command, msgObj);
 
@@ -186,12 +186,69 @@ function protocolListenerInit() {
         }
     });
 
-    _basProtocol.start({
-        RemotePort: serverPort,
-        RemoteIpAddress: serverHost,
+    _omcProtocol.start({
+        RemotePort: omcServerPort,
+        RemoteIpAddress: omcServerHost,
     });
 
-  // * _psmProtocol
+    /**
+     * fn deal rtdata
+     * @param {Object}msgObj
+     */
+    function fnDealRt(msgObj) {
+        console.log(msgObj.TableName);
+        let iOffset = msgObj.offset;
+        let buf = msgObj.buffer;
+        if (msgObj.TableName.indexOf('T_RT_YX') !== -1) {
+            let iCount = msgObj.Count;
+            if (!buf || iOffset + iCount * 32 > buf.length) {
+                console.log('fnDealRt : buf length no enough, ');
+                return;
+            }
+            for (let i = 0; i < msgObj.Count; i++) {
+                let yx = {};
+                yx.id = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                yx = buf.readDoubleLE(iOffset, true); iOffset += 8;
+            }
+        }
+
+
+        //
+        // int nIdx = 0;
+        // memcpy_byte(tData.m_nMeasureID, &(pBuf[nIdx]), ICS_MAX_ITEM_LEN);
+        // nIdx += ICS_MAX_ITEM_LEN;
+        // memcpy_byte(tData.m_nValue, &(pBuf[nIdx]), ICS_MAX_ITEM_LEN);
+        // nIdx += ICS_MAX_ITEM_LEN;
+        // memcpy_byte(tData.m_nRefreshTime, &(pBuf[nIdx]), ICS_MAX_ITEM_LEN);
+        // nIdx += ICS_MAX_ITEM_LEN;
+        // memcpy_byte(tData.m_nRes, &(pBuf[nIdx]), ICS_MAX_ITEM_LEN);
+        // nIdx += ICS_MAX_ITEM_LEN;
+    }
+
+    _rtbusProtocol.on(BasPacket.rtAnsFirstPacket.commandCode, fnDealRt);
+    _rtbusProtocol.on(BasPacket.rtAnsNextPacket.commandCode, fnDealRt);
+    _rtbusProtocol.on(BasPacket.rtReqUpdrcdPacket.commandCode, fnDealRt);
+    _rtbusProtocol.onAllPacket(function(command, msgObj) {
+        console.log(command, msgObj);
+        // switch (command) {
+        // case BasPacket.rtAnsFirstPacket.command:
+        // case BasPacket.rtAnsNextPacket.command:
+        // case BasPacket.rtReqUpdrcdPacket.command:
+        //     {
+        //         break;
+        //     }
+        // default:
+        // }
+    });
+
+    _rtbusProtocol.start({
+        LocalIpAddress: '127.0.0.1',
+        LocalPort: 16696,
+        RemotePort: 6696,
+        RemoteIpAddress: omcServerHost,
+    });
+
+
     _psmProtocol.start({
         LocalIpAddress: '127.0.0.1',
         LocalPort: 9105,
@@ -200,7 +257,7 @@ function protocolListenerInit() {
         FileSavePath: 'd:/temp',
     });
 
-  // all in
+    // all in
     _psmProtocol.onReceivedMessage = function(sCommand, sParam, attach) {
         console.log(sCommand, sParam);
     };
@@ -267,11 +324,15 @@ function protocolListenerInit() {
         }));
     }, 20000);
 
-  // only command
-  //     basProtocol.on(BasPacket.userLoginPacket.command, function (msgObj) {
-  //         console.log(msgObj); // msgObj = {user: 'user1', password: 'password1'}
-  //     });
-}
+    let toTestRtbus1 = setTimeout(function() {
+        clearTimeout(toTestRtbus1);
+
+        let packet = BasPacket.rtLoginPacket.toPacket(262185);
+        _rtbusProtocol.sendPacket(packet);
+
+        console.log(packet);
+    }, 1000);
+};
 
 function sendToOmcServer(msg) {
     if (msg) {
@@ -306,7 +367,7 @@ function sendToOmcServer(msg) {
         for (let i = 0; i < data.length; i++) {
             let alarm = data[i];
             let packet = BasPacket.alarmReqPacket.toPacket(alarm['alarmNo'], action, alarm['user'], alarm['neID'], alarm['alarmType'], alarm['moduleNo'], alarm['cardNo'], alarm['portNo']);
-            let iResult = _basProtocol.sendPacket(packet);
+            let iResult = _omcProtocol.sendPacket(packet);
             console.log('BasProtocol.sendPacket, command: ', command, ', sendResult:', iResult);
             sSql = sSql1 + alarm['alarmNo'] + ';';
             let dataObj = {
@@ -392,11 +453,11 @@ function getOmcServerInfo() {
         console.log(results);
 
         let serverIp = results['queryIp'][0]['ItemValue'];
-        let serverPort = results['queryPort'][0]['ItemValue'];
+        let omcServerPort = results['queryPort'][0]['ItemValue'];
 
         let omcServer = {
             'host': serverIp,
-            'port': serverPort,
+            'port': omcServerPort,
         };
 
         defaultDb.close();
@@ -423,7 +484,7 @@ function getAlarmRec(fnCallback) {
         }
     });
 
-    let sql1 = 'select omc_alarmrec.AlarmNo, omc_alarmrec.RepaireMark, omc_neconfig.NeAlias , omc_alarminfo.AlarmName , omc_alarminfo.AlarmClass, omc_alarminfo.AlarmTimes FROM omc_alarmrec, omc_alarminfo, omc_neconfig WHERE omc_alarmrec.AlarmType = omc_alarminfo.AlarmType and omc_alarmrec.NeID = omc_neconfig.NeNo and omc_alarmrec.Status <> 1 and omc_alarmrec.Confirm <> 1 GROUP BY omc_neconfig.NeAlias , omc_alarmrec.RepaireMark;';
+    let sql1 = 'select omc_alarmrec.AlarmNo, omc_alarmrec.RepaireMark, omc_neconfig.NeAlias , omc_alarminfo.AlarmName , omc_alarminfo.AlarmClass FROM omc_alarmrec, omc_alarminfo, omc_neconfig WHERE omc_alarmrec.AlarmType = omc_alarminfo.AlarmType and omc_alarmrec.NeID = omc_neconfig.NeNo and omc_alarmrec.Status <> 1 and omc_alarmrec.Confirm <> 1 GROUP BY omc_neconfig.NeAlias , omc_alarmrec.RepaireMark;';
 
     defaultDb.load(sql1, function(err, vals) {
         fnCallback(err, vals);

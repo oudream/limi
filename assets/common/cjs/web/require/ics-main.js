@@ -14,7 +14,6 @@ define(function () {
     var _config = {
       paths: {
         'cjcommon': 'common/cjs/web/common/cj-common',
-                // 'cjdatabase': URL + 'cjs/cjs/nodejs/cj-database',
         'cjdatabaseaccess': 'common/cjs/web/database/cj-database-access',
         'cjstorage': 'common/cjs/web/storage/cj-storage',
         'cjajax': 'common/cjs/web/ajax/cj-ajax',

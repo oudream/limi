@@ -7,19 +7,18 @@ const events = require('events');
 const url = require('url');
 const os = require('os');
 
-require('./assets/common/cjs/nodejs/cjlog.js');
-require('./assets/common/cjs/nodejs/cjinterinfo.js');
-require('./assets/common/cjs/nodejs/cjstring.js');
-require('./assets/common/cjs/nodejs/cjnumber.js');
-require('./assets/common/cjs/nodejs/cjmeta.js');
-require('./assets/common/cjs/nodejs/cjbuffer.js');
-require('./assets/common/cjs/nodejs/cjfs.js');
-let HttpServer = require('./assets/common/csm/http_server.js');
+require('./assets/common/cjs/cjinterinfo.js');
+require('./assets/common/cjs/cjstring.js');
+require('./assets/common/cjs/cjnumber.js');
+require('./assets/common/cjs/cjmeta.js');
+require('./assets/common/cjs/cjbuffer.js');
+require('./nodejs/common/cjs/cjlog.js');
+require('./nodejs/common/cjs/cjfs.js');
+let HttpServer = require('./nodejs/common/csm/http_server.js');
 const ShareCache = require('./nodejs/common/share-cache.js').ShareCache;
-const configOpt = require('./assets/common/cjs/nodejs/cj-json-config.js');
+const configOpt = require('./nodejs/common/cjs/cj-json-config.js');
 const utils = require('./nodejs/common/utils.js').utils;
 const log = require('./nodejs/common/log.js');
-// let DbManager = require('./assets/cjs/cjs/nodejs/cj-database.js').DbManager;
 
 let resMap = {};
 

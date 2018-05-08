@@ -2,11 +2,11 @@ let assert = require('assert');
 let path = require('path');
 let http = require('http');
 
-require('./../cjs/cjinterinfo');
-require('./../cjs/cjstring');
+require('./../../assets/common/cjs/cjinterinfo');
+require('./../../assets/common/cjs/cjstring');
 
-let Route = require('./../cjs/nodejs/cjhttp_route');
-let FileServer = require('./../cjs/nodejs/cjhttp_file_server');
+let Route = require('./../common/cjs/cjhttp_route');
+let FileServer = require('./../common/cjs/cjhttp_file_server');
 
 let route = new Route();
 let fileServer = new FileServer();

@@ -1,6 +1,6 @@
 'use strict';
 
-const CjChannelUdp = require('./../cjs/nodejs/cjchannel_udp');
+const CjChannelUdp = require('./../cjs/cjchannel_udp');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -571,7 +571,7 @@ PsmReceivePacket.prototype.dealCache = function() {
 };
 
 
-function PsmSendPacket(body, bufData) {
+function packetPsmSend(body, bufData) {
     let r = Buffer.allocUnsafe(PsmDefine.ci_psm_fix_size + bufData.length);
     let iOffset = 0;
     r.writeInt32LE(PsmDefine.c_psm_head, iOffset, true);
@@ -1148,20 +1148,20 @@ PsmProtocol.prototype.responseNack = function(iCommand, iErrorid, attach) {
 };
 
 /**
- *
- * @param body
- * @param bufData
- * @returns int
+ * postPacketData
+ * @param {Object}body
+ * @param {Buffer}bufData
+ * @return {Number}int
  */
 PsmProtocol.prototype.postPacketData = function(body, bufData) {
-    let buf = PsmSendPacket(body, bufData);
+    let buf = packetPsmSend(body, bufData);
     return this.channel.sendData(buf);
 };
 
 
 /**
- *
- * @returns string
+ * reportSelf
+ * @return {String}string
  */
 PsmProtocol.prototype.reportSelf = function() {
     let sLastTime = new Date(this._lastReceivedDataTime);
@@ -1184,19 +1184,19 @@ PsmProtocol.prototype.checkProtocol = function(interval) {
 
     let timeOut = function() {
         // 发送超时
-        if (this._sendingFileTime !== 0) {
-            if ((Date.now() - this._sendingFileTime) > 1000) {
-                this._sendFileCurrentDataInfo = new PsmFileDataInfo();
-                this._sendFileCurrentIndex = -1;
-                this._sendFileTime = 0;
-                this._sendingFileTime = 0;
+        if (self._sendingFileTime !== 0) {
+            if ((Date.now() - self._sendingFileTime) > 1000) {
+                self._sendFileCurrentDataInfo = new PsmFileDataInfo();
+                self._sendFileCurrentIndex = -1;
+                self._sendFileTime = 0;
+                self._sendingFileTime = 0;
             }
-        } else if (this._sendFileTime !== 0) {
-            if ((Date.now() - this._sendFileTime) > 1000) {
-                this._sendFileCurrentDataInfo = new PsmFileDataInfo();
-                this._sendFileCurrentIndex = -1;
-                this._sendFileTime = 0;
-                this._sendingFileTime = 0;
+        } else if (self._sendFileTime !== 0) {
+            if ((Date.now() - self._sendFileTime) > 1000) {
+                self._sendFileCurrentDataInfo = new PsmFileDataInfo();
+                self._sendFileCurrentIndex = -1;
+                self._sendFileTime = 0;
+                self._sendingFileTime = 0;
             }
         }
 
