@@ -24,6 +24,8 @@ const PsmProtocol = ProtocolPsm;
 const PsmDefine = ProtocolPsm.PsmDefine;
 const PsmRealtimeDataStruct = ProtocolPsm.PsmRealtimeDataStruct;
 
+const rtdb = require('./../../../assets/common/cc4k/rtdb.js');
+
 let _omcProtocol = new BasProtocol();
 let _psmProtocol = new PsmProtocol();
 let _rtbusProtocol = new BasProtocol(false);
@@ -197,19 +199,58 @@ function protocolListenerInit() {
      */
     function fnDealRt(msgObj) {
         console.log(msgObj.TableName);
+        console.log(msgObj.Count);
         let iOffset = msgObj.offset;
         let buf = msgObj.buffer;
-        if (msgObj.TableName.indexOf('T_RT_YX') !== -1) {
+        if (msgObj.TableName.indexOf('T_RT_YX') !== -1 ||
+            msgObj.TableName.indexOf('T_RT_YC') !== -1 ) {
             let iCount = msgObj.Count;
             if (!buf || iOffset + iCount * 32 > buf.length) {
                 console.log('fnDealRt : buf length no enough, ');
                 return;
             }
+            let iInMeasureIds = [];
+            let iOutMeasureIds = [];
             for (let i = 0; i < msgObj.Count; i++) {
-                let yx = {};
-                yx.id = buf.readDoubleLE(iOffset, true); iOffset += 8;
-                yx = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                let iMeasureId = buf.readIntLE(iOffset, 6, true); iOffset += 8;
+                let measure = rtdb.findMeasureById(iMeasureId);
+                if (measure !== null) {
+                    let v = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                    let t = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                    let q = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                    measure.setVQT(v, q, new Date(t))
+                    iInMeasureIds.push(iMeasureId.toString(16));
+                } else {
+                    iOffset += 24;
+                    iOutMeasureIds.push(iMeasureId.toString(16));
+                }
             }
+            console.log('iInMeasureIds : ', iInMeasureIds);
+            console.log('iOutMeasureIds : ', iOutMeasureIds);
+        } else if (msgObj.TableName.indexOf('T_RT_YW') !== -1) {
+            let iCount = msgObj.Count;
+            if (!buf || iOffset + iCount * 152 > buf.length) {
+                console.log('fnDealRt : buf length no enough, ');
+                return;
+            }
+            let iInMeasureIds = [];
+            let iOutMeasureIds = [];
+            for (let i = 0; i < msgObj.Count; i++) {
+                let iMeasureId = buf.readIntLE(iOffset, 6, true); iOffset += 8;
+                let measure = rtdb.findMeasureById(iMeasureId);
+                if (measure !== null) {
+                    let v = buf.toString('utf8', iOffset, iOffset+128); iOffset += 128;
+                    let t = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                    let q = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                    measure.setVQT(v, q, new Date(t));
+                    iInMeasureIds.push(iMeasureId.toString(16));
+                } else {
+                    iOffset += 144;
+                    iOutMeasureIds.push(iMeasureId.toString(16));
+                }
+            }
+            console.log('iInMeasureIds : ', iInMeasureIds);
+            console.log('iOutMeasureIds : ', iOutMeasureIds);
         }
 
 
@@ -324,8 +365,8 @@ function protocolListenerInit() {
         }));
     }, 20000);
 
-    let toTestRtbus1 = setTimeout(function() {
-        clearTimeout(toTestRtbus1);
+    let loginRtbusTimeout = setTimeout(function() {
+        clearTimeout(loginRtbusTimeout);
 
         let packet = BasPacket.rtLoginPacket.toPacket(262185);
         _rtbusProtocol.sendPacket(packet);
@@ -431,6 +472,7 @@ function getOmcServerInfo() {
 
     let sql1 = 'select * from omc_omcconfig where itemno = 3';
     let sql2 = 'select * from omc_omcconfig where itemno = 1';
+    let sql3 = 'SELECT NeNo, SignalUrl, SignalNo FROM omc_signalurl;';
 
     async.parallel({
         queryIp: function(callback) {
@@ -440,6 +482,11 @@ function getOmcServerInfo() {
         },
         queryPort: function(callback) {
             defaultDb.load(sql2, function(err, vals) {
+                callback(err, vals);
+            });
+        },
+        querySignalurl: function(callback) {
+            defaultDb.load(sql3, function(err, vals) {
                 callback(err, vals);
             });
         },
@@ -459,6 +506,17 @@ function getOmcServerInfo() {
             'host': serverIp,
             'port': omcServerPort,
         };
+
+        let rows = results['querySignalurl'];
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i];
+            let neno = row['NeNo'];
+            let code = row['SignalUrl'];
+            let iMeasureId = row['SignalNo'];
+            let measure = rtdb.appendMeasureById(iMeasureId);
+            measure.neno = neno;
+            measure.code = code;
+        }
 
         defaultDb.close();
         defaultDb = null;
@@ -484,7 +542,11 @@ function getAlarmRec(fnCallback) {
         }
     });
 
-    let sql1 = 'select omc_alarmrec.AlarmNo, omc_alarmrec.RepaireMark, omc_neconfig.NeAlias , omc_alarminfo.AlarmName , omc_alarminfo.AlarmClass FROM omc_alarmrec, omc_alarminfo, omc_neconfig WHERE omc_alarmrec.AlarmType = omc_alarminfo.AlarmType and omc_alarmrec.NeID = omc_neconfig.NeNo and omc_alarmrec.Status <> 1 and omc_alarmrec.Confirm <> 1 GROUP BY omc_neconfig.NeAlias , omc_alarmrec.RepaireMark;';
+    let sql1 = 'select omc_alarmrec.AlarmNo, omc_alarmrec.RepaireMark, omc_neconfig.NeAlias , ' +
+        'omc_alarminfo.AlarmName , omc_alarminfo.AlarmClass FROM omc_alarmrec, omc_alarminfo, ' +
+        'omc_neconfig WHERE omc_alarmrec.AlarmType = omc_alarminfo.AlarmType and omc_alarmrec.NeID ' +
+        '= omc_neconfig.NeNo and omc_alarmrec.Status <> 1 and omc_alarmrec.Confirm <> 1 ' +
+        'GROUP BY omc_neconfig.NeAlias , omc_alarmrec.RepaireMark;';
 
     defaultDb.load(sql1, function(err, vals) {
         fnCallback(err, vals);

@@ -86,10 +86,20 @@ filetype = json
  */
 
 (function() {
-    window.cc4k = window.cc4k || {};
-    window.cc4k.rtdb = window.cc4k.rtdb || {};
+    'use strict';
 
-    let rtdb = window.cc4k.rtdb;
+    if (typeof exports === 'object' && typeof global === 'object') {
+        global.cc4k = global.cc4k || {};
+    } else if (typeof window === 'object') {
+        window.cc4k = window.cc4k || {};
+    } else {
+        throw Error('cjs only run at node.js or web browser');
+    }
+    let rtdb = cc4k.rtdb || {};
+    cc4k.rtdb = rtdb;
+    if (typeof exports === 'object' && typeof global === 'object') {
+        exports = module.exports = rtdb;
+    }
 
     let myDebug = function(...args) {
         console.log.apply(null, args);
@@ -105,11 +115,11 @@ filetype = json
 
     let getMeasureTypeById = function getMeasureTypeById(measureId) {
         let iId = Number(measureId);
-        if (iId >= 0x01000000 && iId < 0x02000000) {
+        if (iId >= 0x1000000000 && iId < 0x2000000000) {
             return EnumMeasureType.monsb;
-        } else if (iId >= 0x02000000 && iId < 0x03000000) {
+        } else if (iId >= 0x2000000000 && iId < 0x3000000000) {
             return EnumMeasureType.ycadd;
-        } else if (iId >= 0x03000000 && iId < 0x04000000) {
+        } else if (iId >= 0x3000000000 && iId < 0x4000000000) {
             return EnumMeasureType.straw;
         } else {
             return EnumMeasureType.none;
@@ -118,8 +128,8 @@ filetype = json
     rtdb.getMeasureTypeById = getMeasureTypeById;
 
     let MeasureBase = function MeasureBase(...args) {
-        let iId = 0;
-        let sUrl = '';
+        let iId = null;
+        let sUrl = null;
         if (args.length > 0) {
             let arg0 = args[0];
             if (typeof arg0 === 'number') {
@@ -139,45 +149,54 @@ filetype = json
                     }
                 }
             } else if (arg0 !== null && typeof value === 'object') {
-                this.id = arg0.id ? arg0.id : iId;
-                this.url = arg0.url ? arg0.url : sUrl;
+                this.id = arg0.id ? arg0.id : null;
+                this.url = arg0.url ? arg0.url : null;
+                this.neno = arg0.neno ? arg0.neno : null;
+                this.code = arg0.code ? arg0.code : null;
+                this.title = arg0.title ? arg0.title : '';
                 this.value = arg0.value ? arg0.value : null;
-                this.quality = arg0.quality ? arg0.quality : 0;
-                this.refreshTime = arg0.refreshTime ? arg0.refreshTime : new Date();
-                this.changedTime = arg0.changedTime ? arg0.changedTime : new Date();
-                this.refreshSourceId = arg0.refreshSourceId ? arg0.refreshSourceId : 0;
-                this.changedSourceId = arg0.changedSourceId ? arg0.changedSourceId : 0;
-                this.refreshReasonId = arg0.refreshReasonId ? arg0.refreshReasonId : 0;
-                this.changedReasonId = arg0.changedReasonId ? arg0.changedReasonId : 0;
-                this.equalStrategyId = arg0.equalStrategyId ? arg0.equalStrategyId : 0;
+                this.quality = arg0.quality ? arg0.quality : null;
+                this.refreshTime = arg0.refreshTime ? arg0.refreshTime : null;
+                this.changedTime = arg0.changedTime ? arg0.changedTime : null;
+                this.refreshSourceId = arg0.refreshSourceId ? arg0.refreshSourceId : null;
+                this.changedSourceId = arg0.changedSourceId ? arg0.changedSourceId : null;
+                this.refreshReasonId = arg0.refreshReasonId ? arg0.refreshReasonId : null;
+                this.changedReasonId = arg0.changedReasonId ? arg0.changedReasonId : null;
+                this.equalStrategyId = arg0.equalStrategyId ? arg0.equalStrategyId : null;
                 this.res = arg0.res ? arg0.res : 0;
                 return this;
-                //     this.id               = arg0.id              ? arg0.id              : iId;
-                //     this.url              = arg0.url             ? arg0.url             : sUrl;
+                //     this.id               = arg0.id              ? arg0.id              : null;
+                //     this.url              = arg0.url             ? arg0.url             : null;
+                //     this.neno             = arg0.neno            ? arg0.neno            : null;
+                //     this.code             = arg0.code            ? arg0.code            : null;
+                //     this.title            = arg0.title           ? arg0.title           : null;
                 //     this.value            = arg0.value           ? arg0.value           : null;
-                //     this.quality          = arg0.quality         ? arg0.quality         : 0;
-                //     this.refreshTime      = arg0.refreshTime     ? arg0.refreshTime     : Date();
-                //     this.changedTime      = arg0.changedTime     ? arg0.changedTime     : Date();
-                //     this.refreshSourceId  = arg0.refreshSourceId ? arg0.refreshSourceId : 0;
-                //     this.changedSourceId  = arg0.changedSourceId ? arg0.changedSourceId : 0;
-                //     this.refreshReasonId  = arg0.refreshReasonId ? arg0.refreshReasonId : 0;
-                //     this.changedReasonId  = arg0.changedReasonId ? arg0.changedReasonId : 0;
-                //     this.equalStrategyId  = arg0.equalStrategyId ? arg0.equalStrategyId : 0;
-                //     this.res              = arg0.res             ? arg0.res             : 0;
+                //     this.quality          = arg0.quality         ? arg0.quality         : null;
+                //     this.refreshTime      = arg0.refreshTime     ? arg0.refreshTime     : null;
+                //     this.changedTime      = arg0.changedTime     ? arg0.changedTime     : null;
+                //     this.refreshSourceId  = arg0.refreshSourceId ? arg0.refreshSourceId : null;
+                //     this.changedSourceId  = arg0.changedSourceId ? arg0.changedSourceId : null;
+                //     this.refreshReasonId  = arg0.refreshReasonId ? arg0.refreshReasonId : null;
+                //     this.changedReasonId  = arg0.changedReasonId ? arg0.changedReasonId : null;
+                //     this.equalStrategyId  = arg0.equalStrategyId ? arg0.equalStrategyId : null;
+                //     this.res              = arg0.res             ? arg0.res             : null;
             }
         }
         this.id = iId;
         this.url = sUrl;
+        this.neno = null;
+        this.code = null;
+        this.title = null;
         this.value = null;
-        this.quality = 0;
-        this.refreshTime = new Date();
-        this.changedTime = new Date();
-        this.refreshSourceId = 0;
-        this.changedSourceId = 0;
-        this.refreshReasonId = 0;
-        this.changedReasonId = 0;
-        this.equalStrategyId = 0;
-        this.res = 0;
+        this.quality = null;
+        this.refreshTime = null;
+        this.changedTime = null;
+        this.refreshSourceId = null;
+        this.changedSourceId = null;
+        this.refreshReasonId = null;
+        this.changedReasonId = null;
+        this.equalStrategyId = null;
+        this.res = null;
     };
     rtdb.MeasureBase = MeasureBase;
 
@@ -211,6 +230,17 @@ filetype = json
         for (let i = 0; i < measures.length; i++) {
             let measure = measures[i];
             if (measure.url === sUrl) {
+                return measure;
+            }
+        }
+        return null;
+    };
+
+    MeasureManagerBase.prototype.findByNenoCode = function findByNenoCode(neno = 0, code = '') {
+        let measures = this.measures;
+        for (let i = 0; i < measures.length; i++) {
+            let measure = measures[i];
+            if (measure.neno === neno && measure.code === code) {
                 return measure;
             }
         }
@@ -447,6 +477,13 @@ filetype = json
     };
     rtdb.findMeasureByUrl = findMeasureByUrl;
 
+    let findMeasureByNenoCode = function findMeasureByNenoCode(neno = 0, code = '') {
+        return monsbManager.findByNenoCode(neno, code)
+            || ycaddManager.findByNenoCode(neno, code)
+            || strawManager.findByNenoCode(neno, code);
+    };
+    rtdb.findMeasureByNenoCode = findMeasureByNenoCode;
+
     let appendMeasureById = function(measureId) {
         let iId = Number(measureId);
         let r = null;
@@ -467,95 +504,7 @@ filetype = json
     };
     rtdb.appendMeasureById = appendMeasureById;
 
-    /**
-     * appendMeasureByNenoUrl
-     * @param {Number}neno
-     * @param {string}signalUrl
-     * @return {*}
-     */
-    let appendMeasureByNenoUrl = function(neno, signalUrl) {
-        let iId = Number(measureId);
-        let r = null;
-        switch (getMeasureTypeById(iId)) {
-        case EnumMeasureType.monsb:
-            r = monsbManager.appendById(iId);
-            break;
-        case EnumMeasureType.ycadd:
-            r = ycaddManager.appendById(iId);
-            break;
-        case EnumMeasureType.straw:
-            r = strawManager.appendById(iId);
-            break;
-        default:
-            break;
-        }
-        return r;
-    };
-    rtdb.appendMeasureByNenoUrl = appendMeasureByNenoUrl;
-
-    // # rtdb's sync data
-    let getReqMeasuresJson = function getReqMeasuresJson() {
-        return JSON.stringify({
-            session: '',
-            structtype: 'rtdata_v101',
-            params: (
-                ((monsbManager.getReqMeasures()).concat(ycaddManager.getReqMeasures()))
-                .concat(strawManager.getReqMeasures())
-            ),
-        });
-    };
-    rtdb.getReqMeasuresJson = getReqMeasuresJson;
-
-    let retReqMeasuresJson = '';
-    rtdb.retReqMeasuresJson = retReqMeasuresJson;
-
     let registerDataChangedCallback = function registerDataChangedCallback(fnDataChangedCallback) {
     };
     rtdb.registerDataChangedCallback = registerDataChangedCallback;
-
-    let dealRespMeasures = function dealRespMeasures(response) {
-        let arr = JSON.parse(response);
-        let measures = arr.data;
-        for (let i = 0; i < measures.length; i++) {
-            let measure = measures[i];
-            let iId = measure.mid;
-            let myMeasure = rtdb.findMeasureById(iId);
-            if (myMeasure !== null) {
-                myMeasure.setVQT(measure.v, measure.q, measure.t);
-            }
-        }
-    };
-
-    let startSyncMeasures = function startSyncMeasures() {
-        retReqMeasuresJson = getReqMeasuresJson();
-        let reqRespRtdatas = function() {
-            let xmlhttp;
-            if (window.XMLHttpRequest) {
-                xmlhttp = new XMLHttpRequest();
-            } else if (window.ActiveXObject) {
-                xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-            }
-            xmlhttp.open('post', 'xxx.rtdata', true);
-            xmlhttp.setRequestHeader('POWERED-BY-AID', 'Approve');
-            xmlhttp.setRequestHeader('Content-Type', 'json');
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                    myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
-                    dealRespMeasures(xmlhttp.responseText);
-                }
-            };
-            retReqMeasuresJson = getReqMeasuresJson();
-            let r = xmlhttp.send(retReqMeasuresJson);
-            myDebug('发送：ReqMeasures - ' + new Date() + ' ' + r);
-        };
-
-        if (retReqMeasuresJson.length > 0) {
-            setInterval(reqRespRtdatas, 1000);
-            return true;
-        } else {
-            console.log('!!! warnning: retReqMeasuresJson is empty!!!');
-            return false;
-        }
-    };
-    rtdb.startSyncMeasures = startSyncMeasures;
 })(typeof window !== 'undefined' ? window : this);

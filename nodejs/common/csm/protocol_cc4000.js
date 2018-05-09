@@ -669,13 +669,13 @@ if (true) {
     let rtAnsNextPacket = new BasPacket();
     rtAnsNextPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtAnsNextPacket.add('Count');
-    rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_ANS_NEXT_RCD_SEG);
+    rtAnsNextPacket.setCommand(1, BasDefine.RTDB_ANS_NEXT_RCD_SEG);
     BasPacket.rtAnsNextPacket = rtAnsNextPacket;
 
     let rtReqUpdrcdPacket = new BasPacket();
     rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtReqUpdrcdPacket.add('Count');
-    rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
+    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
     BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
 }
 
