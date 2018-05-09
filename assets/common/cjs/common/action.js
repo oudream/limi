@@ -19,6 +19,8 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             break;
         case 'delAction': delAction(tbID, tbName, def);
             break;
+        case 'killProcess': killProcess(tbID, tbName, def);
+            break;
         case 'omcRTDataCfgDelAction': omcRTDataCfgDelAction(tbID, tbName, def);
             break;
         case 'omcCommunicationUpdateAction': omcCommunicationUpdateAction(data, tbID, def);
@@ -339,6 +341,31 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
         let deleteSql = 'DELETE FROM ' + tableName + ' WHERE ID = ' + '\'' + del + '\'';
         if (window.confirm('确认删除？')) {
             executeSql(deleteSql, log);
+        }
+    }
+
+  /**
+   * 结束数据库进程操作
+   * @param tbID : num 单表id
+   * @param tableName : string 数据库表名
+   * @param def : obj 表定义表中配置
+   */
+    function killProcess(tbID, tableName, def) {
+        let propConfGrid = tbID;
+        let aID = [];
+        let deleteSql = '';
+        let records = propConfGrid.jqGrid('getRowData');
+        for (let i = 0; i < records.length; i++) {
+            if (records[i].isCheck === '1') {
+                aID.push(records[i].Id);
+            }
+        }
+        for (let i = 0; i < aID.length; i++) {
+            deleteSql = deleteSql + 'kill ' + aID[i] + ';';
+        }
+      // console.log(deleteSql);
+        if (window.confirm('确认结束进程？')) {
+            executeSql(deleteSql);
         }
     }
 

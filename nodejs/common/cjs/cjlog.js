@@ -16,7 +16,7 @@
 
     let fs = require('fs');
     let path = require('path');
-    let CjInterinfo = require('./../cjinterinfo.js');
+    let CjInterinfo = require('./cjinterinfo.js');
 
     CjLog._defaultLogPath = path.join(process.cwd(), 'log');
     CjLog.setDefaultLogPath = function(sLogPath) {

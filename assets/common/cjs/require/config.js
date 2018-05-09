@@ -15,24 +15,24 @@ if (window.top['__dirname']) {
 let config = {
     baseUrl: BASEURL,
     paths: {
-        'global': 'common/cjs/web/other/global',
+        'global': 'common/cjs/other/global',
         'jquery': 'common/3rd/jquery-2.1.1.min',
-        'util': 'common/cjs/web/other/util',
+        'util': 'common/cjs/other/util',
         'uix': 'common/3rd/uix/uix.layout',
         'bootstrap': 'common/3rd/bootstrap-2.3.2/js/bootstrap-2.3.2',
-        'server': 'common/cjs/web/other/server',
-        'app': 'common/cjs/web/other/app',
-        'es5': 'common/cjs/web/other/es5',
+        'server': 'common/cjs/other/server',
+        'app': 'common/cjs/other/app',
+        'es5': 'common/cjs/other/es5',
         'json': 'common/3rd/require-plus/json',
         'text': 'common/3rd/require-plus/text',
-        'domready': 'common/cjs/web/other/domReady',
+        'domready': 'common/cjs/other/domReady',
         'echart3': 'common/3rd/echarts-3.6.2/echarts',
     // 'angular': 'lib/angular/angular-1.2.32',
         'jquery.treegrid.bootstrap2': 'common/3rd/jquery.treegrid/jquery.treegrid.bootstrap2',
         'perfectScrollbar': 'common/3rd/perfect-scrollbar/js/perfect-scrollbar',
         'ztree': 'common/3rd/ztree-3.5.29/js/jquery.ztree.all',
         'bs.ics.modal': 'common/3rd/bootstrap.modal/bootstrap.modal',
-        'MD5': 'common/cjs/web/other/md5',
+        'MD5': 'common/cjs/other/md5',
         'bootstrap-date': 'common/3rd/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker',
         'bootstrap-dateCN': 'common/3rd/bootstrap-datetimepicker-master/js/locales/bootstrap-datetimepicker.zh-CN',
         'uix-date': 'common/3rd/bootstrap-datetimepicker-master/js/uix-date',
@@ -43,7 +43,7 @@ let config = {
         'padMake': 'common/3rd/pdfmake.min',
         'vfs_fonts': 'common/3rd/vfs_fonts',
     // 'bootstrap-select': 'lib/bootstrap-select/js/bootstrap-select',
-        'contextMenu': 'common/cjs/web/contextmenu/contextmenu',
+        'contextMenu': 'common/cjs/contextmenu/contextmenu',
         'pickcolor': 'common/3rd/pick-a-color-master/src/js/pick-a-color',
         'papaparse': 'common/3rd/importCSV/papaparse',
         'jschardet': 'common/3rd/importCSV/jschardet',
@@ -142,7 +142,7 @@ if (!window.nodeRequire) {
 // 	requirejs.config(config);
 // }
 // else {
-requirejs([BASEURL + 'common/cjs/web/require/ics-main.js'], function(ics) {
+requirejs([BASEURL + 'common/cjs/require/ics-main.js'], function(ics) {
     ics.loadIcsMain(config);
     console.log(config);
     requirejs.config(config);

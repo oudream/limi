@@ -222,7 +222,7 @@ utils.dataProcess.getId = function(highOrder, lowOrder) {
 
 /**
  * k-v键值对的字符串转化为对象
- * @param str string k-v键值对的字符串
+ * @param {str} str k-v键值对的字符串
  */
 utils.dataProcess.kvStrToObj = function(str) {
     let arr = str.split(';');

@@ -12,6 +12,7 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
     let localData; // 本地数据
     let copyData; // 表格原始数据
     let loadSql = '';
+    let initSql = '';
     let group = null;
     let sort = null;
     let def = []; // 表定义表相关定义
@@ -64,48 +65,22 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
                     group = data.group;
                 }
             }
-            jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 5, 'pager', 'data_record_count_span');
       // console.log('1121212121')
             if (arrs[1] === undefined) {
+                if (data.initSql) {
+                    loadSql = data.initSql;
+                }
                 loadPropertyDef(gDb, loadSql);
             } else {
+                if (data.initSql) {
+                    loadSql = data.initSql;
+                }
                 loadPropertyDef(gDb, loadSql, arrs[1]);
             }
         });
     }
 
     function loadPropertyDef(db, loadSql, filter) {
-    // let serverInfo = cacheOpt.get('server-config')
-    // let reqHost = serverInfo['server']['ipAddress']
-    // let reqPort = serverInfo['server']['httpPort']
-    // let reqParam = {
-    //   reqHost: reqHost,
-    //   reqPort: reqPort
-    // }
-    // let sql = 'select * from qms_propertydef'
-    // db.load(sql, function (err, vals) {
-    //   let sNeType
-    //   for (let i = 0; i < vals.length; i++) {
-    //     let val = vals[i]
-    //     sNeType = val.NeType
-    //     if (sNeType === netype) {
-    //       let define = {
-    //         neType: vals[i].NeType,
-    //         propName: vals[i].PropName,
-    //         colName: vals[i].ColumnName,
-    //         visible: vals[i].Visible,
-    //         propType: vals[i].PropType,
-    //         unique: vals[i].Unique,
-    //         required: vals[i].Required,
-    //         readOnly: vals[i].ReadOnly,
-    //         defaultValue: vals[i].DefaultValue,
-    //         valueScopes: vals[i].ValueScopes,
-    //         foreignKey: vals[i].ForeignKey,
-    //         width: vals[i].DisplayWidth
-    //       }
-    //       def.push(define)
-    //     }
-    //   }
         if (multi) {
             jqGridConfig.multiSelectTableInit(tbID, def, '#pager');
         } else {
@@ -138,6 +113,8 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
         } else {
             jqGridExtend.countNum(loadSql, filter, tableName, group, 5, 'data_record_count_span');
             jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 5, 'pager');
+            jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 5, 'pager', 'data_record_count_span');
+
         }
     // }, reqParam)
     }

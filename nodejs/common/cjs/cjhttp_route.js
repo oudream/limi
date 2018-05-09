@@ -2,8 +2,8 @@
 'use strict';
 
 let http = require('http');
-require('./../cjinterinfo');
-require('./../cjstring');
+require('./cjinterinfo');
+require('./cjstring');
 
 exports = module.exports = Route;
 

@@ -158,7 +158,7 @@ CjChannelUdp.prototype.checkChannel = function(interval) {
         //* recycle heart jump
         if (udp.isAutoHeartbeat) {
             if (udp.isOpen()) {
-                udp.send('heart jump!\r\n');
+                udp.sendData('heart jump!\r\n');
                 console.log('timer auto heart jump!');
             }
         }
