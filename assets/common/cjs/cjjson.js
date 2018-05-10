@@ -17,12 +17,12 @@
 
     if (CjJson.hasOwnProperty('parse')) return;
 
-  /**
-   *
-   * @param * {string[] | string} sJsons
-   * @param {} dest
-   * @returns {*}
-   */
+    /**
+     * parse
+     * @param {string[]|string}sJsons
+     * @param {object}dest
+     * @return {*}
+     */
     CjJson.parse = function parse(sJsons, dest) {
         if (!cjs.CjMeta) {
             throw new ReferenceError('CjMeta is required');

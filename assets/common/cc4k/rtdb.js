@@ -1,90 +1,3 @@
-/* !
-// ICS实时数据请求的 json格式：支持散列请求：rtdata_v101；数组请求是：rtdata_v102；返回时都统一用：rtdata_v001
-// url 是全局统一资源名（可以通用在容器对象或实体对象中）
-// mid 是实时库的实时点全局唯一id
-// url和mid可以只有一个，两个同时都有时以mid为准
-// ics.json 散列请求
-http://10.31.0.15:8821/ics.cgi?fncode=req.rtdata_v101&filetype=json
-
-fncode = req.rtdata_v101
-filetype = json
-
-{
-  "session":"sbid=0001;xxx=adfadsf",
-  "structtype": "rtdata_v101",
-  "params":
-  [
-    {
-    "url": "/fp/zyj/fgj01/rfid",
-    "mid": 33556644
-    },
-    {
-    "url": "/fp/zyj/fgj01/ypmm",
-    "mid": 33556645
-    }
-  ]
-}
-
-
-// ics.json 数组请求
-// 数组请求中是以url为索引时，如果url可以对应到mid就以mid为开始索引；如果url是容器时就返回容器对应数量内个数
-fncode = req.rtdata_v102
-filetype = json
-
-{
-  "session":"sbid=0001;xxx=adfadsf",
-  "structtype": "rtdata_v102",
-  "params":
-  [
-    {
-    "url": "/fp/zyj/fgj01/rfid",
-    "mid": 33556644,
-    "count": 100
-    },
-    {
-    "url": "/fp/zyj/fgj01/ypmm",
-    "mid": 33556645,
-    "count": 100
-    }
-  ]
-}
-
-
-// ics.json返回时都统一用：rtdata_v001
-// "v": 数值
-// "q": 值的质量
-// "t": 值的时间,unix时间戳（1970到目前的毫秒数，服务器的当地时间）
-// 可选属性"srcid": 实时数据信息来源的源ID,
-// 可选属性"srcurl": 实时数据信息来源的源url,
-// 可选属性"state":状态码，无或0时表示成功，其它值看具体数据字典
-{
-  "session":"sbid=0001;xxx=adfadsf",
-  "structtype":"rtdata_v001",
-  "data":[
-    {
-    "url":"/fp/zyj/fgj01/rfid",
-    "mid":33556644,
-    "v":"ABC12345678D",
-    "q":1,
-    "t":1892321321,
-    "srcid":1231231,
-    "srcurl":"/fp/zyj/fgjapp",
-    "state":0
-    },
-    {
-    "url":"/fp/zyj/fgj01/ypmm",
-    "mid":33556645,
-    "v":"20160100001",
-    "q":1,
-    "t":1892321521
-    "srcid":1231231,
-    "srcurl":"/fp/zyj/fgjapp",
-    "state":0
-    }
-  ]
-
- */
-
 (function() {
     'use strict';
 
@@ -148,7 +61,8 @@ filetype = json
                         iId = arg1;
                     }
                 }
-            } else if (arg0 !== null && typeof value === 'object') {
+            } else if (arg0 !== null && typeof arg0 === 'object') {
+                this.type = arg0.type ? arg0.type : null;
                 this.id = arg0.id ? arg0.id : null;
                 this.url = arg0.url ? arg0.url : null;
                 this.neno = arg0.neno ? arg0.neno : null;
@@ -165,6 +79,7 @@ filetype = json
                 this.equalStrategyId = arg0.equalStrategyId ? arg0.equalStrategyId : null;
                 this.res = arg0.res ? arg0.res : 0;
                 return this;
+                //     this.type             = arg0.type            ? arg0.type            : null;
                 //     this.id               = arg0.id              ? arg0.id              : null;
                 //     this.url              = arg0.url             ? arg0.url             : null;
                 //     this.neno             = arg0.neno            ? arg0.neno            : null;
@@ -182,6 +97,7 @@ filetype = json
                 //     this.res              = arg0.res             ? arg0.res             : null;
             }
         }
+        this.type = null;
         this.id = iId;
         this.url = sUrl;
         this.neno = null;
@@ -252,9 +168,9 @@ filetype = json
             let bId = (typeof measure.id === 'number' && measure.id > 0 && this.findById(measure.id) === null);
             let bUrl = (typeof measure.url === 'string' && this.findByUrl(measure.url) === null);
             if (bId || bUrl) {
-                let measure = new this.MeasureClass(measure);
-                this.measures.push(measure);
-                return measure;
+                let newMeasure = new this.MeasureClass(measure);
+                this.measures.push(newMeasure);
+                return newMeasure;
             }
         } else {
             return null;
@@ -339,6 +255,7 @@ filetype = json
     // # monsb
     let MonsbMeasure = function MonsbMeasure(...args) {
         MeasureBase.apply(this, args);
+        this.type = EnumMeasureType.monsb;
         this.value = -1;
     };
     MonsbMeasure.prototype = Object.create(MeasureBase.prototype);
@@ -374,6 +291,7 @@ filetype = json
     // # ycadd
     let YcaddMeasure = function YcaddMeasure(...args) {
         MeasureBase.apply(this, args);
+        this.type = EnumMeasureType.ycadd;
         this.value = -1;
     };
     YcaddMeasure.prototype = Object.create(MeasureBase.prototype);
@@ -409,6 +327,7 @@ filetype = json
     // # straw
     let StrawMeasure = function StrawMeasure(...args) {
         MeasureBase.apply(this, args);
+        this.type = EnumMeasureType.straw;
         this.value = -1;
     };
     StrawMeasure.prototype = Object.create(MeasureBase.prototype);
@@ -484,7 +403,7 @@ filetype = json
     };
     rtdb.findMeasureByNenoCode = findMeasureByNenoCode;
 
-    let appendMeasureById = function(measureId) {
+    let appendMeasureById = function appendMeasureById(measureId) {
         let iId = Number(measureId);
         let r = null;
         switch (getMeasureTypeById(iId)) {
@@ -504,7 +423,75 @@ filetype = json
     };
     rtdb.appendMeasureById = appendMeasureById;
 
-    let registerDataChangedCallback = function registerDataChangedCallback(fnDataChangedCallback) {
+    let appendMeasure = function appendMeasure(obj) {
+        let r = null;
+        if (obj && obj.id) {
+            switch (getMeasureTypeById(obj.id)) {
+            case EnumMeasureType.monsb:
+                r = monsbManager.append(obj);
+                break;
+            case EnumMeasureType.ycadd:
+                r = ycaddManager.append(obj);
+                break;
+            case EnumMeasureType.straw:
+                r = strawManager.append(obj);
+                break;
+            default:
+                break;
+            }
+        }
+        return r;
     };
-    rtdb.registerDataChangedCallback = registerDataChangedCallback;
+    rtdb.appendMeasure = appendMeasure;
+
+    rtdb.measuresChangedCallback = null;
+    let receivedMeasures = function receivedMeasures(recvMeasures) {
+        let measuresByAdd = [];
+        let measuresByDelete = [];
+        let measuresByEdit = [];
+        for (let i = 0; i < recvMeasures.length; i++) {
+            let recvMeasure = recvMeasures[i];
+            let measure = rtdb.findMeasureById(recvMeasure.id);
+            if (measure === null) {
+                measure = rtdb.appendMeasure(recvMeasure);
+                if (measure) {
+                    measuresByAdd.push(measure);
+                }
+            } else {
+                measure.setVQT(recvMeasure.value, recvMeasure.quality, recvMeasure.changedTime);
+                measuresByEdit.push(measure);
+            }
+        }
+        if (rtdb.measuresChangedCallback) {
+            rtdb.measuresChangedCallback(measuresByAdd, measuresByDelete, measuresByEdit);
+        }
+        console.log('measuresByAdd: ', measuresByAdd.length);
+        console.log(measuresByAdd);
+        console.log('measuresByDelete: ', measuresByDelete.length);
+        console.log(measuresByDelete);
+        console.log('measuresByEdit: ', measuresByEdit.length);
+        console.log(measuresByEdit);
+    };
+    rtdb.receivedMeasures = receivedMeasures;
+
+    // # rtdb's sync data
+    let getReqMeasuresJson = function getReqMeasuresJson() {
+        return JSON.stringify({
+            session: '',
+            structtype: 'rtdata_v101',
+            params: (
+                ((monsbManager.getReqMeasures()).concat(ycaddManager.getReqMeasures()))
+                    .concat(strawManager.getReqMeasures())
+            ),
+        });
+    };
+    rtdb.getReqMeasuresJson = getReqMeasuresJson;
+
+    /**
+     * registerMeasuresChangedCallback
+     * @param {Function}fnDataChangedCallback : fn(addMeasures, deleteMeasures, editMeasures)
+     */
+    let registerMeasuresChangedCallback = function registerMeasuresChangedCallback(fnDataChangedCallback) {
+    };
+    rtdb.registerMeasuresChangedCallback = registerMeasuresChangedCallback;
 })(typeof window !== 'undefined' ? window : this);

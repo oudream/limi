@@ -2,6 +2,7 @@ const url = require('url');
 
 const utils = require('./../../common/utils.js').utils;
 const ShareCache = require('./../../common/share-cache.js').ShareCache;
+const rtdb = require('./../../../assets/common/cc4k/rtdb.js');
 
 let sessionList = [];
 
@@ -72,6 +73,60 @@ function init() {
         });
         res.write(sReturnData, 'utf-8');
         res.end();
+    });
+
+    global.httpServer.route.all(/\/(.){0,}.rtdata/, function(req, res) {
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', function(chunk) {
+                body += chunk;
+            });
+            req.on('end', function() {
+                console.log(body);
+                let reqSession = null;
+                let reqStructtype = null;
+                let reqMeasures = null;
+                if (body) {
+                    try {
+                        let reqBody = JSON.parse(body);
+                        reqSession = reqBody.session;
+                        reqStructtype = reqBody.structtype;
+                        reqMeasures = reqBody.params;
+                    } catch (e) {
+                        r = null;
+                        console.log('error: JSON.parse(body)');
+                    }
+                }
+                if (reqSession && reqStructtype && reqMeasures) {
+                    let resMeasures = {
+                        session: 'sbid=0001;xxx=adfadsf',
+                        structtype: 'rtdata_v001',
+                        data: function() {
+                            let data = [];
+                            for (let i = 0; i < reqMeasures.length; i++) {
+                                let reqMeasure = reqMeasures[i];
+                                let neno = reqMeasure.neno;
+                                let code = reqMeasure.code;
+                                let resMeasure = rtdb.findMeasureByNenoCode(neno, code);
+                                if (resMeasure) {
+                                    data.push(resMeasure);
+                                }
+                            }
+                            return data;
+                        }(),
+                    };
+                    res.writeHead(200);
+                    // res.write('HELLO');
+                    res.end(JSON.stringify(resMeasures));
+                } else {
+                    res.writeHead(404);
+                    res.end();
+                }
+            });
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
     });
 }
 

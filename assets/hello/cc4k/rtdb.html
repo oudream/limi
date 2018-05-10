@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script src="./../../common/3rd/jquery-3.1.1.js"></script>
+<script src="./../../common/cc4k/rtdb.js"></script>
+<script src="./../../common/cc4k/rtdb_sync.js"></script>
+
+<body>
+
+<h1>RTDB</h1>
+
+<div id="show-yx-1"></div>
+
+<script>
+    let rtdb = window.cc4k.rtdb;
+    rtdb.appendMeasureByNenoCode(1001, 'yc4');
+    rtdb.startSyncMeasures();
+    window.setInterval(function() {
+        let yc1 = rtdb.findMeasureByNenoCode(1001, 'yc4');
+        if (yc1 !== null) {
+            $('#show-yx-1').innerText = string(yc1.value);
+        }
+    }, 2000);
+</script>
+
+</body>
+</html>

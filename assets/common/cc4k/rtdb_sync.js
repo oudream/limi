@@ -82,6 +82,7 @@ filetype = json
     "state":0
     }
   ]
+}
 
  */
 
@@ -123,7 +124,7 @@ filetype = json
      * @param {Number}neno
      * @param {string}code
      */
-    let appendMeasureByNenoUrl = function(neno, code) {
+    let appendMeasureByNenoCode = function(neno, code) {
         if (findByNenoCode(neno, code) === null) {
             reqMeasures.push({
                 neno: neno,
@@ -131,38 +132,25 @@ filetype = json
             });
         }
     };
-    rtdb.appendMeasureByNenoUrl = appendMeasureByNenoUrl;
-
-    let retReqMeasuresJson = '';
+    rtdb.appendMeasureByNenoCode = appendMeasureByNenoCode;
 
     let dealRespMeasures = function dealRespMeasures(response) {
         let arr = JSON.parse(response);
-        let measures = arr.data;
-        for (let i = 0; i < measures.length; i++) {
-            let measure = measures[i];
-            let iId = measure.mid;
-            let myMeasure = rtdb.findMeasureById(iId);
-            if (myMeasure !== null) {
-                myMeasure.setVQT(measure.v, measure.q, measure.t);
-            }
-        }
-    };
-
-    // # rtdb's sync data
-    let getReqMeasuresJson = function getReqMeasuresJson() {
-        return JSON.stringify({
-            session: '',
-            structtype: 'rtdata_v101',
-            params: (
-                ((monsbManager.getReqMeasures()).concat(ycaddManager.getReqMeasures()))
-                    .concat(strawManager.getReqMeasures())
-            ),
-        });
+        let resMeasures = arr.data;
+        rtdb.receivedMeasures(resMeasures);
     };
 
     let startSyncMeasures = function startSyncMeasures() {
-        retReqMeasuresJson = getReqMeasuresJson();
         let reqRespRtdatas = function() {
+            let retReqMeasuresJson = JSON.stringify({
+                session: Date.now().toString(),
+                structtype: 'rtdata_v101',
+                params: reqMeasures,
+            });
+            if (! retReqMeasuresJson) {
+                console.log('!!! warnning: retReqMeasuresJson is empty!!!');
+                return;
+            }
             let xmlhttp;
             if (window.XMLHttpRequest) {
                 xmlhttp = new XMLHttpRequest();
@@ -178,18 +166,11 @@ filetype = json
                     dealRespMeasures(xmlhttp.responseText);
                 }
             };
-            retReqMeasuresJson = getReqMeasuresJson();
             let r = xmlhttp.send(retReqMeasuresJson);
             myDebug('发送：ReqMeasures - ' + new Date() + ' ' + r);
         };
 
-        if (retReqMeasuresJson.length > 0) {
-            setInterval(reqRespRtdatas, 1000);
-            return true;
-        } else {
-            console.log('!!! warnning: retReqMeasuresJson is empty!!!');
-            return false;
-        }
+        setInterval(reqRespRtdatas, 1000);
     };
     rtdb.startSyncMeasures = startSyncMeasures;
 })(typeof window !== 'undefined' ? window : this);
