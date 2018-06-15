@@ -121,7 +121,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
    * @param num : num 分页数
    * @param pagerID : string pagerID
    */
-    jqGridExtend.paging = function(tbID, loadSql, filter, tableName, group, sort, num, pagerID) {
+    jqGridExtend.paging = function(tbID, loadSql, filter, tableName, group, sort, num, pagerID, def) {
         let sql = '';
         let string = 'where';
         if (loadSql !== '') {
@@ -130,6 +130,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             if (selectID[0].includes('*')) {
                 selectID = ['select ID'];
                 selectID[0] = 'select ID';
+                queryIndex = selectID[0].split(' ');
             }
             sql = selectID[0] + ' from ' + tableName;
             let arr = loadSql.split(' where ');
@@ -173,7 +174,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
         sql1 = sql;
         sql = sql + ' limit ' + PageIndex * num + ',' + num + ';';
     // }
-        selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID);
+        selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID, def);
     };
 
   /**
@@ -186,7 +187,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
    * @param pagerID : string pager的ID
    * @param recordID :string 显示页数的标签ID
    */
-    jqGridExtend.pageBtn = function(tbID, loadSql, tableName, sort, num, pagerID, recordID) {
+    jqGridExtend.pageBtn = function(tbID, loadSql, tableName, sort, num, pagerID, recordID, def) {
         PageIndex = 0;
         $(document).on('jqGrid_gird_' + pagerID, function(evt, pgBtn) {
             let recordCountSpan = $('#' + recordID) || $('#data_record_count_span');
@@ -221,11 +222,11 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             } else {
                 recordCountSpan.text('当前第' + parseInt(PageIndex + 1) + '页,共' + parseInt(lastPage + 1) + '页');
             }
-            selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID);
+            selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID, def);
         });
     };
 
-    function selID(tbID, sql, loadSql, colName, tableName, sort, pagerID) {
+    function selID(tbID, sql, loadSql, colName, tableName, sort, pagerID, def) {
         let db = window.top.cjDb;
         let serverInfo = cacheOpt.get('server-config');
         let reqHost = serverInfo['server']['ipAddress'];
@@ -278,12 +279,12 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                         }
                     }
                 }
-                loadTBData(fSql, tbID, pagerID);
+                loadTBData(fSql, tbID, pagerID, def);
             }
         }, reqParam);
     }
 
-    function loadTBData(sql, tbID, pagerID) {
+    function loadTBData(sql, tbID, pagerID, def) {
         let db = window.top.cjDb;
         let serverInfo = cacheOpt.get('server-config');
         let reqHost = serverInfo['server']['ipAddress'];
@@ -301,11 +302,25 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
 
             let recordLength = vals.length;
 
+            let arr =[];
+            if (def) {
+                for (let i = 0; i < def.length; i ++) {
+                    if (def[i].textType) {
+                        let obj = {};
+                        obj.colName = def[i].colName;
+                        obj.textType = def[i].textType;
+                        arr.push(obj);
+                    }
+                }
+            }
+
             for (let i = 0; i <= recordLength; i++) {
                 if (i < recordLength) {
-                    if (vals[i].F_T !== undefined) {
-                        if (!isNaN(Number(vals[i].F_T))) {
-                            vals[i].F_T = utils.time.utc2Locale(vals[i].F_T);
+                    for (let j = 0; j < arr.length; j ++) {
+                        if (vals[i][arr[j].colName]) {
+                            if (arr[j].textType === 'utcTime') {
+                                vals[i][arr[j].colName] = utils.time.utc2Locale(vals[i][arr[j].colName]);
+                            }
                         }
                     }
                     if (vals[i].F_TYPE !== undefined && vals[i].F_V !== undefined) {

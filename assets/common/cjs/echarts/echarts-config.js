@@ -21,6 +21,7 @@ define(['jquery', 'echart3'], function($, echarts) {
             obj = {
                 name: config.legend[i],
                 type: 'line',
+                showSymbol: false,
                 data: config.seriesData[i],
             };
             series.push(obj);
@@ -293,6 +294,78 @@ define(['jquery', 'echart3'], function($, echarts) {
             ];
         }
         myChart.setOption(option);
+    };
+
+    /**
+     * 配置动态时间图
+     * @param ID : string echart id
+     * @param config : obj 配置
+     */
+    echartsConfig.dynamicTimeConfig = function(ID, config) {
+        let myChart = echarts.init($('#' + ID)[0]); // 基于准备好的dom，初始化echarts实例
+        // 指定图表的配置项和数据
+        let option = {
+            title: {
+                text: config.title, // 标题
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#008ACD',
+                },
+            },
+            color: config.color,
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                },
+            },
+            legend: {
+                type: 'scroll',
+                data: config.legend, // 图例
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {},
+                    // magicType: {
+                    //     type: ['line', 'bar'],
+                    // },
+                    right: '3%',
+                },
+            },
+            xAxis: {
+                // type: 'value',
+                type: 'time',
+                // boundaryGap: true,
+                axisPointer: {
+                    type: 'shadow',
+                },
+                splitLine: {
+                    show: false,
+                },
+            },
+            visualMap: [{
+                show: false,
+                type: 'continuous',
+                seriesIndex: 0
+            }],
+            yAxis: config.yAxis,
+            series: config.seriesData,
+        };
+        myChart.setOption(option);
+    };
+
+    echartsConfig.seriesUpDate = function(ID, data) {
+        let myChart = echarts.getInstanceByDom($('#' + ID)[0]);
+        myChart.setOption({
+            series: data,
+        });
+    };
+
+    echartsConfig.setAxis = function(ID, data) {
+        let myChart = echarts.getInstanceByDom($('#' + ID)[0]);
+        myChart.setOption({
+            xAxis: data,
+        });
     };
 
   // 获取本月到当前日期

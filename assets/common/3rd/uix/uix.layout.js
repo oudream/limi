@@ -239,6 +239,20 @@
 	            // 在改变布局前先改变子元素
 
 
+	            for (var i = 0; i < s.norths.children.length; i++) {
+	                var item = s.norths.children[i];
+	                let northheight = (autoHeight+s.norths.outerHeight+s.souths.outerHeight)/2;
+	                item.ele.css({position: 'absolute', left: left + 'px', right: 'auto', top: 0 + 'px', bottom: 'auto', width: item.outerWidth, height: northheight + 'px', display: 'block', margin: '0px'});
+	                // left += item.outerWidth;
+	            }
+
+	            for (var i = 0; i < s.souths.children.length; i++) {
+	                var item = s.souths.children[i];
+	                let southheight = (autoHeight+s.norths.outerHeight+s.souths.outerHeight)/2;
+	                item.ele.css({position: 'absolute', left: left + 'px', right: 'auto', top: southheight + 'px', bottom: 'auto', width: item.outerWidth, height: southheight + 'px', display: 'block', margin: '0px'});
+	                // left += item.outerWidth;
+	            }
+
 	            for (var i = 0; i < s.wests.children.length; i++) {
 	                var item = s.wests.children[i];
 	                let westheight = autoHeight - item.otherHeight;
@@ -319,7 +333,7 @@
                     log('已停止加载[未发现.uix-layout-container]', true); return;
                 }
 	                _this.tool.log('触发布局[window onload]');
-	                _this.layout();
+	                // _this.layout();
 	                $(window).bind('resize', function() {
 	                    _this.tool.log('触发布局[window onresize]');
 	                    _this.layout();

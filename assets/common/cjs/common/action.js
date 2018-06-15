@@ -7,15 +7,17 @@
 let action = {
 
 };
-define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension'], function($, async) {
+define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension'], function($, async) {
     let doc = window.top.$(window.top.document);
     action.register = function(data, tbID, tbName, def, g, copyData) {
         switch (data.action) {
         case 'newAction':addAction(tbID, def, tbName, g);
             break;
-        case 'omcAddAction':omcAddAction(def, tbName, data.assistAction, data.reload, data.para, g);
+        case 'omcAddAction':omcAddAction(def, tbName, data.assistAction, data.getModelData, data.reload, data.para, g);
             break;
         case 'omcRTDataCfgAddAction':omcRTDataCfgAddAction(data.para, g);
+            break;
+        case 'omcRTLineCfgSaveAction':omcRTLineCfgSaveAction(tbID, tbName, def, copyData);
             break;
         case 'delAction': delAction(tbID, tbName, def);
             break;
@@ -86,6 +88,10 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
         case 'foreMostAction':foremostAction(tbID, tbName, data);
             break;
         case 'uploadAction':uploadAction(g, data);
+            break;
+        case 'sysAddServer':sysAddServer(tbID, tbName);
+            break;
+        case 'sysUpdateServer':sysUpdateServer(tbID, tbName, def, copyData);
             break;
         }
     };
@@ -268,12 +274,13 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
    * @param action : string action名
    * @param g : obj 全局对象
    */
-    function omcAddAction(def, tableName, action, reload, para, g) {
+    function omcAddAction(def, tableName, action, getModelData, reload, para, g) {
         let obj = {};
         obj.defConfig = def;
         obj.action = action;
         obj.reload = reload;
         obj.para = para;
+        obj.getModelData = getModelData;
         let config = JSON.stringify(obj);
         sessionStorage.setItem('addConfig', config);
         sessionStorage.setItem('tbName', tableName);
@@ -293,10 +300,11 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
     }
   /**
    * omcRTDataConfig添加操作(未使用json文件配置)
+   * @param para : num 标签索引
    * @param g : obj 全局对象
    */
     function omcRTDataCfgAddAction(para, g) {
-        let u = 'ics/omc/html/dataShow/add-config.html?index=' + para;
+        let u = 'ics/omc/html/dataShow/add-config.html?index=' + para.index + '&type=' + para.type;
 
         g.iframe({
             title: '新增',
@@ -309,6 +317,48 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             footerButtonAlign: 'right',
             url: g.url(u),
         });
+    }
+
+    /**
+     * 实时曲线保存
+     * @param {num} tbId
+     * @param {string} tableName
+     * @param {obj} def
+     * @param {obj} copyData
+     */
+    function omcRTLineCfgSaveAction(tbId, tableName, def, copyData) {
+        let propConfGrid = tbId;
+        let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow');
+        propConfGrid.jqGrid('saveRow', selectedId);
+        let updateSql = '';
+        let colName = [];
+        let propName = [];
+        let data = getJQAllData(tbId);
+        for (let j = 1; j < def.length; j++) {
+            colName.push(def[j].colName);
+            propName.push(def[j].propName);
+        }
+        for (let len = 0; len < data.length; len++) {
+            let arr = data[len];
+            let copyArr = copyData[len];
+            let upID = data[len].ID;
+            let oPara = {};
+            let sV = '';
+            if (checkChange(arr, copyArr, colName)) {
+                if (checkLimit(arr, def, copyData, len)) {
+                    oPara = {
+                        color: arr.SetColor,
+                        yName: arr.YName,
+                        yUnit: arr.YUnit,
+                    };
+                    sV = JSON.stringify(oPara);
+                    updateSql = updateSql + 'update ' + tableName + ' set F_V = ' + '\'' + sV + '\'' +
+                            ' where ID = ' + upID + ';';
+                }
+            }
+        }
+        // alert(sql)
+        executeSql(updateSql);
     }
 
   /**
@@ -1170,7 +1220,15 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
         let log = '新增:';
         for (let i = 0; i < data.length; i++) {
             insCol.push(data[i].name);
-            insData.push(data[i].value);
+            if (def[i].textType) {
+                if (def[i].textType === 'utcTime') {
+                    insData.push(utils.time.locale2Utc(data[i].value));
+                } else {
+                    insData.push(data[i].value);
+                }
+            } else {
+                insData.push(data[i].value);
+            }
             propName.push(def[i].propName);
             let arr = data[i];
             if (checkObjLimit(arr, def)) {
@@ -1193,10 +1251,55 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
         }
         insertSql = insertSql + 'insert into ' + tbName + '(' + insCol + ')' +
       ' values' + '(' + ins + ')' + ';';
-        $('.modal', window.parent.document).hide();
-        $('.modal-backdrop', window.parent.document).remove();
-        executeSql(insertSql, g, cfg);
-    // $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+        if (cfg.ModelData) {
+            let getSql = cfg.ModelData.sql;
+            async.auto({
+                a: function(callBack) {
+                    loadSql(getSql, function(v) {
+                        callBack(null, v);
+                    });
+                },
+                b: ['a', function(value, callBack) {
+                    let str = $.trim(getSql.substring(getSql.indexOf('t') + 1, getSql.indexOf('f'))); // 截取select 和 from 之间的字符串
+                    let arr = str.split(',');
+                    let aSrc = cfg.ModelData.extraData.src || [];
+                    let aDes = cfg.ModelData.extraData.des || [];
+                    let insSql = '';
+                    for (let i = 0; i < value.a.length; i++) {
+                        let val = '';
+                        insSql = insSql + 'insert into ' + cfg.ModelData.targetTB + ' (' + aDes + ',' + arr + ') values (';
+                        for (let k = 0; k < aSrc.length; k++) {
+                            for (let n = 0; n < data.length; n++) {
+                                if (aSrc[k] === data[n].name) {
+                                    val = val + '\'' + data[n].value + '\'' + ',';
+                                    break;
+                                }
+                            }
+                        }
+                        for (let j = 0; j < arr.length; j++) {
+                            if (j === arr.length - 1) {
+                                val = val + '\'' + value.a[i][arr[j]] + '\'';
+                            } else {
+                                val = val + '\'' + value.a[i][arr[j]] + '\',';
+                            }
+                        }
+                        insSql = insSql + val + ');';
+                    }
+
+                    insertSql = insertSql + insSql;
+                    $('.modal', window.parent.document).hide();
+                    $('.modal-backdrop', window.parent.document).remove();
+                    executeSql(insertSql, log);
+                    $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src;
+                }],
+            }, function(error, value) {
+            });
+        } else {
+            $('.modal', window.parent.document).hide();
+            $('.modal-backdrop', window.parent.document).remove();
+            executeSql(insertSql, g, cfg);
+            // $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+        }
     }
 
   /**
@@ -1857,19 +1960,23 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
    * @param tbID : num 单表id
    */
     function exportToCsv(tbID) {
-        tbID.jqGrid('exportToCsv', {
-            separator: ',',
-            separatorReplace: '', // in order to interpret numbers
-            quote: '"',
-            escquote: '"',
-            newLine: '\r\n', // navigator.userAgent.match(/Windows/) ?	'\r\n' : '\n';
-            replaceNewLine: ' ',
-            includeCaption: true,
-            includeLabels: true,
-            includeGroupHeader: true,
-            includeFooter: true,
-            fileName: 'jqGridExport.csv',
-            returnAsString: false,
+        // tbID.jqGrid('exportToCsv', {
+        //     separator: ',',
+        //     separatorReplace: '', // in order to interpret numbers
+        //     quote: '"',
+        //     escquote: '"',
+        //     newLine: '\r\n', // navigator.userAgent.match(/Windows/) ?	'\r\n' : '\n';
+        //     replaceNewLine: ' ',
+        //     includeCaption: true,
+        //     includeLabels: true,
+        //     includeGroupHeader: true,
+        //     includeFooter: true,
+        //     fileName: 'jqGridExport.csv',
+        //     returnAsString: false,
+        // });
+        tbID.tableExport({
+            filename: 'table',
+            format: 'csv',
         });
         let log = '导出数据';
         recordLog(log);
@@ -2103,6 +2210,63 @@ define(['jquery', 'async', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'u
             footerButtonAlign: 'right',
             url: g.url(u),
         });
+    }
+
+    function sysAddServer(tbID, tbName) {
+        let data = getFormData(tbID);
+        console.log(data);
+        let sQueryNeNo = 'select NeNo from omc_neconfig where NeType >= 513 and NeType <=767 order by NeNo desc';
+        async.auto({
+            queryNeNo: function(callBack) {
+                loadSql(sQueryNeNo, function(v) {
+                    callBack(null, v);
+                });
+            },
+        }, function(err, value) {
+            let aNeNo = value.queryNeNo;
+            let nNeNo = 0;
+            let sSql = '';
+            if (aNeNo[0].NeNo <= 767) {
+                nNeNo = aNeNo[0].NeNo + 1;
+                // 向omc_neconfig添加数据
+                sSql = 'insert into omc_neconfig(NeNo,NeAlias,NeType,AccessType,EthernetPort,EthernetType,NeParentNo,Enable,SysNeed)' +
+                'value(' + nNeNo + ',\'' + data[0].value + '\',' + nNeNo + ',1,0,0,0,1,1' + ');';
+                // 创建对应的property_xxx表
+                sSql = sSql + 'create table property_0x0' + nNeNo.toString(16) + '(PropName char(64),PropValue varchar(512));';
+                console.log(sSql);
+            } else {
+                alert('服务数量已达最大值,无法添加！');
+            }
+        });
+    }
+
+    function sysUpdateServer(tbID, tbName, def, copyData) {
+        let propConfGrid = tbID;
+        let selectedId = propConfGrid.jqGrid('getGridParam', 'selrow');
+        propConfGrid.jqGrid('saveRow', selectedId);
+        let updateSql = '';
+        let colName = [];
+        let propName = [];
+        let sql;
+        let data = getJQAllData(tbID);
+        for (let j = 0; j < def.length; j++) {
+            colName.push(def[j].colName);
+            propName.push(def[j].propName);
+        }
+        for (let len = 0; len < data.length; len++) {
+            if (data[len].oldTag === 'old') {
+                let arr = data[len];
+                let copyArr = copyData[len];
+                if (checkChange(arr, copyArr, colName)) {
+                    if (checkLimit(arr, def, copyData, len)) {
+                        updateSql = updateSql + 'update ' + tbName + ' set PropValue = \'' + arr.PropValue +
+                            '\' where PropName = \'' + arr.ColName + '\';';
+                    }
+                }
+            }
+        }
+        sql = updateSql;
+        executeSql(sql);
     }
 
   /* 获取表中所有数据 */

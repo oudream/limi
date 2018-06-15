@@ -13,6 +13,7 @@ const ShareCache = require('./../../common/share-cache.js').ShareCache;
 const configOpt = require('./../../common/cjs/cj-json-config.js');
 const Database = require('./../../common/cjs/cj-database.js').CjDatabase;
 // const projDir = ShareCache.get('local-info', 'current_work_dir')
+const DbManager = require('./../../common/cjs/cj-database.js').DbManager;
 
 const ProtocolCc4000 = require('./../../common/csm/protocol_cc4000.js');
 const BasProtocol = ProtocolCc4000;
@@ -32,6 +33,10 @@ let _rtbusProtocol = new BasProtocol(false);
 let _event = global.globalEvent;
 let _alarmRecPlayLog = {};
 _alarmRecPlayLog.data = [];
+// 数据库连接
+let dbMgr = null;
+let dbsConfig = null;
+
 
 _alarmRecPlayLog.load = function() {
     let salarmRecPlayLogFilePath = path.join(path.join(process.cwd(), 'temp'), 'alarmrec_playlog.json');
@@ -79,6 +84,8 @@ _alarmRecPlayLog.addPlay = function(alarmNo) {
 };
 
 function init() {
+    dbMgr = createDbManager();
+
     loadConfigFile();
 
     _alarmRecPlayLog.load();
@@ -221,9 +228,9 @@ function protocolListenerInit() {
             for (let i = 0; i < msgObj.Count; i++) {
                 let measure = {};
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
-                measure.value = buf.readIntLE(iOffset, 6, true); iOffset += 8;
-                measure.quality = buf.readDoubleLE(iOffset, true); iOffset += 8;
-                measure.changedTime = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                measure.value = (buf.readIntLE(iOffset, 6, true)).toFixed(2); iOffset += 8;
+                measure.refreshTime =utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
             rtdb.receivedMeasures(inMeasures);
@@ -237,9 +244,9 @@ function protocolListenerInit() {
             for (let i = 0; i < msgObj.Count; i++) {
                 let measure = {};
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
-                measure.value = buf.readDoubleLE(iOffset, true); iOffset += 8;
-                measure.quality = buf.readDoubleLE(iOffset, true); iOffset += 8;
-                measure.changedTime = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                measure.value = (buf.readDoubleLE(iOffset, true)).toFixed(2); iOffset += 8;
+                measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
             rtdb.receivedMeasures(inMeasures);
@@ -254,8 +261,8 @@ function protocolListenerInit() {
                 let measure = {};
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 measure.value = buf.toString('utf8', iOffset, iOffset+128); iOffset += 128;
-                measure.quality = buf.readDoubleLE(iOffset, true); iOffset += 8;
-                measure.changedTime = buf.readDoubleLE(iOffset, true); iOffset += 8;
+                measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
             rtdb.receivedMeasures(inMeasures);
@@ -280,7 +287,7 @@ function protocolListenerInit() {
 
     _rtbusProtocol.start({
         LocalIpAddress: '127.0.0.1',
-        LocalPort: 16696,
+        LocalPort: 6716,
         RemotePort: 6696,
         RemoteIpAddress: omcServerHost,
     });
@@ -364,7 +371,7 @@ function protocolListenerInit() {
     let loginRtbusTimeout = setTimeout(function() {
         clearTimeout(loginRtbusTimeout);
 
-        let packet = BasPacket.rtLoginPacket.toPacket(262185);
+        let packet = BasPacket.rtLoginPacket.toPacket(262149);
         _rtbusProtocol.sendPacket(packet);
 
         console.log(packet);
@@ -452,19 +459,21 @@ function loadConfigFile() {
 
 function getOmcServerInfo() {
     const projDir = ShareCache.get('local-info', 'current_work_dir');
-    let dbConfigs = ShareCache.get('server-config', 'database');
-    let mysqlConfig = dbConfigs['db1'];
-  // let _host = mysqlConfig.host;
-  // let _dsn = mysqlConfig.dsn;
-
-    let defaultDb = new Database(mysqlConfig.type, mysqlConfig, function(err, res) {
-        if (err) {
-            console.log(err);
-            throw err;
-        }
-    });
+  //   let dbConfigs = ShareCache.get('server-config', 'database');
+  //   let mysqlConfig = dbConfigs['db1'];
+  //
+  //   let defaultDb = new Database(mysqlConfig.type, mysqlConfig, function(err, res) {
+  //       if (err) {
+  //           console.log(err);
+  //           throw err;
+  //       }
+  //   });
 
   // let defaultDb = server.dbManager.findDb(_host,_dsn);
+
+
+    let mysqlConfig = dbsConfig['db1'];
+    let defaultDb = dbMgr.createDbConnect(mysqlConfig);
 
     let sql1 = 'select * from omc_omcconfig where itemno = 3';
     let sql2 = 'select * from omc_omcconfig where itemno = 1';
@@ -529,15 +538,18 @@ function getOmcServerInfo() {
 }
 
 function getAlarmRec(fnCallback) {
-    let dbConfigs = ShareCache.get('server-config', 'database');
-    let mysqlConfig = dbConfigs['db1'];
+    let mysqlConfig = dbsConfig['db1'];
+    let defaultDb = dbMgr.createDbConnect(mysqlConfig);
 
-    let defaultDb = new Database(mysqlConfig.type, mysqlConfig, function(err, res) {
-        if (err) {
-            console.log(err);
-            throw err;
-        }
-    });
+    // let dbConfigs = ShareCache.get('server-config', 'database');
+    // let mysqlConfig = dbConfigs['db1'];
+    //
+    // let defaultDb = new Database(mysqlConfig.type, mysqlConfig, function(err, res) {
+    //     if (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // });
 
     let sql1 = 'select omc_alarmrec.AlarmNo, omc_alarmrec.RepaireMark, omc_neconfig.NeAlias , ' +
         'omc_alarminfo.AlarmName , omc_alarminfo.AlarmClass FROM omc_alarmrec, omc_alarminfo, ' +
@@ -550,6 +562,31 @@ function getAlarmRec(fnCallback) {
         defaultDb.close();
         defaultDb = null;
     });
+}
+
+function utc2Locale (utcStr) {
+    let date = new Date(utcStr);
+
+    let _month = date.getMonth() + 1;
+    let month = _month > 9 ? _month : ('0' + _month.toString());
+    let day = date.getDate() > 9 ? date.getDate() : ('0' + date.getDate().toString());
+
+    let _hour = date.getHours() > 9 ? date.getHours() : ('0' + date.getHours().toString());
+    let _min = date.getMinutes() > 9 ? date.getMinutes() : ('0' + date.getMinutes().toString());
+    let _sec = date.getSeconds() > 9 ? date.getSeconds() : ('0' + date.getSeconds().toString());
+
+    let localeString = date.getFullYear() + '/' + month + '/' + day + ' ' +
+        _hour + ':' + _min + ':' + _sec;
+    return localeString;
+}
+
+/**
+ * 创建数据库管理器
+ * @returns {DbManager} : Object 数据库管理器对象
+ */
+function createDbManager () {
+    dbsConfig = ShareCache.get('server-config', 'database')
+    return new DbManager(dbsConfig)
 }
 
 init();

@@ -53,7 +53,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'jqGrid', 'jqGridConfig', 'a
         $.getJSON(configUrl, function(data) {
             tbName = data.tbName;
             operationDataChild = data.operationPanel.itemsChild;
-            child.connection = connection;
+            child.connection = data.connection;
             if (data.operationPanel !== undefined) {
                 operationData = data.operationPanel.items;
                 if (operationData !== null) {

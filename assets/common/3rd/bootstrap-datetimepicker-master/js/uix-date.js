@@ -1,4 +1,4 @@
-define(['jquery', 'util', 'bootstrap', 'bootstrap-dateCN'], function($, util) {
+define(['jquery', 'util', 'bootstrap', 'bootstrap-dateCN', 'utils'], function($, util) {
 	// 默认配置
     let defaults = {
         language: 'zh-CN', // 语言包
@@ -68,7 +68,7 @@ define(['jquery', 'util', 'bootstrap', 'bootstrap-dateCN'], function($, util) {
                 {
                     defaults.minView = 0;
                     defaults.startView = 2;
-                    format = 'yyyy-mm-dd hh:ii';
+                    format = 'yyyy-mm-dd hh:ii:ss';
                     break;
                 }
             case 'form_time':
@@ -88,7 +88,7 @@ define(['jquery', 'util', 'bootstrap', 'bootstrap-dateCN'], function($, util) {
                 }
             }
 			// end获取参数
-            let template = '<div class="input-append date ' + type + '" data-date-format="' + format + '"  data-date ="' + value + '" data-link-field="' + $(this).attr('id') + '"><input size="16" name=" ' + name + '" type="text" value="' + value + '" ' + readonly + '>';
+            let template = '<div class="input-append date ' + type + ' ' + $(this).attr('id') + '" data-date-format="' + format + '"  data-date ="' + value + '" data-link-field="' + $(this).attr('id') + '"><input size="16" name="' + name + '" type="text" value="' + value + '"' + readonly + '>';
 			//			if(!hideRemove) {
 			//				template += '<span class="add-on remo"><i class="icon-remove"></i></span>';
 			//			}

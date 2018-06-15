@@ -124,6 +124,10 @@
         myDebug('!!!error. setValue is abstract method!');
     };
 
+    MeasureBase.prototype.setVTR = function(v, t, r) {
+        myDebug('!!!error. setValue is abstract method!');
+    };
+
     let MeasureManagerBase = function() {
         this.measures = [];
         this.MeasureClass = MeasureBase;
@@ -274,8 +278,18 @@
         if (q !== this.quality) {
             this.quality = q;
         }
-        if (t !== this.changedTime) {
-            this.changedTime = t;
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+    };
+
+    MonsbMeasure.prototype.setVTR = function(v, t, r) {
+        this.setValue(v);
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+        if (r !== this.res) {
+            this.res = r;
         }
     };
 
@@ -310,8 +324,18 @@
         if (q !== this.quality) {
             this.quality = q;
         }
-        if (t !== this.changedTime) {
-            this.changedTime = t;
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+    };
+
+    YcaddMeasure.prototype.setVTR = function(v, t, r) {
+        this.setValue(v);
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+        if (r !== this.res) {
+            this.res = r;
         }
     };
 
@@ -341,13 +365,23 @@
         }
     };
 
-    YcaddMeasure.prototype.setVQT = function(v, q, t) {
+    StrawMeasure.prototype.setVQT = function(v, q, t) {
         this.setValue(v);
         if (q !== this.quality) {
             this.quality = q;
         }
-        if (t !== this.changedTime) {
-            this.changedTime = t;
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+    };
+
+    StrawMeasure.prototype.setVTR = function(v, t, r) {
+        this.setValue(v);
+        if (t !== this.refreshTime) {
+            this.refreshTime = t;
+        }
+        if (r !== this.res) {
+            this.res = r;
         }
     };
 
@@ -458,7 +492,7 @@
                     measuresByAdd.push(measure);
                 }
             } else {
-                measure.setVQT(recvMeasure.value, recvMeasure.quality, recvMeasure.changedTime);
+                measure.setVTR(recvMeasure.value, recvMeasure.refreshTime, recvMeasure.res);
                 measuresByEdit.push(measure);
             }
         }
@@ -492,6 +526,7 @@
      * @param {Function}fnDataChangedCallback : fn(addMeasures, deleteMeasures, editMeasures)
      */
     let registerMeasuresChangedCallback = function registerMeasuresChangedCallback(fnDataChangedCallback) {
+        rtdb.measuresChangedCallback = fnDataChangedCallback;
     };
     rtdb.registerMeasuresChangedCallback = registerMeasuresChangedCallback;
 })(typeof window !== 'undefined' ? window : this);

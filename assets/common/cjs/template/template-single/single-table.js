@@ -65,7 +65,6 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
                     group = data.group;
                 }
             }
-      // console.log('1121212121')
             if (arrs[1] === undefined) {
                 if (data.initSql) {
                     loadSql = data.initSql;
@@ -111,9 +110,9 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
             copyData = jqGridTable.jqGrid('getRowData');
             recordCountSpan.text('共' + recordLength.toString() + '条记录');
         } else {
-            jqGridExtend.countNum(loadSql, filter, tableName, group, 5, 'data_record_count_span');
-            jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 5, 'pager');
-            jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 5, 'pager', 'data_record_count_span');
+            jqGridExtend.countNum(loadSql, filter, tableName, group, 20, 'data_record_count_span');
+            jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 20, 'pager', def);
+            jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 20, 'pager', 'data_record_count_span', def);
 
         }
     // }, reqParam)

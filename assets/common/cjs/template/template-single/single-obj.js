@@ -4,11 +4,12 @@
 
 'use strict';
 
-define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener', 'alarmModal', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
+define(['jquery', 'async', 'global', 'panelConfig', 'uix-date', 'action', 'registerListener', 'alarmModal', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
     let gDb = null;
     let netype; // 表定义表中的NeType
     let tableName; // 表名
     let saveSql;
+    let timeName = [];
     let localData; // 本地数据
     let def = []; // 表定义表相关定义
     // let copyData
@@ -78,7 +79,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
     //     }
     //   }
         panelConfig.objInit(formID, def, tableName);
-        registerListener.listener();
+        dateSet(def);
     // }, gReqParam)
     }
 
@@ -88,6 +89,20 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
             $('#' + data[i].id).click(function() {
                 saveSql = action.register(data[i], formID, tableName, def, g);
             });
+        }
+    }
+
+    function dateSet(def) {
+        for (let i = 0; i < def.length; i++) {
+            if (def[i].time) {
+                $('#dtp_input_' + def[i].colName).uixDate({
+                    dateType: 'form_datetime', // form_datetime,form_date,form_time
+                    readonly: false,
+                    name: $.trim(def[i].colName),
+                    hideRemove: true,
+                });
+                // timeName.push(def[i].colName);
+            }
         }
     }
 

@@ -449,7 +449,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 }
             },
             onPaging: function(pgButton) {
-                $(document).trigger('jqGrid_gird_page', [pgButton]);
+                $(document).trigger('jqGrid_gird_' + pager, [pgButton]);
             },
         });
         for (let i = 0; i < aName.length; i++) {
@@ -662,7 +662,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 selectAll(id, tbID);
             },
             onPaging: function(pgButton) {
-                $(document).trigger('jqGrid_gird_page', [pgButton]);
+                $(document).trigger('jqGrid_gird_' + pager, [pgButton]);
             },
         });
         for (let i = 0; i < aName.length; i++) {

@@ -167,7 +167,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let label = document.createElement('label');
                     label.className = 'control-label';
                     label.innerHTML = data[i].propName + '：';
-            // label.for = data[i].id
+                    // label.for = data[i].id
                     div.appendChild(label);
 
                     let select = document.createElement('select');
@@ -231,7 +231,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let label = document.createElement('label');
                     label.className = 'control-label';
                     label.innerHTML = data[i].propName + '：';
-            // label.for = data[i].id
+                    // label.for = data[i].id
                     div.appendChild(label);
 
                     let input = document.createElement('input');
@@ -260,7 +260,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let label = document.createElement('label');
                     label.className = 'control-label';
                     label.innerHTML = data[i].propName + '：';
-            // label.for = data[i].id
+                    // label.for = data[i].id
                     div.appendChild(label);
                     let foreignKey = data[i].foreignKey;
                     let obj = {};
@@ -314,7 +314,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let label = document.createElement('label');
                     label.className = 'control-label';
                     label.innerHTML = data[i].propName + '：';
-          // label.for = data[i].id
+                    // label.for = data[i].id
                     div.appendChild(label);
 
                     let select = document.createElement('select');
@@ -333,7 +333,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let label = document.createElement('label');
                     label.className = 'control-label';
                     label.innerHTML = data[i].propName + '：';
-          // label.for = data[i].id
+                    // label.for = data[i].id
                     div.appendChild(label);
 
                     let select = document.createElement('select');
@@ -352,119 +352,135 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     }
                     setPanalSelectSql(obj.sql, select.id, valueObj);
                 } else {
-                    let div = document.createElement('div');
-                    div.className = 'form-group';
-                    objForm.appendChild(div);
+                    if (data[i].textType === 'time' || data[i].textType === 'utcTime') {
+                        let div = document.createElement('div');
+                        div.className = 'form-group';
+                        objForm.appendChild(div);
 
-                    let label = document.createElement('label');
-                    label.className = 'control-label';
-                    label.innerHTML = data[i].propName + '：';
-                    // label.for = data[i].id
-                    div.appendChild(label);
+                        let label = document.createElement('label');
+                        label.className = 'control-label';
+                        label.innerHTML = data[i].propName;
+                        div.appendChild(label);
+                        let input = document.createElement('input');
+                        input.className = 'form-control';
+                        input.type = 'hidden';
+                        input.id = 'dtp_input_' + data[i].colName;
+                        div.appendChild(input);
+                    } else {
+                        let div = document.createElement('div');
+                        div.className = 'form-group';
+                        objForm.appendChild(div);
 
-                    let input = document.createElement('input');
-                    input.name = data[i].colName;
-                    input.type = 'text';
-                    input.id = data[i].colName + '_input';
-                    input.className = 'form-control';
+                        let label = document.createElement('label');
+                        label.className = 'control-label';
+                        label.innerHTML = data[i].propName + '：';
+                        // label.for = data[i].id
+                        div.appendChild(label);
 
-          //  设置只读
-                    if (data[i].readOnly === 1) {
-                        input.readOnly = true;
-                    }
-          // 设置默认值
-                    if (data[i].defaultValue !== '' && data[i].defaultValue !== null && data[i].defaultValue !== undefined) {
-                        let defaultValue = data[i].defaultValue;
-                        let obj = {};
-                        if (typeof (defaultValue) === 'string') {
-                            obj = JSON.parse(defaultValue);
-                        } else {
-                            obj = defaultValue;
+                        let input = document.createElement('input');
+                        input.name = data[i].colName;
+                        input.type = 'text';
+                        input.id = data[i].colName + '_input';
+                        input.className = 'form-control';
+
+                        //  设置只读
+                        if (data[i].readOnly === 1) {
+                            input.readOnly = true;
                         }
-                        let dateTime = utils.time.getDateTime();
-                        let code;
-                        let maxNum;
-                        let date = utils.time.getDate('none');
-                        if (obj.type === '0') {
-                            let arr = obj.value.split('+');
-                            let sql = 'select ' + data[i].colName + ' from ' + tableName + ' order by ID asc';
-                            let db = window.top.cjDb;
-                            let serverInfo = cacheOpt.get('server-config');
-                            let reqHost = serverInfo['server']['ipAddress'];
-                            let reqPort = serverInfo['server']['httpPort'];
-                            let reqParam = {
-                                reqHost: reqHost,
-                                reqPort: reqPort,
-                            };
-                            db.load(sql, function fn(err, vals) {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    let maxDbNum;
-                                    if (vals.length === 0) {
-                                        maxDbNum = 0;
+                        // 设置默认值
+                        if (data[i].defaultValue !== '' && data[i].defaultValue !== null && data[i].defaultValue !== undefined) {
+                            let defaultValue = data[i].defaultValue;
+                            let obj = {};
+                            if (typeof (defaultValue) === 'string') {
+                                obj = JSON.parse(defaultValue);
+                            } else {
+                                obj = defaultValue;
+                            }
+                            let dateTime = utils.time.getDateTime();
+                            let code;
+                            let maxNum;
+                            let date = utils.time.getDate('none');
+                            if (obj.type === '0') {
+                                let arr = obj.value.split('+');
+                                let sql = 'select ' + data[i].colName + ' from ' + tableName + ' order by ID asc';
+                                let db = window.top.cjDb;
+                                let serverInfo = cacheOpt.get('server-config');
+                                let reqHost = serverInfo['server']['ipAddress'];
+                                let reqPort = serverInfo['server']['httpPort'];
+                                let reqParam = {
+                                    reqHost: reqHost,
+                                    reqPort: reqPort,
+                                };
+                                db.load(sql, function fn(err, vals) {
+                                    if (err) {
+                                        console.log(err);
                                     } else {
-                                        maxDbNum = vals[vals.length - 1];
-                                        maxDbNum = maxDbNum[data[i].colName].substr(maxDbNum[data[i].colName].length - Number(arr[1]));
-                                    }
-                                    maxNum = Number(maxDbNum) + 1;
-                                    if (maxNum.toString().length !== Number(arr[1])) {
-                                        let len = Number(arr[1]) - maxNum.toString().length;
-                                        for (let k = 0; k < len; k++) {
-                                            maxNum = '0' + maxNum;
+                                        let maxDbNum;
+                                        if (vals.length === 0) {
+                                            maxDbNum = 0;
+                                        } else {
+                                            maxDbNum = vals[vals.length - 1];
+                                            maxDbNum = maxDbNum[data[i].colName].substr(maxDbNum[data[i].colName].length - Number(arr[1]));
                                         }
+                                        maxNum = Number(maxDbNum) + 1;
+                                        if (maxNum.toString().length !== Number(arr[1])) {
+                                            let len = Number(arr[1]) - maxNum.toString().length;
+                                            for (let k = 0; k < len; k++) {
+                                                maxNum = '0' + maxNum;
+                                            }
+                                        }
+                                        if (obj.rule === '1') {
+                                            code = arr[0] + maxNum;
+                                        }
+                                        if (obj.rule === '2') {
+                                            code = arr[0] + date + maxNum;
+                                        }
+                                        input.value = code;
                                     }
-                                    if (obj.rule === '1') {
-                                        code = arr[0] + maxNum;
+                                }, reqParam);
+                            }
+                            if (obj.type === '1') {
+                                input.value = dateTime;
+                            }
+                            // 默认值为操作人员
+                            if (obj.type === '2') {
+                                input.value = sessionStorage.getItem('s_user');
+                            }
+                            // 默认值为表定义表默认值
+                            if (obj.type === '3') {
+                                input.value = obj.value;
+                            }
+                            if (obj.type === '4') {
+                                let sql = obj.sql;
+                                let db = window.top.cjDb;
+                                let serverInfo = cacheOpt.get('server-config');
+                                let reqHost = serverInfo['server']['ipAddress'];
+                                let reqPort = serverInfo['server']['httpPort'];
+                                let reqParam = {
+                                    reqHost: reqHost,
+                                    reqPort: reqPort,
+                                };
+                                db.load(sql, function fn(err, vals) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        input.value = vals[0].value;
                                     }
-                                    if (obj.rule === '2') {
-                                        code = arr[0] + date + maxNum;
-                                    }
-                                    input.value = code;
-                                }
-                            }, reqParam);
+                                }, reqParam);
+                            }
+                            if (obj.type === '5') {
+                                let sql = obj.sql;
+                                let relyCol = obj.relyCol;
+                                let col = data[i].colName;
+                                setTextValue(sql, relyCol, col);
+                            }
                         }
-                        if (obj.type === '1') {
-                            input.value = dateTime;
-                        }
-              // 默认值为操作人员
-                        if (obj.type === '2') {
-                            input.value = sessionStorage.getItem('s_user');
-                        }
-              // 默认值为表定义表默认值
-                        if (obj.type === '3') {
-                            input.value = obj.value;
-                        }
-                        if (obj.type === '4') {
-                            let sql = obj.sql;
-                            let db = window.top.cjDb;
-                            let serverInfo = cacheOpt.get('server-config');
-                            let reqHost = serverInfo['server']['ipAddress'];
-                            let reqPort = serverInfo['server']['httpPort'];
-                            let reqParam = {
-                                reqHost: reqHost,
-                                reqPort: reqPort,
-                            };
-                            db.load(sql, function fn(err, vals) {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    input.value = vals[0].value;
-                                }
-                            }, reqParam);
-                        }
-                        if (obj.type === '5') {
-                            let sql = obj.sql;
-                            let relyCol = obj.relyCol;
-                            let col = data[i].colName;
-                            setTextValue(sql, relyCol, col);
-                        }
-                    }
 
-            // 设置正则表达式
-                    div.appendChild(input);
-                    if (data[i].regularExpression !== '' && data[i].regularExpression !== null && data[i].regularExpression !== undefined) {
-                        $('#' + data[i].colName + '_input').attr('onkeyup', 'value=value.replace(' + data[i].regularExpression + 'g,' + '\'' + '\'' + ')');
+                        // 设置正则表达式
+                        div.appendChild(input);
+                        if (data[i].regularExpression !== '' && data[i].regularExpression !== null && data[i].regularExpression !== undefined) {
+                            $('#' + data[i].colName + '_input').attr('onkeyup', 'value=value.replace(' + data[i].regularExpression + 'g,' + '\'' + '\'' + ')');
+                        }
                     }
                 }
             } else {
@@ -473,7 +489,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 input.type = 'hidden';
                 input.id = data[i].colName + '_input';
                 input.className = 'form-control';
-          // 设置默认值
+                // 设置默认值
                 if (data[i].defaultValue !== '' && data[i].defaultValue !== null && data[i].defaultValue !== undefined) {
                     let defaultValue = data[i].defaultValue;
                     let obj = {}
@@ -528,11 +544,11 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     if (obj.type === '1') {
                         input.value = dateTime;
                     }
-              // 默认值为操作人员
+                    // 默认值为操作人员
                     if (obj.type === '2') {
                         input.value = sessionStorage.getItem('s_user');
                     }
-              // 默认值为表定义表默认值
+                    // 默认值为表定义表默认值
                     if (obj.type === '3') {
                         input.value = obj.value;
                     }
@@ -759,7 +775,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
         });
     }
 
-  // 根据下拉框值设置文本值
+    // 根据下拉框值设置文本值
     function setTextValue(sql, relyCol, col) {
         let db = window.top.cjDb;
         let serverInfo = cacheOpt.get('server-config');

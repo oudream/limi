@@ -28,7 +28,7 @@ define(function() {
                 'echartConfig': 'common/cjs/echarts/echarts-config',
                 'panelConfig': 'common/cjs/panel/panelConfig',
                 'action': 'common/cjs/common/action',
-                'alarmModal': 'ics/sinopec/js/custom/alarmModal',
+                // 'alarmModal': 'ics/sinopec/js/custom/alarmModal',
                 'registerListener': 'ics/sinopec/js/custom/register-listener',
                 'sinopec_authority': 'ics/sinopec/js/authority/authority',
                 'omc_authority': 'ics/omc/js/authority/authority',

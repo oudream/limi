@@ -17,6 +17,8 @@ let config = {
     paths: {
         'global': 'common/cjs/other/global',
         'jquery': 'common/3rd/jquery-2.1.1.min',
+        // 'jquery': 'common/3rd/jquery-3.1.1',
+        'd3':'common/3rd/d3-4.4.1',
         'util': 'common/cjs/other/util',
         'uix': 'common/3rd/uix/uix.layout',
         'bootstrap': 'common/3rd/bootstrap-2.3.2/js/bootstrap-2.3.2',
@@ -49,6 +51,7 @@ let config = {
         'jschardet': 'common/3rd/importCSV/jschardet',
         'base64': 'common/3rd/importCSV/base64',
         'ipmortCSV': 'common/3rd/importCSV/csv2arr',
+        'exportCSV': 'common/3rd/importCSV/exportCSV',
     },
     shim: {
         'bs.ics.modal': {

@@ -85,8 +85,8 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'pane
                 }
                 $(document).off('jqGrid_gird_pager');
                 jqGridExtend.countNum(loadSql, action.queryAction(formID, timeType), tableName, group, 40, 'data_record_count_span');
-                jqGridExtend.paging(tbID, loadSql, action.queryAction(formID, timeType), tableName, group, sort, 40, 'pager');
-                jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span');
+                jqGridExtend.paging(tbID, loadSql, action.queryAction(formID, timeType), tableName, group, sort, 40, 'pager', def);
+                jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span', def);
             });
             if (arrs[1] === undefined) {
                 if (data.initSql) {
@@ -130,8 +130,8 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'pane
         uiResizeListener();
         $(document).off('jqGrid_gird_pager')
         jqGridExtend.countNum(loadSql, filter, tableName, group, 40, 'data_record_count_span');
-        jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 40, 'pager');
-        jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span');
+        jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 40, 'pager', def);
+        jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span', def);
         // }, reqParam)
     }
 

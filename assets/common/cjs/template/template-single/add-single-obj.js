@@ -4,13 +4,14 @@
 
 'use strict';
 
-define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
+define(['jquery', 'async', 'global', 'panelConfig', 'action', 'uix-date', 'registerListener', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
     let gDb = null;
     let netype; // 表定义表中的NeType
     let tableName; // 表名
     let saveSql;
     let localData; // 本地数据
     let def = []; // 表定义表相关定义
+    let timeName = [];
     // let copyData
     let operationData; // 操作按钮
 
@@ -61,11 +62,12 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
                 } else {
                     let config = JSON.parse(sessionStorage.getItem('addConfig'));
                     operationData = [
-            {'id': 'saveBtn', 'name': '保存', 'action': config.action, 'reload': config.reload},
+            {'id': 'saveBtn', 'name': '保存', 'action': config.action, 'reload': config.reload, 'ModelData': config.getModelData},
                     ];
                     panelConfig.operationInit('operation', operationData);
                     omcBtnBind(operationData, arrs[0], config.defConfig);
                     panelConfig.objInit(formID, config.defConfig, arrs[0]);
+                    dateSet(config.defConfig);
                     omcCom();
                 }
             },
@@ -97,6 +99,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
     //     }
     //   }
         panelConfig.objInit(formID, def, tableName);
+        dateSet(def);
         registerListener.listener();
     // }, gReqParam)
     }
@@ -159,6 +162,23 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'registerListener'
                 $('#obj_form').append(model);
             }
         });
+    }
+
+    function dateSet(def) {
+        for (let i = 0; i < def.length; i++) {
+            if (def[i].textType) {
+                if (def[i].textType === 'utcTime' || def[i].textType === 'time') {
+                    $('#dtp_input_' + def[i].colName).uixDate({
+                        dateType: 'form_datetime', // form_datetime,form_date,form_time
+                        readonly: false,
+                        name: $.trim(def[i].colName),
+                        hideRemove: true,
+                        timeType: def[i].textType,
+                    });
+                }
+                // timeName.push(def[i].colName);
+            }
+        }
     }
 
     /**

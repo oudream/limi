@@ -495,7 +495,7 @@ function BasProtocol(bIsTcp = true) {
         channelBase = new CjChannelUdp();
     }
     channelBase.isAutoOpen = true;
-    channelBase.isAutoHeartbeat = true;
+    channelBase.isAutoHeartbeat = false;
 
     let basParser = new BasParser();
     basParser.onReceivedMsg = function(buf, iEnd) {
