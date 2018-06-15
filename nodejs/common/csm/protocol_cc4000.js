@@ -126,6 +126,15 @@ BasDefine.RTDB_ANS_UPD_CFG = 48;
 BasDefine.RTDB_MAX_TABLE_NAME = 64;
 BasDefine.RTDB_MAX_COLUMN_NAME = 64;
 
+// da
+BasDefine.ICS_DA_REQ_DETAIL = 1;
+BasDefine.ICS_DA_ANS_DETAIL = 49;
+BasDefine.ICS_DA_DATA_DETAIL = 97;
+BasDefine.ICS_DA_REQ_SPOT = 2;
+BasDefine.ICS_DA_ANS_DETAIL = 50;
+BasDefine.ICS_DA_DATA_SPOT = 98;
+
+
 /**
  * UserException
  * @param {String}message
@@ -673,6 +682,12 @@ if (true) {
     BasPacket.rtAnsNextPacket = rtAnsNextPacket;
 
     let rtReqUpdrcdPacket = new BasPacket();
+    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtReqUpdrcdPacket.add('Count');
+    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
+    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
+
+    let rtReqDaUpdrcdPacket = new BasPacket();
     rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtReqUpdrcdPacket.add('Count');
     rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
