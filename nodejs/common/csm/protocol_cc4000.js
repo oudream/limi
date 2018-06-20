@@ -74,7 +74,7 @@ BasDefine.RTDB_REQ_ADDRCD = 4;
 BasDefine.RTDB_REQ_DELRCD_BY_KEY = 5;
 BasDefine.RTDB_REQ_DELRCD_BY_IDX = 6;
 BasDefine.RTDB_REQ_DELALL = 7;
-BasDefine.RTDB_REQ_UPDRCD_BY_KEY = 8;
+BasDefine.RTDB_REQ_UPDRCD_BY_KEY = 0x08;
 BasDefine.RTDB_REQ_UPDRCD_BY_IDX = 9;
 BasDefine.RTDB_REQ_GETRCD_BY_KEY = 10;
 BasDefine.RTDB_REQ_GETRCD_BY_IDX = 11;
@@ -89,8 +89,8 @@ BasDefine.RTDB_REQ_GETRCD_BY_COND = 20;
 BasDefine.RTDB_REQ_UPDRCD_BY_COND = 21;
 BasDefine.RTDB_REQ_DELRCD_BY_COND = 22;
 BasDefine.RTDB_REQ_UPD_RCD_LIST = 27;
-BasDefine.RTDB_REQ_LOGIN = 25;
-BasDefine.RTDB_REQ_UPD_CFG = 28;
+BasDefine.RTDB_REQ_LOGIN = 0x19;
+BasDefine.RTDB_REQ_UPD_CFG = 0x1C;
 
 // rt 命令回复
 BasDefine.RTDB_ANS_HEARTBEAT = 43;
@@ -109,8 +109,8 @@ BasDefine.RTDB_ANS_GETRCD_BY_KEY = 30;
 BasDefine.RTDB_ANS_GETRCD_BY_IDX = 31;
 BasDefine.RTDB_ANS_GET_RCD_SEG = 32;
 BasDefine.RTDB_ANS_GET_RCD_LIST = 46;
-BasDefine.RTDB_ANS_FIRST_RCD_SEG = 33;
-BasDefine.RTDB_ANS_NEXT_RCD_SEG = 34;
+BasDefine.RTDB_ANS_FIRST_RCD_SEG = 0x21;
+BasDefine.RTDB_ANS_NEXT_RCD_SEG = 0x22;
 BasDefine.RTDB_ANS_SUBSCRIBE = 35;
 // BasDefine.RTDB_ANS_RAW_SUBSCRIBE         = 43;
 BasDefine.RTDB_ANS_SYNC = 36;
@@ -127,12 +127,12 @@ BasDefine.RTDB_MAX_TABLE_NAME = 64;
 BasDefine.RTDB_MAX_COLUMN_NAME = 64;
 
 // da
-BasDefine.ICS_DA_REQ_DETAIL = 1;
-BasDefine.ICS_DA_ANS_DETAIL = 49;
-BasDefine.ICS_DA_DATA_DETAIL = 97;
-BasDefine.ICS_DA_REQ_SPOT = 2;
-BasDefine.ICS_DA_ANS_DETAIL = 50;
-BasDefine.ICS_DA_DATA_SPOT = 98;
+BasDefine.ICS_DA_REQ_DETAIL = 0x01;
+BasDefine.ICS_DA_ANS_DETAIL = 0x31;
+BasDefine.ICS_DA_DATA_DETAIL = 0x61;
+BasDefine.ICS_DA_REQ_SPOT = 0x02;
+BasDefine.ICS_DA_ANS_SPOT = 0x32;
+BasDefine.ICS_DA_DATA_SPOT = 0x62;
 
 
 /**
@@ -167,6 +167,8 @@ BasAttr.CI_Type_None = 0;
 BasAttr.CI_Type_int = 1;
 BasAttr.CI_Type_double = 2;
 BasAttr.CI_Type_string = 3;
+BasAttr.CI_Type_long = 4;
+BasAttr.CI_Type_buffer = 4;
 
 /**
  * BasPacket
@@ -204,12 +206,24 @@ BasPacket.prototype.toBuffer = function(...args) {
         case BasAttr.CI_Type_int:
             rBuf.writeIntLE(value, iOffset, attr.size, true);
             break;
+        case BasAttr.CI_Type_long:
+            rBuf.writeIntLE(value, iOffset, 6, true);
+            break;
+        case BasAttr.CI_Type_double:
+            rBuf.writeDoubleLE(value, iOffset, true);
+            break;
         case BasAttr.CI_Type_string:
             if (value.length > attr.size) {
                 throw new UserException('BasPacket: value.length > attr.size');
             }
             rBuf.write(value, iOffset, attr.size);// Default: 'utf8'
             rBuf[iOffset + value.length] = 0;
+            break;
+        case BasAttr.CI_Type_buffer:
+            if (value.length > attr.size) {
+                throw new UserException('BasPacket: value.length > attr.size');
+            }
+            value.copy(rbuf, iOffset);// Default: 'utf8'
             break;
         default:
 
@@ -241,6 +255,12 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
         case BasAttr.CI_Type_int:
             value = buf.readIntLE(iOffset, attr.size, true);
             break;
+        case BasAttr.CI_Type_long:
+            value = buf.buf.readIntLE(iOffset, 6, true);
+            break;
+        case BasAttr.CI_Type_double:
+            value = buf.readDoubleLE(iOffset, true);
+            break;
         case BasAttr.CI_Type_string:
             value = buf.toString('utf8', iOffset, iOffset + attr.size);
             iZeroIndex = value.indexOf('\0');
@@ -248,6 +268,13 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
                 value = value.substring(0, iZeroIndex);
             }
             break;
+        // case BasAttr.CI_Type_buffer:
+        //     value = buf.toString('utf8', iOffset, iOffset + attr.size);
+        //     iZeroIndex = value.indexOf('\0');
+        //     if (iZeroIndex >= 0) {
+        //         value = value.substring(0, iZeroIndex);
+        //     }
+        //     break;
         default:
         //
             break;
@@ -280,6 +307,8 @@ BasPacket.prototype.add = function(...args) {
     } else {
         if (size === 4) {
             type = BasAttr.CI_Type_int;
+        } else if (size === 8) {
+            type = BasAttr.CI_Type_double;
         } else if (size > 8) {
             type = BasAttr.CI_Type_string;
         } else {
@@ -659,6 +688,8 @@ if (true) {
     alarmAnsPacket.setCommand(1, BasDefine.OMC_ANS_MOD_ALARM);
     BasPacket.alarmAnsPacket = alarmAnsPacket;
 
+
+    // ### rt
     let rtLoginPacket = new BasPacket();
     rtLoginPacket.add('AppId');
     rtLoginPacket.setCommand(1, BasDefine.RTDB_REQ_LOGIN);
@@ -687,11 +718,47 @@ if (true) {
     rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
     BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
 
-    let rtReqDaUpdrcdPacket = new BasPacket();
-    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
-    rtReqUpdrcdPacket.add('Count');
-    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
-    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
+
+    // ### da
+    let rtReqDaSpotPacket = new BasPacket();
+    rtReqDaSpotPacket.add('StartTm', 8, BasAttr.CI_Type_long);
+    rtReqDaSpotPacket.add('Key', 8, BasAttr.CI_Type_long);
+    rtReqDaSpotPacket.add('KeyLen', 8, BasAttr.CI_Type_long);
+    rtReqDaSpotPacket.setCommand(2, BasDefine.ICS_DA_REQ_SPOT);
+    BasPacket.rtReqDaSpotPacket = rtReqDaSpotPacket;
+
+    let rtAnsDaSpotPacket = new BasPacket();
+    rtAnsDaSpotPacket.setCommand(2, BasDefine.ICS_DA_ANS_SPOT);
+    BasPacket.rtAnsDaSpotPacket = rtAnsDaSpotPacket;
+
+    let rtDataDaSpotPacket = new BasPacket();
+    rtDataDaSpotPacket.setCommand(2, BasDefine.ICS_DA_DATA_SPOT);
+    BasPacket.rtDataDaSpotPacket = rtDataDaSpotPacket;
+
+
+    let rtReqDaDetailPacket = new BasPacket();
+    rtReqDaDetailPacket.add('StartTm', 8, BasAttr.CI_Type_long);
+    rtReqDaDetailPacket.add('EndTm', 8, BasAttr.CI_Type_long);
+    rtReqDaDetailPacket.add('Interval', 8, BasAttr.CI_Type_long);
+    rtReqDaDetailPacket.add('Key', 8, BasAttr.CI_Type_long);
+    rtReqDaDetailPacket.add('KeyLen', 8, BasAttr.CI_Type_long);
+    rtReqDaDetailPacket.add('KeyList', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqDaDetailPacket.setCommand(1, BasDefine.ICS_DA_REQ_DETAIL);
+    BasPacket.rtReqDaDetailPacket = rtReqDaDetailPacket;
+
+    let rtAnsDaDetailPacket = new BasPacket();
+    rtAnsDaDetailPacket.add('Count', 8, BasAttr.CI_Type_long);
+    rtAnsDaDetailPacket.setCommand(1, BasDefine.ICS_DA_ANS_DETAIL);
+    BasPacket.rtAnsDaDetailPacket = rtAnsDaDetailPacket;
+
+    let rtDataDaDetailPacket = new BasPacket();
+    rtDataDaDetailPacket.add('Count', 8, BasAttr.CI_Type_long);
+    rtDataDaDetailPacket.setCommand(1, BasDefine.ICS_DA_DATA_DETAIL);
+    BasPacket.rtDataDaDetailPacket = rtDataDaDetailPacket;
+    // ### had set command :
+    // 0x19, 0x14, 0x21, 0x22, 0x08
+    // 0x12, 0x13, 0x14, 0x24
+    // 0x01, 0x31, 0x61, 0x02, 0x32, 0x62
 }
 
 BasProtocol.test1 = function() {

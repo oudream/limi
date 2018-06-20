@@ -365,7 +365,7 @@ PsmRealtimeDataStruct.prototype.toBuffer = function(objs) {
             switch (attr.type) {
             case BaseAttr.CI_Type_int:
                 if (attr.size > 4) {
-                    rBuf.writeInt32LE(value, iOffset, 4, true);
+                    rBuf.writeInt32LE(value, iOffset, true);
                     iOffset += 4;
                 } else {
                     rBuf.writeIntLE(value, iOffset, attr.size, true);
@@ -373,15 +373,15 @@ PsmRealtimeDataStruct.prototype.toBuffer = function(objs) {
                 }
                 break;
             case BaseAttr.CI_Type_long:
-                rBuf.writeIntLE(value, iOffset, 8, true);
+                rBuf.writeIntLE(value, iOffset, 6, true);
                 iOffset += 8;
                 break;
             case BaseAttr.CI_Type_float:
-                rBuf.writeFloatLE(value, iOffset, 4, true);
+                rBuf.writeFloatLE(value, iOffset, true);
                 iOffset += 4;
                 break;
             case BaseAttr.CI_Type_double:
-                rBuf.writeDoubleLE(value, iOffset, 8, true);
+                rBuf.writeDoubleLE(value, iOffset, true);
                 iOffset += 8;
                 break;
             case BaseAttr.CI_Type_string:

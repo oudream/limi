@@ -30,6 +30,7 @@ const rtdb = require('./../../../assets/common/cc4k/rtdb.js');
 let _omcProtocol = new BasProtocol();
 let _psmProtocol = new PsmProtocol();
 let _rtbusProtocol = new BasProtocol(false);
+let _daProtocol = new BasProtocol(false);
 let _event = global.globalEvent;
 let _alarmRecPlayLog = {};
 _alarmRecPlayLog.data = [];
@@ -83,6 +84,9 @@ _alarmRecPlayLog.addPlay = function(alarmNo) {
     }
 };
 
+/**
+ * init
+ */
 function init() {
     dbMgr = createDbManager();
 
@@ -105,7 +109,12 @@ function init() {
     });
 }
 
+/**
+ * protocolListenerInit
+ * @return {boolean}
+ */
 function protocolListenerInit() {
+    // ### omc protocol
     let serverConfig = ShareCache.get('omc-server-config', 'omc_server');
     if (!serverConfig) {
         return false;
@@ -200,6 +209,8 @@ function protocolListenerInit() {
         RemoteIpAddress: omcServerHost,
     });
 
+
+    // ### rtbus protocol
     /**
      * fn deal rtdata
      * @param {Object}msgObj
@@ -293,6 +304,201 @@ function protocolListenerInit() {
     });
 
 
+    // ### deal http rtlog request
+    let currentReqRtlog = null;
+    let currentResRtlog = null;
+    let currentTimeout = null;
+
+    /**
+     * reqAsyncRtlog
+     * @param {req} req
+     * @param {res} res
+     */
+    function reqAsyncRtlog(req, res) {
+        currentReqRtlog = req;
+        currentResRtlog = res;
+        currentTimeout = setTimeout(function() {
+            if (currentResRtlog !== null) {
+                // 作为网关或者代理工作的服务器尝试执行请求时，未能及时从上游服务器
+                currentResRtlog.writeHead(504);
+                currentResRtlog.end();
+                currentReqRtlog = null;
+                currentResRtlog = null;
+                currentTimeout = null;
+            }
+        }, 1000);
+    }
+
+    global.httpServer.route.all(/\/(.){0,}.rtlog/, function(req, res) {
+        if (currentReqRtlog !== null || currentResRtlog !== null) {
+            // 由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是暂时的，并且将在一段时间以后恢复。
+            res.writeHead(503);
+            res.end();
+            return;
+        }
+        if (! _daProtocol.channel.isOpen()) {
+            // 通用错误消息，服务器遇到了一个未曾预料的状况
+            res.writeHead(500);
+            res.end();
+            return;
+        }
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', function(chunk) {
+                body += chunk;
+            });
+            req.on('end', function() {
+                console.log(body);
+                let reqSession = null;
+                let reqStructtype = null;
+                let reqMeasures = null;
+                if (body) {
+                    try {
+                        let reqBody = JSON.parse(body);
+                        reqSession = reqBody.session;
+                        reqStructtype = reqBody.structtype;
+                        reqMeasures = reqBody.params;
+                    } catch (e) {
+                        console.log('error: JSON.parse(body)');
+                    }
+                }
+                if (reqSession && reqStructtype && reqMeasures) {
+                    if (reqMeasures.length > 0) {
+                        let reqMeasure = reqMeasures[i];
+                        let mids = reqMeasure.mids;
+                        let dtbegin = reqMeasure.dtbegin;
+                        let dtend = reqMeasure.dtend;
+                        let iInterval = reqMeasure.interval;
+                        let keyListBuffer = Buffer.alloc(mids.length * 8);
+                        let iOffset = 0;
+                        for (let i = 0; i < mids.length; i++) {
+                            keyListBuffer.writeIntLE(mids[i], iOffset, 6, true); iOffset += 8;
+                        }
+                        let packet = BasPacket.rtReqDaDetailPacket.toPacket(dtbegin, dtend, iInterval, mids.length, 8, keyListBuffer);
+                        let iSent = _daProtocol.sendPacket(packet);
+                        console.log('_daProtocol.sendPacket(rtReqDaDetailPacket): ', iSent);
+                        reqAsyncRtlog(req, res);
+                    } else {
+                        // 客户端已经要求文件的一部分（Byte serving），但服务器不能提供该部分
+                        res.writeHead(416);
+                        res.end();
+                    }
+                } else {
+                    res.writeHead(404);
+                    res.end();
+                }
+            });
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
+    // ### da protocol
+    /**
+     * fnDealDaDetail
+     * @param {object} msgObj
+     */
+    function fnDealDaDetail(msgObj) {
+        if (currentTimeout !== null) {
+            clearTimeout(currentTimeout);
+            currentTimeout = null;
+        }
+        console.log('fnDealDaDetail.begin: ');
+        let iOffset = msgObj.offset;
+        let buf = msgObj.buffer;
+        let iCount = msgObj.Count;
+        let iLength = buf.length;
+        let iIndex = 0;
+        let data = [];
+        while (iOffset + 8 < iLength) {
+            let iMid = buf.readIntLE(iOffset, 6, true); iOffset += 8;
+            let iType = rtdb.getMeasureTypeById(iMid);
+            let measureLog = {
+                mid: iMid,
+                logtype: 2,
+                log: [],
+                state: 0,
+            };
+            switch (iType) {
+            case rtdb.EnumMeasureType.monsb:
+                if (iOffset + iCount * 8 < iLength) {
+                    iIndex = 0;
+                    while (iIndex < iCount) {
+                        let value = buf.readIntLE(iOffset, 6, true);
+                        iOffset += 8;
+                        measureLog.log.push(value);
+                        iIndex += 1;
+                    }
+                } else {
+                    console.log(iMid, ' iOffset + iCount * 8 < iLength : fail. ');
+                }
+                break;
+            case rtdb.EnumMeasureType.ycadd:
+                if (iOffset + iCount * 8 < iLength) {
+                    iIndex = 0;
+                    while (iIndex < iCount) {
+                        let value = (buf.readDoubleLE(iOffset, true)).toFixed(2);
+                        iOffset += 8;
+                        measureLog.log.push(value);
+                        iIndex += 1;
+                    }
+                } else {
+                    console.log(iMid, ' iOffset + iCount * 8 < iLength : fail. ');
+                }
+                break;
+            case rtdb.EnumMeasureType.straw:
+                if (iOffset + iCount * 8 < iLength) {
+                    iIndex = 0;
+                    while (iIndex < iCount) {
+                        let value = buf.toString('utf8', iOffset, iOffset + 128);
+                        iOffset += 128;
+                        measureLog.log.push(value);
+                        iIndex += 1;
+                    }
+                } else {
+                    console.log(iMid, ' iOffset + iCount * 8 < iLength : fail. ');
+                }
+                break;
+            default:
+                break;
+            }
+            data.push(measureLog);
+        }
+        if (currentResRtlog !== null) {
+            let resMeasures = {
+                session: 'sbid=0001;xxx=adfadsf',
+                structtype: 'rtlog_v001',
+                data: data,
+            };
+            currentResRtlog.writeHead(200);
+            // res.write('HELLO');
+            currentResRtlog.end(JSON.stringify(resMeasures));
+            currentResRtlog = null;
+            currentReqRtlog = null;
+        }
+        console.log('fnDealDaDetail.end.');
+    }
+
+    _daProtocol.on(BasPacket.rtDataDaDetailPacket.commandCode, fnDealDaDetail);
+    _daProtocol.onAllPacket(function(command, msgObj) {
+        console.log(command, msgObj);
+    });
+
+    _daProtocol.start({
+        LocalIpAddress: '127.0.0.1',
+        LocalPort: 6717,
+        RemotePort: 6697,
+        RemoteIpAddress: omcServerHost,
+    });
+
+
+    // ### psm protocol
+    // all in
+    _psmProtocol.onReceivedMessage = function(sCommand, sParam, attach) {
+        console.log(sCommand, sParam);
+    };
+
     _psmProtocol.start({
         LocalIpAddress: '127.0.0.1',
         LocalPort: 9105,
@@ -301,12 +507,13 @@ function protocolListenerInit() {
         FileSavePath: 'd:/temp',
     });
 
-    // all in
-    _psmProtocol.onReceivedMessage = function(sCommand, sParam, attach) {
-        console.log(sCommand, sParam);
-    };
-
+    // ### alarm record
     setInterval(function() {
+        /**
+         * doDealAlarmRec
+         * @param {error} err
+         * @param {array} vals
+         */
         function doDealAlarmRec(err, vals) {
             if (err) {
                 ci.info('db:default,fn:getAlarmRec,err:', err);
@@ -378,6 +585,10 @@ function protocolListenerInit() {
     }, 1000);
 };
 
+/**
+ * sendToOmcServer
+ * @param {string} msg
+ */
 function sendToOmcServer(msg) {
     if (msg) {
         let data = msg.data;
@@ -410,7 +621,8 @@ function sendToOmcServer(msg) {
 
         for (let i = 0; i < data.length; i++) {
             let alarm = data[i];
-            let packet = BasPacket.alarmReqPacket.toPacket(alarm['alarmNo'], action, alarm['user'], alarm['neID'], alarm['alarmType'], alarm['moduleNo'], alarm['cardNo'], alarm['portNo']);
+            let packet = BasPacket.alarmReqPacket.toPacket(alarm['alarmNo'], action, alarm['user']
+                , alarm['neID'], alarm['alarmType'], alarm['moduleNo'], alarm['cardNo'], alarm['portNo']);
             let iResult = _omcProtocol.sendPacket(packet);
             console.log('BasProtocol.sendPacket, command: ', command, ', sendResult:', iResult);
             sSql = sSql1 + alarm['alarmNo'] + ';';
@@ -423,6 +635,9 @@ function sendToOmcServer(msg) {
     }
 }
 
+/**
+ * loadConfigFile
+ */
 function loadConfigFile() {
     const projDir = ShareCache.get('local-info', 'current_work_dir');
 
@@ -457,6 +672,9 @@ function loadConfigFile() {
     }
 }
 
+/**
+ * getOmcServerInfo
+ */
 function getOmcServerInfo() {
     const projDir = ShareCache.get('local-info', 'current_work_dir');
   //   let dbConfigs = ShareCache.get('server-config', 'database');
@@ -537,6 +755,10 @@ function getOmcServerInfo() {
     });
 }
 
+/**
+ * getAlarmRec
+ * @param {function} fnCallback
+ */
 function getAlarmRec(fnCallback) {
     let mysqlConfig = dbsConfig['db1'];
     let defaultDb = dbMgr.createDbConnect(mysqlConfig);
@@ -564,7 +786,12 @@ function getAlarmRec(fnCallback) {
     });
 }
 
-function utc2Locale (utcStr) {
+/**
+ * utc2Locale
+ * @param {string} utcStr
+ * @return {string}
+ */
+function utc2Locale(utcStr) {
     let date = new Date(utcStr);
 
     let _month = date.getMonth() + 1;
@@ -582,11 +809,11 @@ function utc2Locale (utcStr) {
 
 /**
  * 创建数据库管理器
- * @returns {DbManager} : Object 数据库管理器对象
+ * @return {DbManager} : Object 数据库管理器对象
  */
-function createDbManager () {
-    dbsConfig = ShareCache.get('server-config', 'database')
-    return new DbManager(dbsConfig)
+function createDbManager() {
+    dbsConfig = ShareCache.get('server-config', 'database');
+    return new DbManager(dbsConfig);
 }
 
 init();
