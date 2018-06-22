@@ -157,7 +157,7 @@ filetype = json
             } else if (window.ActiveXObject) {
                 xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
             }
-            xmlhttp.open('post', 'xxx.rtdata', true);
+            xmlhttp.open('post', '001.rtdata.cgi', true);
             xmlhttp.setRequestHeader('POWERED-BY-AID', 'Approve');
             xmlhttp.setRequestHeader('Content-Type', 'json');
             xmlhttp.onreadystatechange = function() {

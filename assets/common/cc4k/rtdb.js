@@ -157,10 +157,12 @@
     };
 
     MeasureManagerBase.prototype.findByNenoCode = function findByNenoCode(neno = 0, code = '') {
+        let iNeno = Number(neno);
+        let sCode = String(code);
         let measures = this.measures;
         for (let i = 0; i < measures.length; i++) {
             let measure = measures[i];
-            if (measure.neno === neno && measure.code === code) {
+            if (measure.neno === iNeno && measure.code === sCode) {
                 return measure;
             }
         }

@@ -75,7 +75,7 @@ function init() {
         res.end();
     });
 
-    global.httpServer.route.all(/\/(.){0,}.rtdata/, function(req, res) {
+    global.httpServer.route.all(/\/(.){0,}\.rtdata\.cgi/, function(req, res) {
         if (req.method === 'POST') {
             let body = '';
             req.on('data', function(chunk) {

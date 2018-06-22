@@ -1,4 +1,4 @@
-/*!
+/* !
 
 // 实时点的历史实时数据请求的 json格式：支持时间段请求：rtlog_v102；同一时间点各点的值请求：rtlog_v103；返回时都统一用：rtlog_v001
 // url 是全局统一资源名（可以通用在容器对象或实体对象中）
@@ -29,7 +29,7 @@ filetype = json
   "params":
   [
     {
-    "mids": [33556644, 33556645, 33556646],
+    "measures": [{'id': mid, 'neno':neno, 'code':code}, {'id': mid, 'neno':neno, 'code':code}],
     "dtbegin": 31343242341,
     "dtend": 23413241234,
     "interval": 1000
@@ -49,14 +49,8 @@ filetype = json
   "structtype":"rtdata_v001",
   "data":[
     {
-    "mid":33556644,
+    "measure": {'id': mid, 'neno':neno, 'code':code},
     "logtype": 2,
-    "log": "#logfile.text",
-    "state":0
-    },
-    {
-    "url":"/fp/zyj/fgj01/ypmm",
-    "mid":33556645,
     "log": "#logfile.text",
     "state":0
     }
@@ -87,56 +81,60 @@ filetype = json
 
     /**
      * reqRtlogByPeriod 时间段方式的请求
-     * @param {[]} mids
-     * @param {Date} dtBegin
-     * @param {Date} dtEnd
+     * @param {Array} measures [{neno, code},{neno, code}]
+     * @param {Number} dtBegin
+     * @param {Number} dtEnd
      * @param {Number} iInterval
-     * @param {function} fnCallback(data, err)
+     * @param {function} fnCallback(logCount, data, err)
      */
-    let setRespCallback = function(mids, dtBegin, dtEnd, iInterval, fnCallback) {
-    };
-    rtlog.reqRtlogByPeriod = reqRtlogByPeriod;
-
-    let reqRtlogByPeriod = function(mids, dtBegin, dtEnd, iInterval, fnCallback) {
-    rtlog.reqRtlogByPeriod = reqRtlogByPeriod;
-
-    let dealRespMeasures = function dealRespMeasures(response) {
-        let arr = JSON.parse(response);
-        let resMeasures = arr.data;
-        rtlog.receivedMeasures(resMeasures);
-    };
-
-    let startSyncMeasures = function startSyncMeasures() {
-        let reqRespRtdatas = function() {
-            let retReqMeasuresJson = JSON.stringify({
-                session: Date.now().toString(),
-                structtype: 'rtdata_v101',
-                params: reqMeasures,
-            });
-            if (! retReqMeasuresJson) {
-                console.log('!!! warnning: retReqMeasuresJson is empty!!!');
-                return;
-            }
-            let xmlhttp;
-            if (window.XMLHttpRequest) {
-                xmlhttp = new XMLHttpRequest();
-            } else if (window.ActiveXObject) {
-                xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-            }
-            xmlhttp.open('post', 'xxx.rtdata', true);
-            xmlhttp.setRequestHeader('POWERED-BY-AID', 'Approve');
-            xmlhttp.setRequestHeader('Content-Type', 'json');
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                    myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
-                    dealRespMeasures(xmlhttp.responseText);
+    let reqRtlogByPeriod = function(measures, dtBegin, dtEnd, iInterval, fnCallback) {
+        let retReqMeasuresJson = JSON.stringify({
+            session: Date.now().toString(),
+            structtype: 'rtlog_v102',
+            params: [
+                {
+                    'measures': measures,
+                    'dtbegin': dtBegin,
+                    'dtend': dtEnd,
+                    'interval': iInterval,
+                },
+            ],
+        });
+        if (! retReqMeasuresJson) {
+            console.log('!!! warnning: retReqMeasuresJson is empty!!!');
+            return;
+        }
+        let xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+        }
+        xmlhttp.open('post', '001.rtlog.cgi', true);
+        xmlhttp.setRequestHeader('POWERED-BY-AID', 'Approve');
+        xmlhttp.setRequestHeader('Content-Type', 'json');
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
+                if (fnCallback) {
+                    let arr = JSON.parse(response);
+                    let logCount = arr.logcount;
+                    let resObjects = arr.data;
+                    fnCallback(logCount, resObjects, '');
+                        // for (let i = 0; i < resObjects.length; i++) {
+                        //     let resObject = resObjects[i];
+                        //     //    {
+                        //     //     "measure": {'id': mid, 'neno':neno, 'code':code},
+                        //     //     "logtype": 2,
+                        //     //     "log": "#logfile.text",
+                        //     //     "state":0
+                        //     //     }
+                        // }
                 }
-            };
-            let r = xmlhttp.send(retReqMeasuresJson);
-            myDebug('发送：ReqMeasures - ' + new Date() + ' ' + r);
+            }
         };
-
-        setInterval(reqRespRtdatas, 1000);
+        let r = xmlhttp.send(retReqMeasuresJson);
+        myDebug('发送：ReqMeasures - ' + new Date() + ' ' + r);
     };
-    rtlog.startSyncMeasures = startSyncMeasures;
+    rtlog.reqRtlogByPeriod = reqRtlogByPeriod;
 })(typeof window !== 'undefined' ? window : this);

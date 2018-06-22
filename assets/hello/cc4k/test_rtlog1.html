@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>RTLOG-FILES</title>
+
+	<script src="./../../common/3rd/jquery-3.1.1.min.js"></script>
+
+	<link rel="stylesheet" href="./../../common/3rd/bootstrap-3.3.7/css/bootstrap.min.css">
+	<script src="./../../common/3rd/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="./../../common/3rd/highcharts-6.0.7/code/highcharts.js"></script>
+	<script src="./../../common/3rd/highcharts-6.0.7/code/modules/series-label.js"></script>
+	<script src="./../../common/3rd/highcharts-6.0.7/code/modules/exporting.js"></script>
+
+	<script src="./../../common/cjs/cjenv.js"></script>
+	<script>
+        let CjEnv = cjs.CjEnv;
+	</script>
+
+	<script src="./../../common/cc4k/rtlog_ajax.js"></script>
+	<script>
+		let rtlog = cc4k.rtlog;
+	</script>
+</head>
+<body>
+
+<table class="table table-hover">
+	<caption>RTLOG-HOURS-TABLE</caption>
+	<tbody id="tbody-rtlog-hours">
+	</tbody>
+	<tr>
+		<td>
+			<input id="edNeno1" type="text" value="1896873985">
+			<input id="edNeno2" type="text" value="1896873985">
+		</td>
+		<td>
+			<input id="edCode1" type="text" value="URL_YSX_QCCYJ_CHUJGLBP">
+			<input id="edCode2" type="text" value="URL_YSX_QCCYJ_CHUJGLKK">
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<input id="edDtBegin" type="datetime-local" value="2018-06-21T13:59:59"/>
+			<input id="edDtEnd" type="datetime-local" value="2018-06-21T13:59:59"/>
+			<input id="edInterval" type="number">
+		</td>
+		<td>
+			<button id="bnShowLog"></button>
+		</td>
+	</tr>
+</table>
+
+<table class="table table-hover">
+	<caption>RTLOG-HOURS-CHART</caption>
+	<tbody id="tbody-rtlog-dirs">
+	</tbody>
+	<tr>
+		<td id="show-log-curve-1" style="width: 800px"><div style="min-width: 310px; height: 300px; margin: 0 auto"></div></td>
+	</tr>
+</table>
+
+</body>
+
+<script>
+    let currentDtBegin = null;
+    let currentDtEnd = null;
+    let currentInterval = null;
+
+    let refreshHourHighCharts = function (sUiShowId, logCount, resObjects) {
+        console.log('received logCount: ', logCount);
+        console.log('received resObjects.length: ', resObjects.length);
+        let series = [];
+        for (let i = 0; i < resObjects.length; i++) {
+            let data = [];
+            let resObject = resObjects[i];
+            let measure = resObject.measure;
+            let logText = resObject.log;
+            //    {
+            //     "measure": {'id': mid, 'neno':neno, 'code':code},
+            //     "logtype": 2,
+            //     "log": "#logfile.text",
+            //     "state":0
+            //     }
+			let logTime = currentDtBegin;
+            for (let j = 0; j < logText.length; ++j) {
+                data.push([
+                    new Date(logTime),
+                    logText[j]]);
+                logTime += currentInterval;
+            }
+            series.push({
+                data: data,
+                lineWidth: 0.5,
+                name: String(measure.neno) + '/' + measure.code
+			});
+            console.log('received logText.length: ', logText.length);
+        }
+
+        Highcharts.chart(sUiShowId, {
+
+            chart: {
+                zoomType: 'x'
+            },
+
+            title: {
+                text: sUiShowId + ' drawing ' + resObjects.length + ' points'
+            },
+
+            subtitle: {
+                text: 'Using the Boost module'
+            },
+
+            tooltip: {
+                valueDecimals: 2
+            },
+
+            xAxis: {
+                type: 'datetime'
+            },
+
+            series: [{
+                data: (function () {
+                    let data = [],
+                        logObj,
+                        i;
+                    for (i = 0; i < logObjs.length; ++i) {
+                        logObj = logObjs[i];
+                        data.push([
+                            logObj.changedTime,
+                            logObj.data[1]]);
+                    }
+                    return data;
+                }()),
+                lineWidth: 0.5,
+                name: 'Hourly data points'
+            }]
+
+        });
+    };
+
+    let reqRtlogCallback = function reqRtlogCallback(logCount, resObjects, err) {
+        refreshHourHighCharts('show-log-curve-1', logCount, resObjects);
+    };
+
+    $('#bnShowLog').click(function() {
+        // {
+        //     "measures": [{'id': mid, 'neno':neno, 'code':code}, {'id': mid, 'neno':neno, 'code':code}],
+        //     "dtbegin": 31343242341,
+        //     "dtend": 23413241234,
+        //     "interval": 1000
+        // }
+        let measures = [
+			{
+                neno: $('#edNeno1').val(),
+                code: $('#edCode1').val(),
+			},
+			{
+                neno: $('#edNeno2').val(),
+                code: $('#edCode2').val(),
+			}
+		];
+        currentDtBegin = (new Date($('#edDtBegin').val())).getTime();
+        currentDtEnd = (new Date($('#edDtEnd').val())).getTime();
+        currentInterval = Number($('#edInterval').val());
+
+        rtlog.reqRtlogByPeriod(measures, currentDtBegin, currentDtEnd, currentInterval, reqRtlogCallback);
+    });
+</script>
+
+</html>

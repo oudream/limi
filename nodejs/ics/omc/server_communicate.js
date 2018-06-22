@@ -30,7 +30,7 @@ const rtdb = require('./../../../assets/common/cc4k/rtdb.js');
 let _omcProtocol = new BasProtocol();
 let _psmProtocol = new PsmProtocol();
 let _rtbusProtocol = new BasProtocol(false);
-let _daProtocol = new BasProtocol(false);
+let _daProtocol = new BasProtocol();
 let _event = global.globalEvent;
 let _alarmRecPlayLog = {};
 _alarmRecPlayLog.data = [];
@@ -329,7 +329,7 @@ function protocolListenerInit() {
         }, 1000);
     }
 
-    global.httpServer.route.all(/\/(.){0,}.rtlog/, function(req, res) {
+    global.httpServer.route.all(/\/(.){0,}\.rtlog\.cgi/, function(req, res) {
         if (currentReqRtlog !== null || currentResRtlog !== null) {
             // 由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是暂时的，并且将在一段时间以后恢复。
             res.writeHead(503);
@@ -364,20 +364,35 @@ function protocolListenerInit() {
                 }
                 if (reqSession && reqStructtype && reqMeasures) {
                     if (reqMeasures.length > 0) {
-                        let reqMeasure = reqMeasures[i];
-                        let mids = reqMeasure.mids;
-                        let dtbegin = reqMeasure.dtbegin;
-                        let dtend = reqMeasure.dtend;
-                        let iInterval = reqMeasure.interval;
-                        let keyListBuffer = Buffer.alloc(mids.length * 8);
-                        let iOffset = 0;
-                        for (let i = 0; i < mids.length; i++) {
-                            keyListBuffer.writeIntLE(mids[i], iOffset, 6, true); iOffset += 8;
+                        let reqMeasure = reqMeasures[0];
+                        let measures = reqMeasure.measures;
+                        let mids = [];
+                        for (let i = 0; i < measures.length; i++) {
+                            let measure = measures[i];
+                            let measure2 = rtdb.findMeasureByNenoCode(measure.neno, measure.code);
+                            if (measure2 !== null) {
+                                mids.push(measure2.id);
+                            }
                         }
-                        let packet = BasPacket.rtReqDaDetailPacket.toPacket(dtbegin, dtend, iInterval, mids.length, 8, keyListBuffer);
-                        let iSent = _daProtocol.sendPacket(packet);
-                        console.log('_daProtocol.sendPacket(rtReqDaDetailPacket): ', iSent);
-                        reqAsyncRtlog(req, res);
+                        if (mids.length > 0) {
+                            let dtbegin = reqMeasure.dtbegin;
+                            let dtend = reqMeasure.dtend;
+                            let iInterval = reqMeasure.interval;
+                            let keyListBuffer = Buffer.alloc(mids.length * 8);
+                            let iOffset = 0;
+                            for (let i = 0; i < mids.length; i++) {
+                                keyListBuffer.writeIntLE(mids[i], iOffset, 6, true);
+                                iOffset += 8;
+                            }
+                            let packet = BasPacket.rtReqDaDetailPacket.toPacket(dtbegin, dtend, iInterval, mids.length, 8, keyListBuffer);
+                            let iSent = _daProtocol.sendPacket(packet);
+                            console.log('_daProtocol.sendPacket(rtReqDaDetailPacket): ', iSent);
+                            reqAsyncRtlog(req, res);
+                        } else {
+                            // 在请求头Expect中指定的预期内容无法被服务器满足
+                            res.writeHead(417);
+                            res.end();
+                        }
                     } else {
                         // 客户端已经要求文件的一部分（Byte serving），但服务器不能提供该部分
                         res.writeHead(416);
@@ -404,7 +419,7 @@ function protocolListenerInit() {
             clearTimeout(currentTimeout);
             currentTimeout = null;
         }
-        console.log('fnDealDaDetail.begin: ');
+        console.log('_daProtocol.fnDealDaDetail.begin: ');
         let iOffset = msgObj.offset;
         let buf = msgObj.buffer;
         let iCount = msgObj.Count;
@@ -413,9 +428,15 @@ function protocolListenerInit() {
         let data = [];
         while (iOffset + 8 < iLength) {
             let iMid = buf.readIntLE(iOffset, 6, true); iOffset += 8;
+            let measure = rtdb.findMeasureById(iMid);
+            let measure2 = {id: iMid};
+            if (measure !== null) {
+                measure2['neno'] = measure.neno;
+                measure2['code'] = measure.code;
+            }
             let iType = rtdb.getMeasureTypeById(iMid);
             let measureLog = {
-                mid: iMid,
+                measure: measure2,
                 logtype: 2,
                 log: [],
                 state: 0,
@@ -469,6 +490,7 @@ function protocolListenerInit() {
             let resMeasures = {
                 session: 'sbid=0001;xxx=adfadsf',
                 structtype: 'rtlog_v001',
+                logcount: iCount,
                 data: data,
             };
             currentResRtlog.writeHead(200);
@@ -477,7 +499,7 @@ function protocolListenerInit() {
             currentResRtlog = null;
             currentReqRtlog = null;
         }
-        console.log('fnDealDaDetail.end.');
+        console.log('_daProtocol.fnDealDaDetail.end.');
     }
 
     _daProtocol.on(BasPacket.rtDataDaDetailPacket.commandCode, fnDealDaDetail);
@@ -489,7 +511,8 @@ function protocolListenerInit() {
         LocalIpAddress: '127.0.0.1',
         LocalPort: 6717,
         RemotePort: 6697,
-        RemoteIpAddress: omcServerHost,
+        // RemoteIpAddress: omcServerHost,
+        RemoteIpAddress: '10.31.58.33',
     });
 
 

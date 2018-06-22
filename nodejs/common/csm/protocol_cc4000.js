@@ -168,7 +168,7 @@ BasAttr.CI_Type_int = 1;
 BasAttr.CI_Type_double = 2;
 BasAttr.CI_Type_string = 3;
 BasAttr.CI_Type_long = 4;
-BasAttr.CI_Type_buffer = 4;
+BasAttr.CI_Type_buffer = 5;
 
 /**
  * BasPacket
@@ -178,7 +178,7 @@ function BasPacket() {
     this.commandAttrs = [];
     this.commandSeq = 0;
     this.commandCode = 0;
-    this.request = 0;
+    this.commandAttrBufferCount = 0;
 }
 
 BasPacket.packets = new Map();
@@ -187,18 +187,30 @@ BasPacket.prototype.toBuffer = function(...args) {
     let self = this;
     let commandAttrs = self.commandAttrs;
   // :todo.best : compatible : arguments.length != commandAttrs.length
-    if (arguments.length !== commandAttrs.length) {
+    if (args.length !== commandAttrs.length) {
         return Buffer.alloc(0);
     }
-    let iTotalSize = self.getTotalSize();
+    let iTotalSize = self.getStaticTotalSize();
+    let idx = 0;
+    let attr;
+    let value;
+    // get attrs's buffer size
+    if (self.commandAttrBufferCount > 0) {
+        while (idx < commandAttrs.length) {
+            attr = commandAttrs[idx];
+            value = args[idx];
+            if (attr.type === BasAttr.CI_Type_buffer) {
+                iTotalSize += value.length;
+            }
+            ++idx;
+        }
+    }
     if (iTotalSize <= 0) {
         return Buffer.alloc(0);
     }
-    let rBuf = Buffer.alloc(self.getTotalSize());
-    let attr;
-    let value;
-    let idx = 0;
+    let rBuf = Buffer.alloc(iTotalSize);
     let iOffset = 0;
+    idx = 0;
     while (idx < commandAttrs.length) {
         attr = commandAttrs[idx];
         value = args[idx];
@@ -223,10 +235,9 @@ BasPacket.prototype.toBuffer = function(...args) {
             if (value.length > attr.size) {
                 throw new UserException('BasPacket: value.length > attr.size');
             }
-            value.copy(rbuf, iOffset);// Default: 'utf8'
+            value.copy(rBuf, iOffset);// Default: 'utf8'
             break;
         default:
-
             break;
         }
         iOffset += attr.size;
@@ -239,7 +250,7 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
     let self = this;
     let commandAttrs = self.commandAttrs;
     let r = {};
-    let iTotalSize = self.getTotalSize();
+    let iTotalSize = self.getStaticTotalSize();
     if (!buf || iStart + iTotalSize > buf.length - 2) {
         console.log('BasPacket.prototype.fromBuffer : buf length no enough, ', iStart + iTotalSize, buf.length);
         return r;
@@ -256,7 +267,7 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
             value = buf.readIntLE(iOffset, attr.size, true);
             break;
         case BasAttr.CI_Type_long:
-            value = buf.buf.readIntLE(iOffset, 6, true);
+            value = buf.readIntLE(iOffset, 6, true);
             break;
         case BasAttr.CI_Type_double:
             value = buf.readDoubleLE(iOffset, true);
@@ -301,6 +312,7 @@ BasPacket.prototype.add = function(...args) {
     if (arguments.length > 1) {
         size = args[1];
     }
+    // get default type
     let type;
     if (arguments.length > 2) {
         type = args[2];
@@ -319,11 +331,13 @@ BasPacket.prototype.add = function(...args) {
     if (arguments.length > 3) {
         encoding = args[3];
     }
-
+    if (type === BasAttr.CI_Type_buffer) {
+        this.commandAttrBufferCount += 1;
+    }
     this.commandAttrs.push(new BasAttr(name, size, type, encoding));
 };
 
-BasPacket.prototype.getTotalSize = function() {
+BasPacket.prototype.getStaticTotalSize = function() {
     let iSize = 0;
     let self = this;
     let commandAttrs = self.commandAttrs;
@@ -331,6 +345,9 @@ BasPacket.prototype.getTotalSize = function() {
     let idx = 0;
     while (idx < commandAttrs.length) {
         attr = commandAttrs[idx++];
+        if (attr.type === BasAttr.CI_Type_buffer) {
+            continue;
+        }
         iSize += attr.size;
     }
     return iSize;
@@ -367,7 +384,7 @@ BasPacket.prototype.preparePacket = function(buf) {
     return r.slice(0, iNewSize);
 };
 
-BasPacket.prototype.encodePacket = function(buf) {
+BasPacket.prototype.encodePacket = function(buf, iTotalSize) {
     if (!buf || buf.length === 0) {
         return Buffer.allocUnsafe(0);
     }
@@ -385,7 +402,7 @@ BasPacket.prototype.encodePacket = function(buf) {
     r.writeIntLE(this.commandCode, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-    r.writeIntLE(this.request, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+    r.writeIntLE(iTotalSize, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     buf.copy(r, iOffset);
@@ -403,7 +420,6 @@ BasPacket.prototype.encodePacket = function(buf) {
 BasPacket.prototype.setCommand = function(iCommandSeq, iCommand) {
     this.commandSeq = iCommandSeq;
     this.commandCode = iCommand;
-    this.request = this.getTotalSize();
     BasPacket.packets.set(iCommand, this);
 };
 
