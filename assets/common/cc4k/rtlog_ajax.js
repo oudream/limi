@@ -46,7 +46,9 @@ filetype = json
 // 可选属性"state":状态码，无或0时表示成功，其它值看具体数据字典
 {
   "session":"sbid=0001;xxx=adfadsf",
-  "structtype":"rtdata_v001",
+  "structtype":"rtlog_v001",
+  "state":0,
+  "logcount":0,
   "data":[
     {
     "measure": {'id': mid, 'neno':neno, 'code':code},
@@ -117,10 +119,7 @@ filetype = json
             if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                 myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
                 if (fnCallback) {
-                    let arr = JSON.parse(response);
-                    let logCount = arr.logcount;
-                    let resObjects = arr.data;
-                    fnCallback(logCount, resObjects, '');
+                    fnCallback(JSON.parse(xmlhttp.responseText));
                         // for (let i = 0; i < resObjects.length; i++) {
                         //     let resObject = resObjects[i];
                         //     //    {

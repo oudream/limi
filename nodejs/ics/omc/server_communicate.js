@@ -319,14 +319,21 @@ function protocolListenerInit() {
         currentResRtlog = res;
         currentTimeout = setTimeout(function() {
             if (currentResRtlog !== null) {
-                // 作为网关或者代理工作的服务器尝试执行请求时，未能及时从上游服务器
-                currentResRtlog.writeHead(504);
-                currentResRtlog.end();
-                currentReqRtlog = null;
+                // 504 : 作为网关或者代理工作的服务器尝试执行请求时，未能及时从上游服务器
+                let resMeasures = {
+                    session: 'sbid=0001;xxx=adfadsf',
+                    structtype: 'rtlog_v001',
+                    state: 504,
+                    logcount: 0,
+                    data: [],
+                };
+                currentResRtlog.writeHead(200);
+                // res.write('HELLO');
+                currentResRtlog.end(JSON.stringify(resMeasures));
                 currentResRtlog = null;
-                currentTimeout = null;
+                currentReqRtlog = null;
             }
-        }, 1000);
+        }, 3000);
     }
 
     global.httpServer.route.all(/\/(.){0,}\.rtlog\.cgi/, function(req, res) {
@@ -414,14 +421,69 @@ function protocolListenerInit() {
      * fnDealDaDetail
      * @param {object} msgObj
      */
-    function fnDealDaDetail(msgObj) {
+    function fnDealAnsDaDetail(msgObj) {
+        console.log('_daProtocol.fnDealAnsDaDetail.begin: ');
+        let iStateCode = msgObj.StateCode;
+        // let iCount = msgObj.Count;
+        if (iStateCode !== 0) {
+            if (currentTimeout !== null) {
+                clearTimeout(currentTimeout);
+                currentTimeout = null;
+            }
+            if (currentResRtlog !== null) {
+                let resMeasures = {
+                    session: 'sbid=0001;xxx=adfadsf',
+                    structtype: 'rtlog_v001',
+                    state: iStateCode,
+                    logcount: 0,
+                    data: [],
+                };
+                currentResRtlog.writeHead(200);
+                // res.write('HELLO');
+                currentResRtlog.end(JSON.stringify(resMeasures));
+                currentResRtlog = null;
+                currentReqRtlog = null;
+            }
+            console.log('_daProtocol.fnDealAnsDaDetail - StateCode: ', iStateCode);
+        }
+        console.log('_daProtocol.fnDealDaDetail.begin: ');
+    }
+
+    /**
+     * fnDealDaDetail
+     * @param {object} msgObj
+     */
+    function fnDealDataDaDetail(msgObj) {
         if (currentTimeout !== null) {
             clearTimeout(currentTimeout);
             currentTimeout = null;
         }
-        console.log('_daProtocol.fnDealDaDetail.begin: ');
+        console.log('_daProtocol.fnDealDataDaDetail.begin: ');
         let iOffset = msgObj.offset;
         let buf = msgObj.buffer;
+        let iStateCode = msgObj.StateCode;
+        if (iStateCode !== 0) {
+            if (currentTimeout !== null) {
+                clearTimeout(currentTimeout);
+                currentTimeout = null;
+            }
+            if (currentResRtlog !== null) {
+                let resMeasures = {
+                    session: 'sbid=0001;xxx=adfadsf',
+                    structtype: 'rtlog_v001',
+                    state: iStateCode,
+                    logcount: 0,
+                    data: [],
+                };
+                currentResRtlog.writeHead(200);
+                // res.write('HELLO');
+                currentResRtlog.end(JSON.stringify(resMeasures));
+                currentResRtlog = null;
+                currentReqRtlog = null;
+            }
+            console.log('_daProtocol.fnDealDataDaDetail - StateCode: ', iStateCode);
+            return;
+        }
         let iCount = msgObj.Count;
         let iLength = buf.length;
         let iIndex = 0;
@@ -490,6 +552,7 @@ function protocolListenerInit() {
             let resMeasures = {
                 session: 'sbid=0001;xxx=adfadsf',
                 structtype: 'rtlog_v001',
+                state: 0,
                 logcount: iCount,
                 data: data,
             };
@@ -499,10 +562,11 @@ function protocolListenerInit() {
             currentResRtlog = null;
             currentReqRtlog = null;
         }
-        console.log('_daProtocol.fnDealDaDetail.end.');
+        console.log('_daProtocol.fnDealDataDaDetail.end.');
     }
 
-    _daProtocol.on(BasPacket.rtDataDaDetailPacket.commandCode, fnDealDaDetail);
+    _daProtocol.on(BasPacket.rtAnsDaDetailPacket.commandCode, fnDealAnsDaDetail);
+    _daProtocol.on(BasPacket.rtDataDaDetailPacket.commandCode, fnDealDataDaDetail);
     _daProtocol.onAllPacket(function(command, msgObj) {
         console.log(command, msgObj);
     });
