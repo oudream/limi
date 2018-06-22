@@ -31,12 +31,12 @@
 	</tbody>
 	<tr>
 		<td>
-			<input id="edNeno1" type="text" value="1896873985">
-			<input id="edNeno2" type="text" value="1896873985">
+			<input id="edNeno1" type="text" value="1895890945">
+			<input id="edNeno2" type="text" value="1896480769">
 		</td>
 		<td>
-			<input id="edCode1" type="text" value="URL_YSX_QCCYJ_CHUJGLBP">
-			<input id="edCode2" type="text" value="URL_YSX_QCCYJ_CHUJGLKK">
+			<input id="edCode1" type="text" value="URL_YSX_HCCRCSBZZ_DMZJ">
+			<input id="edCode2" type="text" value="URL_YSX_QCRCZZ_RCDZ">
 		</td>
 	</tr>
 	<tr>
@@ -163,6 +163,11 @@
         currentDtBegin = (new Date($('#edDtBegin').val())).getTime();
         currentDtEnd = (new Date($('#edDtEnd').val())).getTime();
         currentInterval = Number($('#edInterval').val());
+
+        // test
+      	currentDtBegin = 1528880816298;
+      	currentDtEnd =1528897838967;
+      	currentInterval = 3600000;
 
         rtlog.reqRtlogByPeriod(measures, currentDtBegin, currentDtEnd, currentInterval, reqRtlogCallback);
     });

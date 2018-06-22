@@ -424,7 +424,99 @@ BasPacket.prototype.setCommand = function(iCommandSeq, iCommand) {
 };
 
 BasPacket.prototype.toPacket = function(...args) {
-    return this.encodePacket(BasPacket.prototype.toBuffer.apply(this, args));
+  let self = this;
+  let commandAttrs = self.commandAttrs;
+  // :todo.best : compatible : arguments.length != commandAttrs.length
+  if (args.length !== commandAttrs.length) {
+    return Buffer.alloc(0);
+  }
+  let iTotalSize = self.getStaticTotalSize();
+  let idx = 0;
+  let attr;
+  let value;
+  // get attrs's buffer size
+  if (self.commandAttrBufferCount > 0) {
+    while (idx < commandAttrs.length) {
+      attr = commandAttrs[idx];
+      value = args[idx];
+      if (attr.type === BasAttr.CI_Type_buffer) {
+        iTotalSize += value.length;
+      }
+      ++idx;
+    }
+  }
+  if (iTotalSize <= 0) {
+    return Buffer.alloc(0);
+  }
+  let rBuf = Buffer.alloc(iTotalSize);
+  let iOffset = 0;
+  idx = 0;
+  while (idx < commandAttrs.length) {
+    attr = commandAttrs[idx];
+    value = args[idx];
+    switch (attr.type) {
+      case BasAttr.CI_Type_int:
+        rBuf.writeIntLE(value, iOffset, attr.size, true);
+        break;
+      case BasAttr.CI_Type_long:
+        rBuf.writeIntLE(value, iOffset, 6, true);
+        break;
+      case BasAttr.CI_Type_double:
+        rBuf.writeDoubleLE(value, iOffset, true);
+        break;
+      case BasAttr.CI_Type_string:
+        if (value.length > attr.size) {
+          throw new UserException('BasPacket: value.length > attr.size');
+        }
+        rBuf.write(value, iOffset, attr.size);// Default: 'utf8'
+        rBuf[iOffset + value.length] = 0;
+        break;
+      case BasAttr.CI_Type_buffer:
+        if (value.length > attr.size) {
+          throw new UserException('BasPacket: value.length > attr.size');
+        }
+        value.copy(rBuf, iOffset);// Default: 'utf8'
+        break;
+      default:
+        break;
+    }
+    iOffset += attr.size;
+    ++idx;
+  }
+
+  let buf = rBuf;
+  if (!buf || buf.length === 0) {
+    return Buffer.allocUnsafe(0);
+  }
+  let iOldSize = buf.length;
+  // total length : 1 + 3 + 3 + 3 + 1 + 1
+  let r = Buffer.allocUnsafe(iOldSize + 1 + 4 + 4 + 4 + 1 + 1);
+
+  iOffset = 0;
+  r[iOffset] = BasDefine.PACKAGE_REQ_START;
+  iOffset += 1;
+
+  r.writeIntLE(this.commandSeq, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+
+  r.writeIntLE(this.commandCode, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+
+  r.writeIntLE(iTotalSize, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+
+  buf.copy(r, iOffset);
+  iOffset += buf.length;
+
+  r[iOffset] = 0;// crc
+  iOffset += 1;
+
+  r[iOffset] = BasDefine.PACKAGE_REQ_END;
+  iOffset += 1; // r.length
+
+  return this.preparePacket(r);
+    //
+    // return this.encodePacket(BasPacket.prototype.toBuffer.apply(this, args));
 };
 
 /**
@@ -763,11 +855,13 @@ if (true) {
     BasPacket.rtReqDaDetailPacket = rtReqDaDetailPacket;
 
     let rtAnsDaDetailPacket = new BasPacket();
+    rtAnsDaDetailPacket.add('StateCode');
     rtAnsDaDetailPacket.add('Count', 8, BasAttr.CI_Type_long);
     rtAnsDaDetailPacket.setCommand(1, BasDefine.ICS_DA_ANS_DETAIL);
     BasPacket.rtAnsDaDetailPacket = rtAnsDaDetailPacket;
 
     let rtDataDaDetailPacket = new BasPacket();
+    rtDataDaDetailPacket.add('StateCode');
     rtDataDaDetailPacket.add('Count', 8, BasAttr.CI_Type_long);
     rtDataDaDetailPacket.setCommand(1, BasDefine.ICS_DA_DATA_DETAIL);
     BasPacket.rtDataDaDetailPacket = rtDataDaDetailPacket;
