@@ -48,10 +48,14 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             }
             if (def[i].readOnly === 1) {
                 editable = false;
+            } else if (def[i].readOnly === 2) {
+                editable = false;
             } else {
                 editable = true;
             }
             if (def[i].visible === 0) {
+                hidden = true;
+            } else if (def[i].visible === 2) {
                 hidden = true;
             } else {
                 hidden = false;
@@ -278,6 +282,8 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             }
             if (def[i].readOnly === 1) {
                 editable = false;
+            } else if (def[i].readOnly === 2) {
+                editable = false;
             } else {
                 editable = true;
             }
@@ -501,6 +507,8 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 editable = false;
             }
             if (def[i].readOnly === 1) {
+                editable = false;
+            } if (def[i].readOnly === 2) {
                 editable = false;
             } else {
                 editable = true;
