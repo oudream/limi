@@ -4,7 +4,7 @@
 
 'use strict';
 
-define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'panelConfig', 'action', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
+define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'panelConfig', 'action', 'comAction', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'loadNode', 'structure', 'model', 'view', 'controller', 'utils', 'cache', 'jqGridExtension'], function($, async, g) {
     let gDb = null;
     let netype; // 表定义表中的NeType
     let tableName; // 表名
@@ -84,8 +84,8 @@ define(['jquery', 'async', 'global', 'jqGrid', 'uix-date', 'jqGridConfig', 'pane
                     }
                 }
                 $(document).off('jqGrid_gird_pager');
-                jqGridExtend.countNum(loadSql, action.queryAction(formID, timeType), tableName, group, 40, 'data_record_count_span');
-                jqGridExtend.paging(tbID, loadSql, action.queryAction(formID, timeType), tableName, group, sort, 40, 'pager', def);
+                jqGridExtend.countNum(loadSql, comAction.queryAction(formID, timeType), tableName, group, 40, 'data_record_count_span');
+                jqGridExtend.paging(tbID, loadSql, comAction.queryAction(formID, timeType), tableName, group, sort, 40, 'pager', def);
                 jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 40, 'pager', 'data_record_count_span', def);
             });
             if (arrs[1] === undefined) {

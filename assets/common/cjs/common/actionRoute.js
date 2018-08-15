@@ -9,6 +9,9 @@ let action = {
 let arr = ['comAction'];
 define(arr, function() {
     action.register = function(data, tbID, tbName, def, g, copyData) {
+        if (typeof data === 'string') {
+            data = JSON.parse(data);
+        }
         let route = data.action;
         let nameSpaces = route.split('.');
         let projectName = sessionStorage.getItem('projectName');

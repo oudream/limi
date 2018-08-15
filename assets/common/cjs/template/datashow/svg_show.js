@@ -79,10 +79,25 @@ define(['jquery', 'global', 'async','d3','jqGrid', 'panelConfig', 'uix-date', 'j
         let temp = 0;
         svgIds.each(function(d, i) {
             var name = this.id;
-            var index = name.indexOf("url-");
+            var index = name.toUpperCase().indexOf("URI-");
             if (index >= 0) {
                 var arr = name.substring(index+4).split("-");
-                if (arr.length==2)
+                if (arr.length === 1)  //URI-YG550H01_YX_0001
+                {
+                    aSignal[temp] ={
+                        Name:name,
+                        id:-1,
+                        v:-1,
+                        t:0,
+                        q:0,
+                        res:0,
+                        NeNo:-1,
+                        SignalUrl:arr[0],
+                        NeName:"",
+                        type:1
+                    };
+                }
+                else if (arr.length === 2) //URI-ZYJ01-YG550H_YX_0001
                 {
                     aSignal[temp] ={
                         Name:name,
@@ -94,8 +109,39 @@ define(['jquery', 'global', 'async','d3','jqGrid', 'panelConfig', 'uix-date', 'j
                         NeNo:-1,
                         SignalUrl:arr[1],
                         NeName:arr[0],
+                        type:2
                     };
                     temp ++;
+                }
+            }
+            else
+            {
+                index = name.toUpperCase().indexOf("MID-");  //MID-0x1000000000,MID-1234567890
+                if (index >= 0) {
+                    var arr = name.split("-");
+                    if (arr.length === 2) {
+                        var mid = 0;
+                        if (arr[1].toLowerCase().indexOf("0x") >= 0) //MID-0x1000000000
+                            mid = parseInt(arr[1].substring(index + 2),16);
+                        else  mid = parseInt(arr[1],10); //MID-1234567890
+
+                        if(mid>0)
+                        {
+                            aSignal[temp] = {
+                                Name: name,
+                                id: mid,
+                                v: -1,
+                                t: 0,
+                                q: 0,
+                                res: 0,
+                                NeNo: -1,
+                                SignalUrl: "",
+                                NeName: "",
+                                type: 3
+                            };
+                            temp++;
+                        }
+                    }
                 }
             }
         });
@@ -114,22 +160,48 @@ define(['jquery', 'global', 'async','d3','jqGrid', 'panelConfig', 'uix-date', 'j
 
         for (let i = 0; i < aSignal.length; i++) {
             var neno=0;
-            for(let j =0;j<aNeCfg.length;j++)
+            if(aSignal[i].type === 1)//URI-YG550H01_YX_0001
             {
-                if(aNeCfg[j].Name==aSignal[i].NeName)
-                {
-                    aSignal[i].NeNo = aNeCfg[j].NeNo;
-                    break;
-                }
-            }
-            if(aSignal[i].NeNo != -1)
-            {
-                var id = 0;
                 for(let k =0;k<aSigalUrl.length;k++)
                 {
-                    if (aSigalUrl[k].NeNo == aSignal[i].NeNo && aSigalUrl[k].SignalUrl ==  aSignal[i].SignalUrl )
+                    if (aSigalUrl[k].SignalUrl ==  aSignal[i].SignalUrl )
                     {
-                        aSignal[i].id = aSigalUrl[k].SignalNo;
+                        aSignal[i].id   = aSigalUrl[k].SignalNo;
+                        aSignal[i].NeNo = aSigalUrl[k].NeNo;
+                        break;
+                    }
+                }
+            }
+            else if(aSignal[i].type === 2) //URI-ZYJ01-YG550H_YX_0001
+            {
+                for(let j =0;j<aNeCfg.length;j++)
+                {
+                    if(aNeCfg[j].Name==aSignal[i].NeName)
+                    {
+                        aSignal[i].NeNo = aNeCfg[j].NeNo;
+                        break;
+                    }
+                }
+                if(aSignal[i].NeNo != -1)
+                {
+                    for(let k =0;k<aSigalUrl.length;k++)
+                    {
+                        if (aSigalUrl[k].NeNo == aSignal[i].NeNo && aSigalUrl[k].SignalUrl ==  aSignal[i].SignalUrl )
+                        {
+                            aSignal[i].id = aSigalUrl[k].SignalNo;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if(aSignal[i].type === 3) // MID-0x1000000000,MID-1234567890
+            {
+                for(let k =0;k<aSigalUrl.length;k++)
+                {
+                    if (aSigalUrl[k].SignalNo == aSignal[i].id )
+                    {
+                        aSignal[i].SignalUrl   = aSigalUrl[k].SignalUrl;
+                        aSignal[i].NeNo = aSigalUrl[k].NeNo;
                         break;
                     }
                 }
@@ -145,7 +217,7 @@ define(['jquery', 'global', 'async','d3','jqGrid', 'panelConfig', 'uix-date', 'j
         let nCallBackCount = 1;
 
         for (let i = 0; i < aSignal.length; i++) {
-            cc4k.rtdb.appendMeasureByNenoCode(aSignal[i].NeNo, aSignal[i].SignalUrl);
+            if(aSignal[i].NeNo != -1) cc4k.rtdb.appendMeasureByNenoCode(aSignal[i].NeNo, aSignal[i].SignalUrl);
         }
         cc4k.rtdb.startSyncMeasures();
         //回调函数

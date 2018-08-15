@@ -24,9 +24,9 @@ BasDefine.PACKAGE_ITEM_REQ_LEN = 4;
 BasDefine.OMC_OK = 0;
 // 一般的响应内存长度
 BasDefine.PACKAGE_SIMPLE_REQ_LEN = 512;
-BasDefine.PACKAGE_MAX_REQ_LEN = 2048;
+BasDefine.PACKAGE_MAX_REQ_LEN = 1024 * 50;
 // 接收缓冲池打消
-BasDefine.PACKAGE_MAX_BUF_SIZE = 30000;
+BasDefine.PACKAGE_MAX_BUF_SIZE = BasDefine.PACKAGE_MAX_REQ_LEN * 5 + 1;
 
 // 无基本信息
 BasDefine.OMC_OK_WITHINFO = 100;
@@ -134,6 +134,9 @@ BasDefine.ICS_DA_REQ_SPOT = 0x02;
 BasDefine.ICS_DA_ANS_SPOT = 0x32;
 BasDefine.ICS_DA_DATA_SPOT = 0x62;
 
+BasDefine.ICS_YX_TABLENAME = 'T_RT_YX';
+BasDefine.ICS_YC_TABLENAME = 'T_RT_YC';
+BasDefine.ICS_YW_TABLENAME = 'T_RT_YW';
 
 /**
  * UserException
@@ -246,7 +249,7 @@ BasPacket.prototype.toBuffer = function(...args) {
     return rBuf;
 };
 
-BasPacket.prototype.fromBuffer = function(buf, iStart) {
+BasPacket.prototype.fromBuffer = function(buf, iStart, iEnd) {
     let self = this;
     let commandAttrs = self.commandAttrs;
     let r = {};
@@ -300,6 +303,7 @@ BasPacket.prototype.fromBuffer = function(buf, iStart) {
     }
     r.buffer = buf;
     r.offset = iOffset;
+    r.end = iEnd;
     return r;
 };
 
@@ -692,7 +696,7 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
 
     let packet = BasPacket.packets.get(pkCommand);
     if (packet) {
-        let msgObj = packet.fromBuffer(buf, iOffset);
+        let msgObj = packet.fromBuffer(buf, iOffset, iEnd);
         this.dispatch(pkCommand, msgObj);
         console.log('BasPacket.dealPacket : pkCommand [', pkCommand, '] dispatch!');
     } else {
@@ -809,12 +813,14 @@ if (true) {
     BasPacket.rtUpdcfgPacket = rtUpdcfgPacket;
 
     let rtAnsFirstPacket = new BasPacket();
+    rtAnsFirstPacket.add('StateCode');
     rtAnsFirstPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtAnsFirstPacket.add('Count');
     rtAnsFirstPacket.setCommand(1, BasDefine.RTDB_ANS_FIRST_RCD_SEG);
     BasPacket.rtAnsFirstPacket = rtAnsFirstPacket;
 
     let rtAnsNextPacket = new BasPacket();
+    rtAnsNextPacket.add('StateCode');
     rtAnsNextPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtAnsNextPacket.add('Count');
     rtAnsNextPacket.setCommand(1, BasDefine.RTDB_ANS_NEXT_RCD_SEG);
@@ -823,7 +829,15 @@ if (true) {
     let rtReqUpdrcdPacket = new BasPacket();
     rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtReqUpdrcdPacket.add('Count');
+    rtReqUpdrcdPacket.add('Rt', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
     rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
+    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
+
+    let rtReqUpdrcdPacket = new BasPacket();
+    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtReqUpdrcdPacket.add('Count');
+    rtReqUpdrcdPacket.add('RtList', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPD_RCD_LIST);
     BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
 
 

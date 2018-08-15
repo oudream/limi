@@ -239,8 +239,9 @@ function protocolListenerInit() {
             for (let i = 0; i < msgObj.Count; i++) {
                 let measure = {};
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
-                measure.value = (buf.readIntLE(iOffset, 6, true)).toFixed(2); iOffset += 8;
+                measure.value = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 measure.refreshTime =utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                // measure.refreshTime =utc2Locale(new Date().getTime()); iOffset += 8; // 测试
                 measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
@@ -257,6 +258,7 @@ function protocolListenerInit() {
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 measure.value = (buf.readDoubleLE(iOffset, true)).toFixed(2); iOffset += 8;
                 measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                // measure.refreshTime = utc2Locale(new Date().getTime()); iOffset += 8; // 测试
                 measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
@@ -273,6 +275,7 @@ function protocolListenerInit() {
                 measure.id = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 measure.value = buf.toString('utf8', iOffset, iOffset+128); iOffset += 128;
                 measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true)); iOffset += 8;
+                // measure.refreshTime = utc2Locale(new Date().getTime()); iOffset += 8; // 测试
                 measure.res = buf.readIntLE(iOffset, 6, true); iOffset += 8;
                 inMeasures.push(measure);
             }
@@ -336,6 +339,7 @@ function protocolListenerInit() {
         }, 3000);
     }
 
+    // ### deal http log
     global.httpServer.route.all(/\/(.){0,}\.rtlog\.cgi/, function(req, res) {
         if (currentReqRtlog !== null || currentResRtlog !== null) {
             // 由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是暂时的，并且将在一段时间以后恢复。
@@ -416,6 +420,69 @@ function protocolListenerInit() {
         }
     });
 
+    // ### deal http yk / set measure
+    global.httpServer.route.all(/\/(.){0,}ics\.cgi/, function(req, res) {
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', function(chunk) {
+                body += chunk;
+            });
+            req.on('end', function() {
+                console.log(body);
+                let reqSession = null;
+                let reqStructtype = null;
+                let reqMeasures = null;
+                if (body) {
+                    try {
+                        let reqBody = JSON.parse(body);
+                        reqSession = reqBody.session;
+                        reqStructtype = reqBody.structtype;
+                        reqMeasures = reqBody.params;
+                    } catch (e) {
+                        r = null;
+                        console.log('error: JSON.parse(body)');
+                    }
+                }
+                if (reqSession && reqStructtype && reqMeasures) {
+                    let resMeasures = {
+                        session: reqSession,
+                        structtype: reqStructtype,
+                        data: function() {
+                            let data = [];
+                            for (let i = 0; i < reqMeasures.length; i++) {
+                                let reqMeasure = reqMeasures[i];
+                                let resMeasure = null;
+                                if (reqMeasure.hasOwnProperty('neno')) {
+                                    let neno = reqMeasure.neno;
+                                    let code = reqMeasure.code;
+                                    resMeasure = rtdb.findMeasureByNenoCode(neno, code);
+                                } else if (reqMeasure.hasOwnProperty('mid')) {
+                                    let mid = reqMeasure.mid;
+                                    resMeasure = rtdb.findMeasureById(mid);
+                                }
+                                let tableName = rtdb.getMeasureTableNameById(resMeasure.id);
+                                let packet = BasPacket.rtReqUpdrcdPacket.toPacket(tableName, dtend, iInterval, mids.length, 8, keyListBuffer);
+                                let iSent = _daProtocol.sendPacket(packet);
+                                console.log('_daProtocol.sendPacket(rtReqDaDetailPacket): ', iSent);
+
+                            }
+                            return data;
+                        }(),
+                    };
+                    res.writeHead(200);
+                    // res.write('HELLO');
+                    res.end(JSON.stringify(resMeasures));
+                } else {
+                    res.writeHead(404);
+                    res.end();
+                }
+            });
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
     // ### da protocol
     /**
      * fnDealDaDetail
@@ -460,6 +527,7 @@ function protocolListenerInit() {
         }
         console.log('_daProtocol.fnDealDataDaDetail.begin: ');
         let iOffset = msgObj.offset;
+        let iEnd = msgObj.end;
         let buf = msgObj.buffer;
         let iStateCode = msgObj.StateCode;
         if (iStateCode !== 0) {
@@ -485,7 +553,7 @@ function protocolListenerInit() {
             return;
         }
         let iCount = msgObj.Count;
-        let iLength = buf.length;
+        let iLength = iEnd > buf.length ? buf.length : iEnd;
         let iIndex = 0;
         let data = [];
         while (iOffset + 8 < iLength) {
@@ -531,7 +599,7 @@ function protocolListenerInit() {
                 }
                 break;
             case rtdb.EnumMeasureType.straw:
-                if (iOffset + iCount * 8 < iLength) {
+                if (iOffset + iCount * 128 < iLength) {
                     iIndex = 0;
                     while (iIndex < iCount) {
                         let value = buf.toString('utf8', iOffset, iOffset + 128);
@@ -821,10 +889,12 @@ function getOmcServerInfo() {
         let inMeasures = [];
         for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
+            let time = new Date().getTime();
             inMeasures.push({
                 id: row['SignalNo'],
                 neno: row['NeNo'],
                 code: row['SignalUrl'],
+                refreshTime: time,
             });
         }
         rtdb.receivedMeasures(inMeasures);
@@ -891,6 +961,7 @@ function utc2Locale(utcStr) {
 
     let localeString = date.getFullYear() + '/' + month + '/' + day + ' ' +
         _hour + ':' + _min + ':' + _sec;
+    console.log('aaaaa',localeString);
     return localeString;
 }
 

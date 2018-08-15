@@ -57,7 +57,16 @@ utils.time.getDateTime = function(separator) {
     return utils.time.getDate(_separator) + ' ' + utils.time.getTime();
 };
 
-utils.time.utc2Locale = function(utcStr) {
+utils.time.utc2Locale = function(utcStr, separator, separator1) {
+    let _separator = '/';
+    if (separator) {
+        _separator = separator;
+    }
+    let _separator1 = ' ';
+    if (separator1) {
+        _separator1 = separator1;
+    }
+
     let utc = parseInt(utcStr, 10) * 1000;
     let date = new Date(utc);
 
@@ -69,7 +78,7 @@ utils.time.utc2Locale = function(utcStr) {
     let _min = date.getMinutes() > 9 ? date.getMinutes() : ('0' + date.getMinutes().toString());
     let _sec = date.getSeconds() > 9 ? date.getSeconds() : ('0' + date.getSeconds().toString());
 
-    let localeString = date.getFullYear() + '/' + month + '/' + day + ' ' +
+    let localeString = date.getFullYear() + _separator + month + _separator + day + _separator1 +
     _hour + ':' + _min + ':' + _sec;
     return localeString;
 };

@@ -286,3 +286,118 @@
         opacity: 0; }
     40% {
         opacity: 1; } }
+
+/*
+   Echats控制面板
+ */
+.control{
+    color: #eee;
+    font: 11px 'Lucida Grande', sans-serif;
+    text-shadow: 0 -1px 0 #111;
+}
+.control ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    clear: both;
+}
+.control .property-name {
+    cursor: default;
+    float: left;
+    clear: left;
+    width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.control .close-btn{
+    /* opacity: 0; */
+    -webkit-transition: opacity 0.1s linear;
+    -o-transition: opacity 0.1s linear;
+    -moz-transition: opacity 0.1s linear;
+    transition: opacity 0.1s linear;
+    border: 0;
+    position: absolute;
+    line-height: 19px;
+    height: 20px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #000;
+}
+.control .string{
+    border-left: 3px solid #1ed36f;
+}
+.control .save-btn{
+    background-color: #3074ff !important;
+    text-align: center;
+    color: white;
+    height: 20px !important;
+    line-height: 20px !important;
+}
+.control .save-btn:hover {
+    cursor: pointer;
+}
+.control .cr {
+    clear: both;
+    padding-left: 3px;
+    height: 27px;
+}
+.control .close {
+    height: 0;
+}
+.control li:not(.folder) {
+    background: #1a1a1a;
+    border-bottom: 1px solid #2c2c2c;
+}
+.control li:not(.folder) {
+    cursor: auto;
+    height: 27px;
+    line-height: 27px;
+    overflow: hidden;
+    padding: 0 4px 0 5px;
+}
+.control .c {
+    float: left;
+    width: 75%;
+}
+.control input{
+    color: #000;
+    width: 154px !important;
+    height: 14px !important;
+    line-height: 14px !important;
+}
+.control .interval {
+    width: 100px !important;
+}
+.control .sel {
+    width: 50px !important;
+    height: 25px !important;
+    line-height: 25px !important;
+}
+
+.left{
+    width: 40px;
+    height: 100px;
+    position: absolute;
+    left: 4%;
+    top: 40%;
+    display: none;
+    /*background-color: #918F87;*/
+}
+.right{
+    width: 40px;
+    height: 100px;
+    position: absolute;
+    right: 4%;
+    top: 40%;
+    display: none;
+    /*background-color: #918F87;*/
+}
+.left img:hover{
+    cursor: pointer;
+    transform: scale(1.3);
+}
+.right img:hover{
+    cursor: pointer;
+    transform: scale(1.3);
+}

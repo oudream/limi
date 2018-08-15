@@ -268,9 +268,15 @@ define(['jquery', 'global', 'async', 'jqGrid', 'echartConfig', 'panelConfig', 'u
                 oYAxis.axisLabel = {
                     formatter: '{value}' + aData[i][j].yUnit,
                 };
+                oYAxis.axisLine = {
+                    lineStyle: {
+                        color: aData[i][j].color,
+                    },
+                };
                 aYAxis.push(oYAxis);
                 let obj = {};
                 let oData = {};
+                obj.showSymbol = false;
                 obj.name = aData[i][j].code;
                 obj.type = 'line';
                 obj.showSymbol= false;
@@ -294,6 +300,7 @@ define(['jquery', 'global', 'async', 'jqGrid', 'echartConfig', 'panelConfig', 'u
                 color: aColor,
                 yAxis: aYAxis,
                 seriesData: aSeriesData,
+                float: false,
             };
             echartsConfig.dynamicTimeConfig(ID, option);
         }

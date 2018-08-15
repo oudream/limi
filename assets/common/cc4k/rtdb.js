@@ -40,6 +40,28 @@
     };
     rtdb.getMeasureTypeById = getMeasureTypeById;
 
+    let EnumMeasureTableName = {
+        none: '',
+        monsb: 'T_RT_YX',
+        ycadd: 'T_RT_YC',
+        straw: 'T_RT_YW',
+    };
+    rtdb.EnumMeasureTableName = EnumMeasureTableName;
+
+    let getMeasureTableNameById = function getMeasureTableNameById(measureId) {
+        let iId = Number(measureId);
+        if (iId >= 0x1000000000 && iId < 0x2000000000) {
+            return EnumMeasureTableName.monsb;
+        } else if (iId >= 0x2000000000 && iId < 0x3000000000) {
+            return EnumMeasureTableName.ycadd;
+        } else if (iId >= 0x3000000000 && iId < 0x4000000000) {
+            return EnumMeasureTableName.straw;
+        } else {
+            return EnumMeasureTableName.none;
+        }
+    };
+    rtdb.getMeasureTableNameById = getMeasureTableNameById;
+
     let MeasureBase = function MeasureBase(...args) {
         let iId = null;
         let sUrl = null;

@@ -81,7 +81,7 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
 
     function loadPropertyDef(db, loadSql, filter) {
         if (multi) {
-            jqGridConfig.multiSelectTableInit(tbID, def, '#pager');
+            jqGridConfig.multiSelectTableInit(tbID, def, 'pager');
         } else {
             jqGridConfig.tableInit(tbID, def, 'pager');
         }
@@ -113,7 +113,6 @@ define(['jquery', 'async', 'global', 'jqGrid', 'panelConfig', 'jqGridConfig', 'a
             jqGridExtend.countNum(loadSql, filter, tableName, group, 20, 'data_record_count_span');
             jqGridExtend.paging(tbID, loadSql, filter, tableName, group, sort, 20, 'pager', def);
             jqGridExtend.pageBtn(tbID, loadSql, tableName, sort, 20, 'pager', 'data_record_count_span', def);
-
         }
     // }, reqParam)
     }

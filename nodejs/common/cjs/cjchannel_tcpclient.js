@@ -21,7 +21,7 @@ CjChannelTcpclient.prototype.receivedData = function(data) {
     }
   // console.log(data.toString());
   // fs.writeFile('f:/002.txt', data, function (err) {
-  //     if (err) {
+  //     if (err) {+
   //         console.log(err);
   //     }
   // });
@@ -149,7 +149,7 @@ CjChannelTcpclient.prototype.checkChannel = function(interval) {
         if (self.isAutoOpen) {
             if (!self.isOpen()) {
                 self.open();
-                console.log('timer auto open');
+                console.log('timer auto open : ', self.connectParams, self.isOpen());
             }
         }
 

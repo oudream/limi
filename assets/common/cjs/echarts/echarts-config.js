@@ -302,6 +302,8 @@ define(['jquery', 'echart3'], function($, echarts) {
      * @param config : obj 配置
      */
     echartsConfig.dynamicTimeConfig = function(ID, config) {
+        let seriesAllData = [];
+        echarts.dispose($('#' + ID)[0]);
         let myChart = echarts.init($('#' + ID)[0]); // 基于准备好的dom，初始化echarts实例
         // 指定图表的配置项和数据
         let option = {
@@ -336,21 +338,31 @@ define(['jquery', 'echart3'], function($, echarts) {
                 // type: 'value',
                 type: 'time',
                 // boundaryGap: true,
-                axisPointer: {
-                    type: 'shadow',
-                },
                 splitLine: {
                     show: false,
                 },
             },
-            visualMap: [{
-                show: false,
-                type: 'continuous',
-                seriesIndex: 0
-            }],
             yAxis: config.yAxis,
             series: config.seriesData,
         };
+        if (config.float) {
+            for (let i = 0; i < option.series.length; i++) {
+                let seriesData = [];
+                for (let j = 0; j < option.series[i].data.length; j++) {
+                    seriesData.push(option.series[i].data[j].value[1]);
+                }
+                seriesAllData.push(seriesData);
+            }
+            for (let i = 0; i < seriesAllData.length; i++) {
+                let max = Math.max(...seriesAllData[i]) + Math.max(...seriesAllData[i]) * 0.2;
+                option.yAxis[i].max = max.toFixed(0);
+                let min = Math.min(...seriesAllData[i]) - Math.min(...seriesAllData[i]) * 0.2;
+                if (min < 0) {
+                    min = 0;
+                }
+                option.yAxis[i].min = min.toFixed(0);
+            }
+        }
         myChart.setOption(option);
     };
 

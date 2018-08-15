@@ -119,7 +119,7 @@ filetype = json
             if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                 myDebug('接收：RespMeasures - ' + new Date() + ' ' + xmlhttp.response.length);
                 if (fnCallback) {
-                    fnCallback(JSON.parse(xmlhttp.responseText));
+                    fnCallback(JSON.parse(xmlhttp.responseText), dtBegin, dtEnd, iInterval);
                         // for (let i = 0; i < resObjects.length; i++) {
                         //     let resObject = resObjects[i];
                         //     //    {

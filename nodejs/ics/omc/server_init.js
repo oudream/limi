@@ -99,8 +99,8 @@ function init() {
                 }
                 if (reqSession && reqStructtype && reqMeasures) {
                     let resMeasures = {
-                        session: 'sbid=0001;xxx=adfadsf',
-                        structtype: 'rtdata_v001',
+                        session: reqSession,
+                        structtype: reqStructtype,
                         data: function() {
                             let data = [];
                             for (let i = 0; i < reqMeasures.length; i++) {

@@ -7,7 +7,7 @@
 let comAction = {
 
 };
-define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension'], function($, async) {
+define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension', 'modal'], function($, async) {
     let doc = window.top.$(window.top.document);
     comAction.register = function(data, tbID, tbName, def, g, copyData) {
         let route = data.action;
@@ -19,28 +19,30 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
             name = nameSpaces[1];
         }
         switch (name) {
-            case 'delAction': delAction(tbID, tbName, def);
-                break;
-            case 'killProcess': killProcess(tbID, tbName, def);
-                break;
-            case 'saveAction': saveAction(tbID, tbName, def, copyData);
-                break;
-            case 'addAction':addAction(def, tbName, data.assistAction, data.getModelData, data.reload, data.para, g);
-                break;
-            case 'saveObjAction': saveObjAction(data, tbID, tbName, def, g);
-                break;
-            case 'modalAction':modalAction(g, data, tbID);
-                break;
-            case 'exportCsvAction':exportToCsv(tbID);
-                break;
-            case 'upAction':upAction(tbID, tbName, data);
-                break;
-            case 'downAction':downAction(tbID, tbName, data);
-                break;
-            case 'foreMostAction':foremostAction(tbID, tbName, data);
-                break;
-            case 'uploadAction':uploadAction(g, data);
-                break;
+        case 'delAction': delAction(tbID, tbName, def);
+            break;
+        case 'killProcess': killProcess(tbID, tbName, def);
+            break;
+        case 'saveAction': saveAction(tbID, tbName, def, copyData);
+            break;
+        case 'addAction':addAction(def, tbName, data.assistAction, data.getModelData, data.reload, data.para, g);
+            break;
+        case 'saveObjAction': saveObjAction(data, tbID, tbName, def, g);
+            break;
+        case 'modalAction':modalAction(g, data, tbID);
+            break;
+        case 'exportCsvAction':exportToCsv(tbID);
+            break;
+        case 'upAction':upAction(tbID, tbName, data);
+            break;
+        case 'downAction':downAction(tbID, tbName, data);
+            break;
+        case 'foreMostAction':foremostAction(tbID, tbName, data);
+            break;
+        case 'uploadAction':uploadAction(g, data);
+            break;
+        case 'menuAction':menuAction();
+            break;
         }
     };
     comAction.queryAction = function(id, timeType) {
@@ -682,6 +684,21 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
         });
     }
 
+    function menuAction() {
+        let mask = new modal.CreateModal();
+        if ($('#modal-mask').length) {
+            mask.maskCancel();
+            $('#content #menu').toggle();
+        } else {
+            mask.maskInit(200);
+            $('#content #menu').toggle();
+        }
+        $('#modal-mask').click(function() {
+            mask.maskCancel();
+            $('#content #menu').toggle();
+        });
+    }
+
     /* 获取表中所有数据 */
     function getJQAllData(tbID) {
         let o = tbID;
@@ -772,16 +789,18 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
             } else {
                 if (reload) {
                     switch (reload.reload) {
-                        case 'YX': doc.trigger('reload-yx');
-                            break;
-                        case 'YC': doc.trigger('reload-yc');
-                            break;
-                        case 'YW': doc.trigger('reload-yw');
-                            break;
-                        case 'SUBS': doc.trigger('reload-subs');
-                            break;
-                        default:
-                            break;
+                    case 'YX': doc.trigger('reload-yx');
+                        break;
+                    case 'YC': doc.trigger('reload-yc');
+                        break;
+                    case 'YW': doc.trigger('reload-yw');
+                        break;
+                    case 'SUBS': doc.trigger('reload-subs');
+                        break;
+                    case 'dev_props': doc.trigger('reload-dev_props');
+                        break;
+                    default:
+                        break;
                     }
                 } else {
                     window.location.reload();

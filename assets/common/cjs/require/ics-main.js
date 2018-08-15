@@ -34,12 +34,17 @@ define(function() {
                 'sinopec_authority': 'ics/sinopec/js/authority/authority',
                 'omc_authority': 'ics/omc/js/authority/authority',
                 'cache': 'common/cjs/storage/cache',
+                'watch': 'common/cjs/watch',
                 'treeManager': 'common/cjs/z-tree/tree-manager',
                 'treeConfig': 'common/cjs/z-tree/tree-config',
+                'modal': 'common/cjs/components/modal/modal',
                 'async': 'common/3rd/async/async.min',
                 'jqGridExtension': 'common/cjs/jqGrid/jqGrid-extension',
                 'ics_app': 'common/cjs/common/ics-app',
                 'asm550c_authority': 'ics/asm550c/js/authority/authority',
+                'neConfig': 'ics/systemInit/config/neConfig',
+                'templates': 'common/cjs/template/templates',
+                'analysis': 'common/cjs/analysis/analysis',
             },
             shim: {
                 'cjcommon': {},
@@ -51,6 +56,9 @@ define(function() {
                 'controller': {},
                 'utils': {},
                 'treeManager': {},
+                'modal': {
+                    deps: ['css!' + URL + 'common/ccss/modal.css'],
+                },
 
             },
 
