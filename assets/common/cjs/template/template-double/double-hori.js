@@ -53,6 +53,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'jqGrid', 'jqGridConfig', 'a
         arrs = arr.split('!');
         let projectName = sessionStorage.getItem('projectName');
         let configUrl = '/ics/' + projectName + '/config/template_config/' + arrs[0] + '.json';
+
         $.getJSON(configUrl, function(data) {
             tableName = data.tbName;
             tableNameChild = data.tbNameChild;
@@ -119,7 +120,10 @@ define(['jquery', 'async', 'global', 'panelConfig', 'jqGrid', 'jqGridConfig', 'a
         tbIDChild.jqGrid('clearGridData', false);
         let sql = 'select * from ' + tableNameChild + ' where ' + connectionChild + ' = ' + '\'' + sel + '\'';
         if (loadSqlChild !== '') {
-            sql = loadSqlChild + ' where ' + connectionChild + ' = ' + '\'' + sel + '\'';
+            if (loadSqlChild.indexOf("where") > -1)
+                sql = loadSqlChild + ' and ' + connectionChild + ' = ' + '\'' + sel + '\'';
+            else
+                sql = loadSqlChild + ' where ' + connectionChild + ' = ' + '\'' + sel + '\'';
         }
         loadBottom(sql);
     };

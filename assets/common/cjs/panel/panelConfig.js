@@ -114,6 +114,100 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     };
 
     /**
+     * 新模板初始化查询面板
+     * @param id : num 查询面板id
+     * @param data : array 数组对象
+     */
+    panelConfig.queryPanelInit = function(id, data) {
+        let queryForm = document.getElementById(id);
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].type === 'text') {
+                let div = document.createElement('div');
+                div.className = 'query-group';
+                queryForm.appendChild(div);
+
+                let label = document.createElement('label');
+                label.className = 'query-label';
+                label.innerHTML = data[i].labelName;
+                // label.for = data[i].id
+                div.appendChild(label);
+
+                let div1 = document.createElement('div');
+                div1.className = 'query_content';
+                div.appendChild(div1);
+
+                let input = document.createElement('input');
+                input.type = 'text';
+                input.id = data[i].id;
+                input.name = data[i].name;
+                div1.appendChild(input);
+            }
+
+            if (data[i].type === 'select') {
+                let div = document.createElement('div');
+                div.className = 'query-group';
+                queryForm.appendChild(div);
+
+                let label = document.createElement('label');
+                label.className = 'query-label';
+                label.innerHTML = data[i].labelName;
+                // label.for = data[i].id
+                div.appendChild(label);
+
+                let div1 = document.createElement('div');
+                div1.className = 'query_content';
+                div.appendChild(div1);
+
+                let select = document.createElement('select');
+                select.id = data[i].id;
+                select.name = data[i].name;
+                div1.appendChild(select);
+
+                if (data[i].data !== undefined) {
+                    if (typeof data[i].data === 'object') {
+                        if (data[i].local === '1') {
+                            setSelectLocal2(data[i].data, data[i].id);
+                        } else {
+                            setSelectLocal(data[i].data, data[i].id);
+                        }
+                    } else {
+                        setSelectSql(data[i].data, data[i].id);
+                    }
+                }
+            }
+
+            if (data[i].type === 'time') {
+                let div = document.createElement('div');
+                div.className = 'query-group';
+                queryForm.appendChild(div);
+
+                let label = document.createElement('label');
+                label.className = 'query-label';
+                label.innerHTML = data[i].labelName;
+                // label.for = data[i].id
+                div.appendChild(label);
+
+                let div1 = document.createElement('div');
+                div1.className = 'query_content';
+                div.appendChild(div1);
+
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.id = 'dtp_input' + data[i].id;
+                div1.appendChild(input);
+            }
+        }
+
+        let div = `<div class="query-btn">
+                                <svg class="icon query-icon" aria-hidden="true">
+                                     <use xlink:href="#icon-search"></use>
+                                </svg>
+                                <span class="query-span">查询</span>
+                            </div>`;
+        $('#' + id).append(div);
+    };
+
+    /**
      * 初始化单对象面板
      * @param id : num 单对象面板id
      * @param data : array 数组对象 表定义表相关配置
@@ -603,6 +697,17 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             let i = document.createElement('i');
             i.className = 'icon-th icon-pic ' + data[j].id;
             span.appendChild(i);
+        }
+    };
+    panelConfig.operationPanelInit = function(id, data) {
+        for (let j = 0; j < data.length; j++) {
+            let icon = `<span class="operation-icon" id="${data[j].id}">
+                            ${data[j].name}
+                            <svg class="icon operation-${data[j].icon}" aria-hidden="true">
+                                 <use xlink:href="#icon-${data[j].icon}"></use>
+                            </svg>
+                        </span>`;
+            $('#' + id).append(icon);
         }
     };
     panelConfig.operationChildInit = function(id, data, uDC) {

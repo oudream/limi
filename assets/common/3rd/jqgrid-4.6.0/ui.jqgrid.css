@@ -299,14 +299,15 @@ tr.ui-search-toolbar select {
 	margin: 0 !important;
 	padding: 0 !important;
 	position: relative;
-	height: 25px;
+	height: 45px;
 	white-space: nowrap;
 	overflow: hidden;
 	font-size: 11px
 }
 
 .ui-jqgrid .ui-pager-control {
-	position: relative
+	position: relative;
+    height: 45px;
 }
 
 .ui-jqgrid .ui-pg-table {

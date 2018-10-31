@@ -7,7 +7,7 @@
 let comAction = {
 
 };
-define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension', 'modal'], function($, async) {
+define(['jquery', 'async', 'MD5', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils', 'jqGridExtension', 'modal', 'MD5', 'action', 'dataProcess'], function($, async, MD5) {
     let doc = window.top.$(window.top.document);
     comAction.register = function(data, tbID, tbName, def, g, copyData) {
         let route = data.action;
@@ -27,6 +27,16 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
             break;
         case 'addAction':addAction(def, tbName, data.assistAction, data.getModelData, data.reload, data.para, g);
             break;
+        case 'add':add(def, tbName, data.assistAction, data);
+            break;
+        case 'addUser':addUser(def, tbName, data.assistAction, data, tbID);
+            break;
+        case 'resetPWD':resetPWD(tbID, def, tbName, data.assistAction, data);
+            break;
+        case 'reset':reset(data, tbID, tbName, def, g);
+            break;
+        case 'addSysUser':addSysUser(data, tbID, tbName, def, g);
+            break;
         case 'saveObjAction': saveObjAction(data, tbID, tbName, def, g);
             break;
         case 'modalAction':modalAction(g, data, tbID);
@@ -43,10 +53,15 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
             break;
         case 'menuAction':menuAction();
             break;
+        case 'loginAction':loginAction(data);
+            break;
+        case 'addUser2Group':addUser2Group(data, tbID, tbName, def);
+            break;
         }
     };
     comAction.queryAction = function(id, timeType) {
         let data = getFormData(id);
+        console.log('queryAction function :' +data);
         let sql = '';
         let time;
         for (let i = 0; i < data.length; i++) {
@@ -298,7 +313,165 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
             url: g.url(u),
         });
     }
+    /**
+     * 添加操作(新布局)
+     * @param def : obj 表定义表中配置
+     * @param tableName : string 数据库表名
+     * @param actions : string action名
+     * @param data : obj 配置数据
+     */
+    function add(def, tableName, actions, data) {
+        let addModal = new modal.CreateModal('', 1200, 400);
+        addModal.add();
+        if (data.assistConfig) {
+            if (data.assistConfig.type === 'table') {
+                let table = data.assistConfig;
+                let div = `<table id='${table.tbID}' class='table'>
+                    </table>
+                    <div id='${table.pagerID}'></div>`;
+                $('#add-form').append(div);
+                let tbID = $('#' + table.tbID);
+                if (table.multi) {
+                    jqGridConfig.multiSelectTableInit(tbID, table.def, table.pagerID);
+                } else {
+                    jqGridConfig.tableInit(tbID, table.def, table.pagerID);
+                }
+                tableResiz(table);
+                let operationData = [
+                    {'action': actions},
+                ];
+                $('.modal-btn-save').unbind('click');
+                $('.modal-btn-save').click(function() {
+                    action.register(operationData[0], table.tbID, tableName, table.def, '');
+                });
+                $(document).off('jqGrid_gird_' + table.pagerID);
+                jqGridExtend.countNum(table.loadSql, '', table.tableName, '', table.showCount, table.recordID);
+                jqGridExtend.paging(tbID, table.loadSql, '', table.tableName, '', '', table.showCount, table.pagerID, table.def);
+                jqGridExtend.pageBtn(tbID, table.loadSql, table.tableName, '', table.showCount, table.pagerID, table.recordID, table.def);
+            }
+            if (data.assistConfig.type === 'form') {
+                let form = data.assistConfig;
+                panelConfig.objInit('add-form', form.def, form.tableName);
+                let operationData = [
+                    {'action': actions},
+                    form
+                ];
+                $('.modal-btn-save').unbind('click');
+                $('.modal-btn-save').click(function() {
+                    action.register(Object.assign(operationData[0],operationData[1]), 'add-form', form.tableName, form.def, '');
+                });
+            }
+        } else {
+            panelConfig.objInit('add-form', def, tableName);
+            let operationData = [
+                {'action': actions},
+            ];
+            $('.modal-btn-save').unbind('click');
+            $('.modal-btn-save').click(function() {
+                action.register(operationData[0], 'add-form', tableName, def, '');
+            });
+        }
+        sessionStorage.setItem('tbName', tableName);
+    }
 
+    function addUser(def, tableName, actions, data) {
+        let priTB = $('#' + data.assistConfig.primaryTable);
+        let selectedId = priTB.jqGrid('getGridParam', 'selrow');
+        priTB.jqGrid('saveRow', selectedId);
+        let col = 'ID';
+        let ID = priTB.jqGrid('getCell', selectedId, col);
+        if (!ID) {
+            let msgModal = new modal.CreateModal('请选择一行数据', 400, 220);
+            msgModal.alert();
+        } else {
+            let addModal = new modal.CreateModal('', 1200, 400);
+            addModal.add();
+            if (data.assistConfig) {
+                if (data.assistConfig.type === 'table') {
+                    let table = data.assistConfig;
+                    let div = `<table id='${table.tbID}' class='table'>
+                    </table>
+                    <div id='${table.pagerID}'></div>`;
+                    $('#add-form').append(div);
+                    let tbID = $('#' + table.tbID);
+                    if (table.multi) {
+                        jqGridConfig.multiSelectTableInit(tbID, table.def, table.pagerID);
+                    } else {
+                        jqGridConfig.tableInit(tbID, table.def, table.pagerID);
+                    }
+                    tableResiz(table);
+                    let operationData = [
+                        {'action': actions, 'ID': ID},
+                    ];
+                    $('.modal-btn-save').unbind('click');
+                    $('.modal-btn-save').click(function() {
+                        action.register(operationData[0], table.tbID, tableName, table.def, '');
+                    });
+                    jqGridExtend.countNum(table.loadSql, '', table.tableName, '', table.showCount, table.recordID);
+                    jqGridExtend.paging(tbID, table.loadSql, '', table.tableName, '', '', table.showCount, table.pagerID, table.def);
+                    jqGridExtend.pageBtn(tbID, table.loadSql, table.tableName, '', table.showCount, table.pagerID, table.recordID, table.def);
+                }
+                sessionStorage.setItem('tbName', tableName);
+            }
+        }
+    }
+    /**
+     * 重置密码
+     * @param def : obj 表定义表中配置
+     * @param tableName : string 数据库表名
+     * @param actions : string action名
+     * @param data : obj 配置数据
+     */
+    function resetPWD(tbID, def, tableName, actions, data) {
+        let selectedId = tbID.jqGrid('getGridParam', 'selrow');
+        tbID.jqGrid('saveRow', selectedId);
+        let col = 'ID';
+        let ID = tbID.jqGrid('getCell', selectedId, col);
+        if (!ID) {
+            let msgModal = new modal.CreateModal('请选择一行数据', 400, 220);
+            msgModal.alert();
+        } else {
+            let addModal = new modal.CreateModal('', 1200, 400);
+            addModal.add();
+            if (data.assistConfig.type === 'form') {
+                let form = data.assistConfig;
+                panelConfig.objInit('add-form', form.def, form.tableName);
+                let operationData = [
+                    {'action': actions, 'ID': ID},
+                ];
+                $('.modal-btn-save').unbind('click');
+                $('.modal-btn-save').click(function() {
+                    action.register(operationData[0], 'add-form', form.tableName, form.def, '');
+                });
+            }
+        }
+
+        sessionStorage.setItem('tbName', tableName);
+    }
+
+    function reset(data, tbID, tbName) {
+        let id = data.ID;
+        let arr = getFormData(tbID);
+        let user = sessionStorage.getItem('user');
+        let str = MD5(user + arr[0].value);
+        let sql = 'UPDATE ' + tbName +' SET PassWord = ' + '\'' + str + '\'' + 'WHERE ID ='+ id + ';';
+        $('#modal-confirm', window.top.document).remove();
+        $('#modal-mask', window.top.document).remove();
+        executeSql(sql);
+    }
+    function addSysUser(data, tbID, tbName) {
+        let arr = getFormData(tbID);
+        let obj = {};
+        arr.forEach((item) =>{
+            obj[item.name] = item.value;
+        });
+
+        obj['PassWord']  = MD5(obj.UserName + obj.Password);
+        let sql = `insert into omc_sys_user (UserName,Name,CardNo,PassWord) values('${obj.UserName}','${obj.Name}','${obj.CardNo}','${obj.PassWord}')`;
+        $('#modal-confirm', window.top.document).remove();
+        $('#modal-mask', window.top.document).remove();
+        executeSql(sql);
+    }
     /**
      * 保存单对象操作
      * @param formID : num 单对象form的id
@@ -385,11 +558,15 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
                 }],
             }, function(error, value) {
             });
-        } else {
+        }
+        if (cfg.reload) {
             $('.modal', window.parent.document).hide();
             $('.modal-backdrop', window.parent.document).remove();
             executeSql(insertSql, g, cfg);
-            // $('#box_content iframe', window.parent.document).last()[0].src = $('#box_content iframe', window.parent.document).last()[0].src
+        } else {
+            $('#modal-confirm', window.top.document).remove();
+            $('#modal-mask', window.top.document).remove();
+            executeSql(insertSql);
         }
     }
 
@@ -699,6 +876,52 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
         });
     }
 
+    function loginAction(data) {
+        let para = getUrlPara();
+        console.log(para);
+        let userName = $('.' + data.userName).val();
+        let password = $('.' + data.password).val();
+        let str = MD5(userName + password);
+        $.ajax({
+            type: 'POST',
+            url: 'login.icsdata?fncode=user.login',
+            data: 'userName=' + userName + '&password=' + str,
+            success: function(msg) {
+                let arr = msg.split(';');
+                let arrs = arr[0].split('=');
+                let user = arr[1].split('=');
+                let param = sessionStorage.getItem('loginJump');
+                sessionStorage.setItem('s_user', decodeURI(arrs[1]));
+                sessionStorage.setItem('user', decodeURI(user[1]));
+                logAction(data.paras);
+                window.location = '../../../../common/chtml/template/template.html?json=' + param;
+            },
+        });
+    }
+
+    function addUser2Group(data, tbID) {
+        let GID = data.ID;
+        let sql = '';
+        let propConfGrid = $('#' + tbID);
+        let aID = [];
+        let records = propConfGrid.jqGrid('getRowData');
+        for (let i = 0; i < records.length; i++) {
+            if (records[i].isCheck === '1') {
+                aID.push(records[i].ID);
+            }
+        }
+        if (aID.length === 0) {
+            window.alert('请选择数据！');
+        } else {
+            for (let i = 0; i <aID.length; i++) {
+                sql += 'insert into omc_sys_user_group (UID,GID) values(' + aID[i] + ',' + GID + ');';
+            }
+        }
+        $('#modal-confirm', window.top.document).remove();
+        $('#modal-mask', window.top.document).remove();
+        executeSql(sql);
+    }
+
     /* 获取表中所有数据 */
     function getJQAllData(tbID) {
         let o = tbID;
@@ -803,7 +1026,12 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
                         break;
                     }
                 } else {
-                    window.location.reload();
+                    let para = getUrlPara();
+                    if (para.json) {
+                        window.location.href = '#json=' + para.json;
+                    } else {
+                        window.location.reload();
+                    }
                 }
             }
         }, reqParam);
@@ -821,5 +1049,80 @@ define(['jquery', 'async', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', 'cjajax'
         db.load(sql, function(e, v) {
             callBack(v);
         }, reqParam);
+    }
+
+    async function asyncSql (sql) {
+        let db = window.top.cjDb
+        let serverInfo = cacheOpt.get('server-config')
+        let reqHost = serverInfo['server']['ipAddress']
+        let reqPort = serverInfo['server']['httpPort']
+        let reqParam = {
+            reqHost: reqHost,
+            reqPort: reqPort
+        }
+        return new Promise(function (resolve, reject) {
+            db.load(sql, (e, v) => {
+                resolve(v)
+            }, reqParam)
+        })
+    }
+
+    async function logAction(data) {
+        let db = window.top.cjDb;
+        let serverInfo = cacheOpt.get('server-config');
+        let reqHost = serverInfo['server']['ipAddress'];
+        let reqPort = serverInfo['server']['httpPort'];
+        let reqParam = {
+            reqHost: reqHost,
+            reqPort: reqPort,
+        };
+        let dataPro = new dataProcess.DataPro();
+        let defData = await dataPro.getDefData(data);
+        let aKey = [];
+        let aValue = [];
+        for (let j = 0; j < defData.length; j++) {
+            if (defData[j].tbName === 'ti_log_web') {
+                for (let item in defData[j].value) {
+                    aKey.push(item);
+                    aValue.push(`'${defData[j].value[item]}'`);
+                }
+            }
+        }
+        let sql = `insert into ti_log_web (${aKey.join(',')}) value(${aValue.join(',')});`;
+        db.loadT(sql, function fn(err) {
+            if (err) {
+                console.log(err);
+            }
+        }, reqParam);
+    }
+
+    function getUrlPara() {
+        let url = document.URL;
+        let arrs = url.split('?');
+        if (arrs[1]) {
+            let paras = arrs[1].split('&');
+            let obj = {};
+            for (let i = 0; i < paras.length; i++) {
+                let para = paras[i].split('=');
+                obj[para[0]] = para[1];
+            }
+            return obj;
+        } else {
+            return {};
+        }
+    }
+    function tableResiz(prop) {
+        let tableId = prop.tbID;
+        let parentBox = $('#gbox_' + tableId).parent().parent();
+        let gridBox = $('#' + tableId);
+        gridBox.setGridWidth(parentBox.innerWidth() - 100);
+        let height = parentBox.innerHeight() -
+            $('#gbox_' + tableId + ' .ui-jqgrid-hdiv').outerHeight() -
+            $('#' + prop.pagerID).outerHeight() -
+            25;
+        if (parentBox.innerHeight() === 0) {
+            height = 265;
+        }
+        gridBox.setGridHeight(height);
     }
 });

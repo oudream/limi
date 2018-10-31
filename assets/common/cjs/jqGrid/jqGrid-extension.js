@@ -9,9 +9,9 @@ let jqGridExtend = {
 };
 
 define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], function($) {
-    let totalPage;
-    let PageIndex = 0;
-    let sql1 = '';
+    let totalPage = {};
+    let PageIndex = {};
+    let sql1 = {};
     let selectID;
     let queryIndex;
   /**
@@ -42,7 +42,36 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
         $('#next_' + ID).removeClass('ui-state-disabled');
         $('#last_' + ID).removeClass('ui-state-disabled');
     };
-
+    jqGridExtend.loadTable = function(prop, sql) {
+        let db = window.top.cjDb;
+        let serverInfo = cacheOpt.get('server-config');
+        let reqHost = serverInfo['server']['ipAddress'];
+        let reqPort = serverInfo['server']['httpPort'];
+        let reqParam = {
+            reqHost: reqHost,
+            reqPort: reqPort,
+        };
+        let tbID = $('#' + prop.tbID);
+        tbID.jqGrid('clearGridData', false)
+        db.load(sql, function fn(e, v) {
+            if (e) {
+                console.log(e);
+            } else {
+                for (let i = 0; i < v.length; i++) {
+                    if (i < v.length) {
+                        tbID.jqGrid('addRowData', i + 1, v[i]);
+                        $('#' + prop.recordID).text('共' + v.length + '条记录');
+                        tbID.jqGrid('setCell', i + 1, 'rowID', i + 1);
+                    }
+                    if (i === v.length) {
+                        tbID.jqGrid('setCell', i, 'rowID', i);
+                    }
+                }
+                let priData = tbID.jqGrid('getRowData');
+                sessionStorage.setItem('tablePriData', JSON.stringify(priData));
+            }
+        }, reqParam);
+    };
   /**
    * jqGrid统计总页数
    * @param loadSql : string 初始sql语句
@@ -91,15 +120,15 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 console.log(err);
             } else {
                 if (val.length > 1) {
-                    totalPage = val.length;
+                    totalPage[recordID] = val.length;
                 } else {
-                    totalPage = val[0].total;
+                    totalPage[recordID] = val[0].total;
                 }
                 let tot;
-                if ((totalPage % num) === 0) {
-                    tot = parseInt(totalPage / num) - 1;
+                if ((totalPage[recordID] % num) === 0) {
+                    tot = parseInt(totalPage[recordID] / num) - 1;
                 } else {
-                    tot = parseInt(totalPage / num);
+                    tot = parseInt(totalPage[recordID] / num);
                 }
                 if (parseInt(tot + 1) === 0) {
                     recordCountSpan.text('无查询数据');
@@ -124,6 +153,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
     jqGridExtend.paging = function(tbID, loadSql, filter, tableName, group, sort, num, pagerID, def) {
         let sql = '';
         let string = 'where';
+        PageIndex[pagerID] = 0;
         if (loadSql !== '') {
             selectID = loadSql.split(',');
             queryIndex = selectID[0].split(' ');
@@ -171,8 +201,8 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             }
         }
     // if (PageIndex === 0) {
-        sql1 = sql;
-        sql = sql + ' limit ' + PageIndex * num + ',' + num + ';';
+        sql1[pagerID] = sql;
+        sql = sql + ' limit ' + PageIndex[pagerID] * num + ',' + num + ';';
     // }
         selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID, def);
     };
@@ -188,39 +218,39 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
    * @param recordID :string 显示页数的标签ID
    */
     jqGridExtend.pageBtn = function(tbID, loadSql, tableName, sort, num, pagerID, recordID, def) {
-        PageIndex = 0;
+        PageIndex[pagerID] = 0;
         $(document).on('jqGrid_gird_' + pagerID, function(evt, pgBtn) {
             let recordCountSpan = $('#' + recordID) || $('#data_record_count_span');
             let sql = '';
             let lastPage;
-            if ((totalPage % num) === 0) {
-                lastPage = parseInt(totalPage / num) - 1;
+            if ((totalPage[recordID] % num) === 0) {
+                lastPage = parseInt(totalPage[recordID] / num) - 1;
             } else {
-                lastPage = parseInt(totalPage / num);
+                lastPage = parseInt(totalPage[recordID] / num);
             }
             if (pgBtn === 'first_' + pagerID) {
-                PageIndex = 0;
-                sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';';
+                PageIndex[pagerID] = 0;
+                sql = sql1[pagerID] + ' limit ' + PageIndex[pagerID] * num + ',' + num + ';';
             } else if (pgBtn === 'last_' + pagerID) {
-                PageIndex = lastPage;
-                sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';';
+                PageIndex[pagerID] = lastPage;
+                sql = sql1[pagerID] + ' limit ' + PageIndex[pagerID] * num + ',' + num + ';';
             } else if (pgBtn === 'prev_' + pagerID) {
-                if (PageIndex > 0) {
-                    PageIndex--;
+                if (PageIndex[pagerID] > 0) {
+                    PageIndex[pagerID]--;
                 }
-                sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';';
+                sql = sql1[pagerID] + ' limit ' + PageIndex[pagerID] * num + ',' + num + ';';
             } else if (pgBtn === 'next_' + pagerID) {
-                if (PageIndex === lastPage) {
-                    PageIndex = lastPage;
+                if (PageIndex[pagerID] === lastPage) {
+                    PageIndex[pagerID] = lastPage;
                 } else {
-                    PageIndex++;
+                    PageIndex[pagerID]++;
                 }
-                sql = sql1 + ' limit ' + PageIndex * num + ',' + num + ';';
+                sql = sql1[pagerID] + ' limit ' + PageIndex[pagerID] * num + ',' + num + ';';
             }
             if (parseInt(lastPage + 1) === 0) {
                 recordCountSpan.text('无查询数据');
             } else {
-                recordCountSpan.text('当前第' + parseInt(PageIndex + 1) + '页,共' + parseInt(lastPage + 1) + '页');
+                recordCountSpan.text('当前第' + parseInt(PageIndex[pagerID] + 1) + '页,共' + parseInt(lastPage + 1) + '页');
             }
             selID(tbID, sql, loadSql, selectID, tableName, sort, pagerID, def);
         });
@@ -320,6 +350,9 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                         if (vals[i][arr[j].colName]) {
                             if (arr[j].textType === 'utcTime') {
                                 vals[i][arr[j].colName] = utils.time.utc2Locale(vals[i][arr[j].colName]);
+                            }
+                            if (arr[j].textType === 'num') {
+                                vals[i][arr[j].colName] = Number(vals[i][arr[j].colName]);
                             }
                         }
                     }

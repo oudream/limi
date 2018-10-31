@@ -2451,11 +2451,11 @@
                         let po=['first'+tp, 'prev'+tp, 'next'+tp, 'last'+tp]; if (dir==='rtl') {
                             po.reverse();
                         }
-                        pgl += '<td id=\''+po[0]+'\' class=\'ui-pg-button ui-corner-all\'><span class=\'ui-icon ui-icon-seek-first\'></span></td>';
-                        pgl += '<td id=\''+po[1]+'\' class=\'ui-pg-button ui-corner-all\'><span class=\'ui-icon ui-icon-seek-prev\'></span></td>';
+                        pgl += '<td id=\''+po[0]+'\' class=\'ui-pg-button ui-corner-all\'><svg class=\'icon pager-icon\' aria-hidden=\'true\'><use xlink:href=\'#icon-verticalright\'></use></svg></td>';
+                        pgl += '<td id=\''+po[1]+'\' class=\'ui-pg-button ui-corner-all\'><svg class=\'icon pager-icon\' aria-hidden=\'true\'><use xlink:href=\'#icon-left\'></use></svg></td>';
                         pgl += pginp !== '' ? sep+pginp+sep:'';
-                        pgl += '<td id=\''+po[2]+'\' class=\'ui-pg-button ui-corner-all\'><span class=\'ui-icon ui-icon-seek-next\'></span></td>';
-                        pgl += '<td id=\''+po[3]+'\' class=\'ui-pg-button ui-corner-all\'><span class=\'ui-icon ui-icon-seek-end\'></span></td>';
+                        pgl += '<td id=\''+po[2]+'\' class=\'ui-pg-button ui-corner-all\'><svg class=\'icon pager-icon\' aria-hidden=\'true\'><use xlink:href=\'#icon-right\'></use></svg></td>';
+                        pgl += '<td id=\''+po[3]+'\' class=\'ui-pg-button ui-corner-all\'><svg class=\'icon pager-icon\' aria-hidden=\'true\'><use xlink:href=\'#icon-verticalleft\'></use></svg></td>';
                     } else if (pginp !== '') {
                         pgl += pginp;
                     }

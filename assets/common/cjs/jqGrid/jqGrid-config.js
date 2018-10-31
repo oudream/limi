@@ -205,8 +205,8 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
             //     records: "records"
             // },
             onSelectRow: function(id) {
-                $('#' + id).addClass('select');
-                $('#' + id).siblings().removeClass('select');
+                $('#' + this.id + ' #' + id).addClass('select');
+                $('#' + this.id + ' #' + id).siblings().removeClass('select');
                 if (id && id !== lastsel) {
                     tbID.jqGrid('saveRow', lastsel);
                     tbID.jqGrid('editRow', id, true);
@@ -222,6 +222,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                     let col = obj.connection;
                     let sel = tbID.jqGrid('getCell', selectedId, col);
                     obj.loadTBDataChild(sel);
+                    tbID.jqGrid('editRow', id, true);
                 }
 
                 if (selFunc) {
@@ -455,6 +456,7 @@ define(['jquery', 'cjcommon', 'cjdatabaseaccess', 'cjajax', 'cache', 'utils'], f
                 }
             },
             onPaging: function(pgButton) {
+                $(document).off('jqGrid_gird_' + pager);
                 $(document).trigger('jqGrid_gird_' + pager, [pgButton]);
             },
         });

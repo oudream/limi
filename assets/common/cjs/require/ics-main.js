@@ -38,6 +38,7 @@ define(function() {
                 'treeManager': 'common/cjs/z-tree/tree-manager',
                 'treeConfig': 'common/cjs/z-tree/tree-config',
                 'modal': 'common/cjs/components/modal/modal',
+                'keyboard': 'common/cjs/components/keyboard/keyboard',
                 'async': 'common/3rd/async/async.min',
                 'jqGridExtension': 'common/cjs/jqGrid/jqGrid-extension',
                 'ics_app': 'common/cjs/common/ics-app',
@@ -45,6 +46,7 @@ define(function() {
                 'neConfig': 'ics/systemInit/config/neConfig',
                 'templates': 'common/cjs/template/templates',
                 'analysis': 'common/cjs/analysis/analysis',
+                'dataProcess': 'common/cjs/analysis/dataProcess',
             },
             shim: {
                 'cjcommon': {},
@@ -58,6 +60,9 @@ define(function() {
                 'treeManager': {},
                 'modal': {
                     deps: ['css!' + URL + 'common/ccss/modal.css'],
+                },
+                'keyboard': {
+                    deps: ['css!' + URL + 'common/ccss/keyboard.css'],
                 },
 
             },

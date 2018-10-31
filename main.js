@@ -19,6 +19,7 @@ const ShareCache = require('./nodejs/common/share-cache.js').ShareCache;
 const configOpt = require('./nodejs/common/cjs/cj-json-config.js');
 const utils = require('./nodejs/common/utils.js').utils;
 const log = require('./nodejs/common/log.js');
+const login = require('./nodejs/common/login.js').login;
 
 let resMap = {};
 
@@ -59,34 +60,92 @@ function init() {
     console.log('启动HTTP服务器完成');
   // log.writeLog('启动HTTP服务器完成...');
 
+    let currentReq = null;
+    let currentRes = null;
+    let currentTimeout = null;
+
+    /**
+     * reqAsync
+     * @param {req} req
+     * @param {res} res
+     */
+    function reqAsync(req, res) {
+        currentReq = req;
+        currentRes = res;
+        currentTimeout = setTimeout(function() {
+            if (currentRes !== null) {
+                // 504 : 作为网关或者代理工作的服务器尝试执行请求时，未能及时从上游服务器
+                // let resMeasures = {
+                //     session: 'sbid=0001;xxx=adfadsf',
+                //     structtype: 'rtlog_v001',
+                //     state: 504,
+                //     logcount: 0,
+                //     data: [],
+                // };
+                currentRes.writeHead(200);
+                // res.write('HELLO');
+                // currentRes.end(JSON.stringify(resMeasures));
+                currentRes = null;
+                currentReq = null;
+            }
+        }, 3000);
+    }
+
     svr.route.all(/\/(.){0,}.icsdata/, function fn(req, res) {
         let remoteIp = utils.net.getRemoteIpAddress(req);
-
         let paramsObj = url.parse(req.url, true).query;
         let sessionId = paramsObj.sessionId;
         let fncode = paramsObj.fncode;
+        // reqAsync(req, res);
+        //
+        // if (currentReq!== null || currentRes !== null) {
+        //     // 由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是暂时的，并且将在一段时间以后恢复。
+        //     res.writeHead(503);
+        //     res.end();
+        //     return;
+        // }
+        if (fncode === 'user.login') {
+            let data = '';
+            req.on('data', function(chunk) {
+                data += chunk;
+            });
 
-        let returnData = {
-            sessionId: sessionId,
-        };
-
-        if (fncode.indexOf('.data.svrstatus') !== -1) {
-            returnData['data'] = {
-                status: 200,
-            };
-            returnData['error'] = null;
+            req.on('end', function() {
+                console.log(data);
+                login.verification(data, function(err, result) {
+                    if (err) {
+                        res.write(err);
+                        res.end();
+                    } else {
+                        res.setHeader('Set-Cookie', result);
+                        res.write(result[0]);
+                        res.end();
+                    }
+                });
+            });
         } else {
-            returnData['data'] = null;
-            returnData['error'] = 'fncode error';
-        }
+            let returnData = {
+                sessionId: sessionId,
+            };
 
-        let sReturnData = JSON.stringify(returnData);
-        res.writeHead(200, {
-            'Content-Type': 'text/json',
-            'Access-Control-Allow-Origin': '*', /* ,'Content-Length' : dataLength */
-        });
-        res.write(sReturnData, 'utf-8');
-        res.end();
+            if (fncode.indexOf('.data.svrstatus') !== -1) {
+                returnData['data'] = {
+                    status: 200,
+                };
+                returnData['error'] = null;
+            } else {
+                returnData['data'] = null;
+                returnData['error'] = 'fncode error';
+            }
+
+            let sReturnData = JSON.stringify(returnData);
+            res.writeHead(200, {
+                'Content-Type': 'text/json',
+                'Access-Control-Allow-Origin': '*', /* ,'Content-Length' : dataLength */
+            });
+            res.write(sReturnData, 'utf-8');
+            res.end();
+        }
     });
 
   /**
@@ -133,7 +192,7 @@ function init() {
     // load=ics/omc,ics/daemon
     let sLoad = cjs.CjString.findValueInArray(process.argv, 'load=');
     cjs.log('加载模块: ' + sLoad);
-    sLoad = sLoad || 'ics/omc';
+    sLoad = sLoad || 'ics/common';
     if (sLoad.length > 0) {
         let sLoads = sLoad.split(/,|;/);
         for (let i = 0; i < sLoads.length; i++) {

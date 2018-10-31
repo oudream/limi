@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Hello2</title>
+
+    <style type="text/css">
+        h1 {
+            text-align: center
+        }
+
+        h2 {
+            text-align: left
+        }
+
+        h3 {
+            text-align: right
+        }
+
+        .td-rtdata {
+            width: 220px
+        }
+    </style>
+
+    <script>
+        var s9 = "i am test9";
+        console.log(s9);
+    </script>
+
+    <script src="./../../common/3rd/jquery-3.1.1.js"></script>
+
+    <script src="./../../common/3rd/d3-4.4.1.js"></script>
+
+    <script src="./../../common/3rd/highcharts-6.0.7/code/highcharts.js"></script>
+    <script src="./../../common/3rd/highcharts-6.0.7/code/modules/exporting.js"></script>
+
+</head>
+<body>
+
+<h1>Power Box</h1>
+
+<table>
+    <tr>
+        <td style="width: 450px">
+            <table>
+                <tr>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-11">
+                            <script>
+                                $("#div-rtdata-11").load("./svg/33554433.svg");
+                            </script>
+                        </div>
+                    </td>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-12">
+                            <script>
+                                $("#div-rtdata-12").load("./svg/33554434.svg");
+                            </script>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-21">
+                            <script>
+                                $("#div-rtdata-21").load("./svg/33554436.svg");
+                            </script>
+                        </div>
+                    </td>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-22">
+                            <script>
+                                $("#div-rtdata-22").load("./svg/33554437.svg");
+                            </script>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-31">
+                            <script>
+                                $("#div-rtdata-31").load("./svg/33554435.svg");
+                            </script>
+                        </div>
+                    </td>
+                    <td class="td-rtdata">
+                        <div id="div-rtdata-32">
+                            <script>
+                                $("#div-rtdata-32").load("./svg/33554438.svg");
+                            </script>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 650px">
+            <div id="show-rt-curve-33554449" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+            <br>
+            <div id="show-rt-curve-33554450" style="min-width: 310px; height: 300px; margin: 0 auto"></div>
+        </td>
+    </tr>
+</table>
+
+</body>
+
+<script src="./gcl_rtdb.js"></script>
+<script src="./gcl_gis_rtdb.js"></script>
+
+<script>
+    $(document).ready(function () {
+        gcl.gis.uiRtdb.rtdataStartRefresh();
+        gcl.gis.uiRtcurve.rtcurveStartRefresh();
+        gcl.rtdb.startSyncMeasures();
+    });
+</script>
+
+<script>
+    function testGetTxt1(){
+        let dealRespMeasures = function (response) {
+            let arr = JSON.parse(response);
+            console.log(arr);
+        };
+
+
+        let req_resp_rtdatas = function () {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            }
+            else if (window.ActiveXObject) {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open("get", "./../rtlog/20180327/0x010000A2.txt", true);
+            xmlhttp.setRequestHeader("POWERED-BY-AID", "Approve");
+            xmlhttp.setRequestHeader('Content-Type', 'json');
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    dealRespMeasures(xmlhttp.responseText)
+                }
+            };
+            let r = xmlhttp.send('');
+            console.log(r);
+        };
+
+        req_resp_rtdatas();
+    };
+//    testGetTxt1();
+</script>
+
+<!--<script src="./gcl_rtlog.js"></script>-->
+<!--<script src="./gcl_gis_rtlog.js"></script>-->
+
+</html>

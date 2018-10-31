@@ -33,7 +33,7 @@ define(['jquery', 'async', 'global', 'panelConfig', 'action', 'uix-date', 'regis
         arrs = arr.split('!');
         let config = JSON.parse(sessionStorage.getItem('addConfig'));
         operationData = [
-            {'id': 'saveBtn', 'name': '保存', 'action': config.action, 'reload': config.reload, 'ModelData': config.getModelData},
+            {'id': 'saveBtn', 'name': '保存', 'action': config.action, 'reload': config.reload, 'assistConfig': config.assistConfig},
         ];
         panelConfig.operationInit('operation', operationData);
         btnBind(operationData, arrs[0], config.defConfig);

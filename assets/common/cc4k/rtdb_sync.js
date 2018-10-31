@@ -38,11 +38,15 @@ filetype = json
   [
     {
     "url": "/fp/zyj/fgj01/rfid",
+    "neno": 123412,
+    "code": "adbc...",
     "mid": 33556644,
     "count": 100
     },
     {
     "url": "/fp/zyj/fgj01/ypmm",
+    "neno": 123412,
+    "code": "adbc...",
     "mid": 33556645,
     "count": 100
     }
@@ -63,6 +67,8 @@ filetype = json
   "data":[
     {
     "url":"/fp/zyj/fgj01/rfid",
+    "neno": 123412,
+    "code": "adbc...",
     "mid":33556644,
     "v":"ABC12345678D",
     "q":1,
@@ -73,6 +79,8 @@ filetype = json
     },
     {
     "url":"/fp/zyj/fgj01/ypmm",
+    "neno": 123412,
+    "code": "adbc...",
     "mid":33556645,
     "v":"20160100001",
     "q":1,
@@ -170,7 +178,7 @@ filetype = json
     }
 
     let myDebug = function(...args) {
-        console.log.apply(null, args);
+        // console.log.apply(null, args);
     };
 
     let reqMeasures = [];
@@ -241,18 +249,24 @@ filetype = json
     };
     rtdb.startSyncMeasures = startSyncMeasures;
 
+    // ### sent.yk , set measure
 
-    let registerRespSetMeasureCallback = function registerRespSetMeasureCallback(fnDataChangedCallback) {
-        rtdb.respSetMeasureCallback = fnDataChangedCallback;
+    /**
+     * reqSetMeasureCallback(resSession, resMeasures); resMeasures( add "state", if state == 0 is success, else false
+     * @param resSession sessionId
+     * @param resMeasures rtdb.MeasureBase [MeasureBase add attr ( state : [0: success, other: error] )]
+     */
+    let registerReqSetMeasureCallback = function registerReqSetMeasureCallback(fnDataChangedCallback) {
+        rtdb.reqSetMeasureCallback = fnDataChangedCallback;
     };
-    rtdb.registerRespSetMeasureCallback = registerRespSetMeasureCallback;
+    rtdb.registerReqSetMeasureCallback = registerReqSetMeasureCallback;
 
     let dealRespSetMeasureByNenoCode = function dealRespSetMeasureByNenoCode(response) {
         let arr = JSON.parse(response);
         let resSession = arr.session;
         let resMeasures = arr.data;
-        if (rtdb.respSetMeasureCallback) {
-            rtdb.respSetMeasureCallback(resSession, resMeasures);
+        if (rtdb.reqSetMeasureCallback) {
+            rtdb.reqSetMeasureCallback(resSession, resMeasures);
         }
     };
 

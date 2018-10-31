@@ -4,6 +4,7 @@ let utils = {
     'dom': {},
     'number': {},
     'dataProcess': {},
+    'data':{},
 };
 utils.time.getDate = function(separator) {
     let _separator = '/';
@@ -92,6 +93,10 @@ utils.time.locale2Utc = function(localeStr) {
 
     return utcSStr;
 };
+utils.time.getUTC = function(){
+    let utc = new Date().getTime()/1000;
+    return parseInt(utc).toString();
+}
 
 utils.dom.getSelectOption = function(selectId, which) {
     let select = document.getElementById(selectId);
@@ -199,6 +204,17 @@ utils.number.getVaildIndex = function(ids) {
     return index;
 };
 
+function S4() {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+};
+
+utils.number.guid = function (mode) {
+    if(mode === 0)
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    else
+        return (S4()+S4()+S4()+S4()+S4()+S4()+S4()+S4());
+};
+
 utils.dataProcess.getId = function(highOrder, lowOrder) {
   /** 顺序号index（低位）转为16进制 */
     let lowOrderHex = lowOrder.toString(16);
@@ -244,3 +260,98 @@ utils.dataProcess.kvStrToObj = function(str) {
     }
     return obj;
 };
+
+/**
+ *
+ *  数据转换
+ */
+
+utils.data.trans = function(value,fmt){
+    if (fmt === 'utc' || fmt ==='utcTime')
+        return utils.time.locale2Utc(value);
+    else return value;
+};
+
+/*5.加载文件*/
+/* 已加载文件缓存列表,用于判断文件是否已加载过，若已加载则不再次加载*/
+var classcodes =[];
+window.Import={
+    /*加载一批文件，_files:文件路径数组,可包括js,css,less文件,succes:加载成功回调函数*/
+    LoadFileList:function(_files,succes){
+        var FileArray=[];
+        if(typeof _files==="object"){
+            FileArray=_files;
+        }else{
+            /*如果文件列表是字符串，则用,切分成数组*/
+            if(typeof _files==="string"){
+                FileArray=_files.split(",");
+            }
+        }
+        if(FileArray!=null && FileArray.length>0){
+            var LoadedCount=0;
+            for(var i=0;i< FileArray.length;i++){
+                loadFile(FileArray[i],function(){
+                    LoadedCount++;
+                    if(LoadedCount==FileArray.length){
+                        succes();
+                    }
+                })
+            }
+        }
+        /*加载JS文件,url:文件路径,success:加载成功回调函数*/
+        function loadFile(url, success) {
+            if (!FileIsExt(classcodes,url)) {
+                var ThisType=GetFileType(url);
+                var fileObj=null;
+                if(ThisType==".js"){
+                    fileObj=document.createElement('script');
+                    fileObj.src = url;
+                }else if(ThisType==".css"){
+                    fileObj=document.createElement('link');
+                    fileObj.href = url;
+                    fileObj.type = "text/css";
+                    fileObj.rel="stylesheet";
+                }else if(ThisType==".less"){
+                    fileObj=document.createElement('link');
+                    fileObj.href = url;
+                    fileObj.type = "text/css";
+                    fileObj.rel="stylesheet/less";
+                }
+                success = success || function(){};
+                fileObj.onload = fileObj.onreadystatechange = function() {
+                    if (!this.readyState || 'loaded' === this.readyState || 'complete' === this.readyState) {
+                        success();
+                        classcodes.push(url)
+                    }
+                }
+                document.getElementsByTagName('head')[0].appendChild(fileObj);
+            }else{
+                success();
+            }
+        }
+        /*获取文件类型,后缀名，小写*/
+        function GetFileType(url){
+            if(url!=null && url.length>0){
+                return url.substr(url.lastIndexOf(".")).toLowerCase();
+            }
+            return "";
+        }
+        /*文件是否已加载*/
+        function FileIsExt(FileArray,_url){
+            if(FileArray!=null && FileArray.length>0){
+                var len =FileArray.length;
+                for (var i = 0; i < len; i++) {
+                    if (FileArray[i] ==_url) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+}
+//
+// var FilesArray=["js/index.js","js/ClassInherit1.js","js/highcharts_2.21.js","css/index.css"];
+// Import.LoadFileList(FilesArray,function(){
+//     /*这里写加载完成后需要执行的代码或方法*/
+// });

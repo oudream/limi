@@ -509,6 +509,10 @@
         let measuresByEdit = [];
         for (let i = 0; i < recvMeasures.length; i++) {
             let recvMeasure = recvMeasures[i];
+            // if (recvMeasure.id === 0x1307001128)
+            // {
+            //     console.log('0x1307001128: ', recvMeasure.value)
+            // }
             let measure = rtdb.findMeasureById(recvMeasure.id);
             if (measure === null) {
                 measure = rtdb.appendMeasure(recvMeasure);
@@ -523,12 +527,12 @@
         if (rtdb.measuresChangedCallback) {
             rtdb.measuresChangedCallback(measuresByAdd, measuresByDelete, measuresByEdit);
         }
-        console.log('measuresByAdd: ', measuresByAdd.length);
-        console.log(measuresByAdd);
-        console.log('measuresByDelete: ', measuresByDelete.length);
-        console.log(measuresByDelete);
-        console.log('measuresByEdit: ', measuresByEdit.length);
-        console.log(measuresByEdit);
+        // console.log('measuresByAdd: ', measuresByAdd.length);
+        // console.log(measuresByAdd);
+        // console.log('measuresByDelete: ', measuresByDelete.length);
+        // console.log(measuresByDelete);
+        // console.log('measuresByEdit: ', measuresByEdit.length);
+        // console.log(measuresByEdit);
     };
     rtdb.receivedMeasures = receivedMeasures;
 

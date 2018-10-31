@@ -461,8 +461,7 @@ function protocolListenerInit() {
                                     measureBuffer.writeIntLE(resMeasure.refreshTime, iOffset, 6, true); iOffset += 8;
                                     measureBuffer.writeIntLE(resMeasure.res, iOffset, 6, true); iOffset += 8;
                                     let tableName = rtdb.getMeasureTableNameById(resMeasure.id);
-                                    let sKet = String(reqMeasure.id);
-                                    let packet = BasPacket.rtReqUpdkeyPacket.toPacket(tableName, sKet, measureBuffer);
+                                    let packet = BasPacket.rtReqUpdkeyPacket.toPacket(tableName, resMeasure.id, '', measureBuffer);
                                     let iSent = _rtbusProtocol.sendPacket(packet);
                                     reqMeasure.state = iSent >= 0 ? 0 : -1;
                                     console.log('_rtbusProtocol.sendPacket(rtReqUpdkeyPacket): ', iSent);
@@ -716,7 +715,6 @@ function protocolListenerInit() {
             command: 'alarm-answer',
         }));
     }, 20000);
-
 }
 
 /**
@@ -884,9 +882,6 @@ function getOmcServerInfo() {
         }
         rtdb.receivedMeasures(inMeasures);
 
-        defaultDb.close();
-        defaultDb = null;
-
         ShareCache.set('omc-server-config', 'omc_server', omcServer);
         let configObj = ShareCache.get('omc-server-config');
 
@@ -895,7 +890,7 @@ function getOmcServerInfo() {
 
         _event.emit('omc-listener-start');
     });
-    
+
     async.auto({
         queryRtBusIp: function(callback) {
             defaultDb.load(sql7, function(err, vals) {
@@ -916,6 +911,7 @@ function getOmcServerInfo() {
             sql5 = `select ip, port from omc_rtsubscribe where AppID = '${value.queryAppId[0].AppID}'`;
             _rtbusAppId = Number(value.queryAppId[0].AppID);
             defaultDb.load(sql5, function(err, vals) {
+                // fixme pool is closed
                 callback(err, vals);
             });
         }],
@@ -924,6 +920,8 @@ function getOmcServerInfo() {
         let localPort = '';
         let RtBusIp = '';
         let RtBusPort = '';
+
+        closeDB(defaultDb);
 
         if (!value.queryIpPort) {
             localIp = '0.0.0.0';
@@ -1023,8 +1021,7 @@ function getAlarmRec(fnCallback) {
 
     defaultDb.load(sql1, function(err, vals) {
         fnCallback(err, vals);
-        defaultDb.close();
-        defaultDb = null;
+        closeDB(defaultDb);
     });
 }
 
@@ -1046,7 +1043,7 @@ function utc2Locale(utcStr) {
 
     let localeString = date.getFullYear() + '/' + month + '/' + day + ' ' +
         _hour + ':' + _min + ':' + _sec;
-    console.log('aaaaa', localeString);
+    // console.log('aaaaa', localeString);
     return localeString;
 }
 
@@ -1065,6 +1062,16 @@ function getServerID() {
     let sSvrGlobal = fs.readFileSync(path.resolve(oData.cc4000.deployPath, './config/SvrGlobal.json'), {encoding: 'utf-8'});
     let oSvrGlobal = JSON.parse(sSvrGlobal);
     return oSvrGlobal.tables[0].rows[0].ServerId;
+}
+
+function closeDB(db) {
+    let dbCloseTimeOut = setTimeout(function() {
+        if (!db) {
+            db.close();
+            db = null;
+        }
+        clearTimeout(dbCloseTimeOut);
+    }, 3000);
 }
 
 init();

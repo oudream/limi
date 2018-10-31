@@ -131,9 +131,9 @@ class CjDatabaseAccess {
         }
 
         this.requestPool[curSessionId] = fn_callback;
-
+        let s = 'begin;' + sql + 'commit;';
         let reqParam = {
-            sql: sql,
+            sql: s,
             fncode: 'req.sql.transaction',
             type: this.type,
             sessionId: curSessionId,

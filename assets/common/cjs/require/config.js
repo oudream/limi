@@ -44,6 +44,7 @@ let config = {
         'jqGrid': 'common/3rd/jqGrid-4.6.0/jquery.jqGrid.src',
         'padMake': 'common/3rd/pdfmake.min',
         'vfs_fonts': 'common/3rd/vfs_fonts',
+        'ifvisible': 'common/3rd/ifvisible',
     // 'bootstrap-select': 'lib/bootstrap-select/js/bootstrap-select',
         'contextMenu': 'common/cjs/contextmenu/contextmenu',
         'pickcolor': 'common/3rd/pick-a-color-master/src/js/pick-a-color',

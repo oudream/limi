@@ -12,6 +12,8 @@ exports = module.exports = BasProtocol;
  */
 function BasDefine() {
 }
+BasDefine.PROTOCOL_MODEL_OMC = 1001;
+BasDefine.PROTOCOL_MODEL_RT = 1002;
 
 BasDefine.PACKAGE_OK = 0;
 BasDefine.PACKAGE_ERROR = 300;
@@ -125,6 +127,7 @@ BasDefine.RTDB_ANS_UPD_CFG = 48;
 // rt
 BasDefine.RTDB_MAX_TABLE_NAME = 64;
 BasDefine.RTDB_MAX_COLUMN_NAME = 64;
+BasDefine.RTDB_MAX_KEY = 128;
 
 // da
 BasDefine.ICS_DA_REQ_DETAIL = 0x01;
@@ -268,12 +271,15 @@ BasPacket.prototype.fromBuffer = function(buf, iStart, iEnd) {
         switch (attr.type) {
         case BasAttr.CI_Type_int:
             value = buf.readIntLE(iOffset, attr.size, true);
+            iOffset += attr.size;
             break;
         case BasAttr.CI_Type_long:
             value = buf.readIntLE(iOffset, 6, true);
+            iOffset += attr.size;
             break;
         case BasAttr.CI_Type_double:
             value = buf.readDoubleLE(iOffset, true);
+            iOffset += attr.size;
             break;
         case BasAttr.CI_Type_string:
             value = buf.toString('utf8', iOffset, iOffset + attr.size);
@@ -281,16 +287,13 @@ BasPacket.prototype.fromBuffer = function(buf, iStart, iEnd) {
             if (iZeroIndex >= 0) {
                 value = value.substring(0, iZeroIndex);
             }
+            iOffset += attr.size;
             break;
-        // case BasAttr.CI_Type_buffer:
-        //     value = buf.toString('utf8', iOffset, iOffset + attr.size);
-        //     iZeroIndex = value.indexOf('\0');
-        //     if (iZeroIndex >= 0) {
-        //         value = value.substring(0, iZeroIndex);
-        //     }
-        //     break;
+        case BasAttr.CI_Type_buffer:
+            // do not increate ioffset
+            break;
         default:
-        //
+            iOffset += attr.size;
             break;
         }
         Object.defineProperty(r, attr.name, {
@@ -298,7 +301,6 @@ BasPacket.prototype.fromBuffer = function(buf, iStart, iEnd) {
             enumerable: true,
             value: value,
         });
-        iOffset += attr.size;
         ++idx;
     }
     r.buffer = buf;
@@ -635,7 +637,7 @@ BasParser.prototype.repairMsg = function(iStartPos, iEndPos) {
  *
  * @constructor
  */
-function BasProtocol(bIsTcp = true) {
+function BasProtocol(bIsTcp = true, iProtocolModel = BasDefine.PROTOCOL_MODEL_OMC) {
     let self = this;
 
     let channelBase;
@@ -660,6 +662,7 @@ function BasProtocol(bIsTcp = true) {
     this.fnAllPacket = null;
     this.channel = channelBase;
     this.parser = basParser;
+    this.protocolModel = iProtocolModel;
 }
 
 /**
@@ -745,10 +748,19 @@ BasProtocol.prototype.checkProtocol = function(interval) {
 
     let timeOut = function() {
     // *recycle heart jump
-        if (self.channel.isOpen() && BasPacket.userLoginPacket) {
-            let packet = BasPacket.userLoginPacket.toPacket('user1', 'password1', 'no1', 1001);
-            let iResult = self.sendPacket(packet);
-            console.log('BasProtocol timer auto heartbeat ! result : ', iResult);
+        if (self.channel.isOpen()) {
+            let packet = self.protocolModel === BasDefine.PROTOCOL_MODEL_OMC ? BasPacket.userLoginPacket : BasPacket.rtReqHeartbeat;
+            if (packet) {
+                let packetBuf = packet.toPacket('user1', 'password1', 'no1', 1001);
+                if (packetBuf.length > 0) {
+                    let iResult = self.sendPacket(packetBuf);
+                    console.log('BasProtocol timer auto heartbeat ! result : ', iResult);
+                } else {
+                    console.log('BasProtocol heart jump : packetBuf.length <= 0!');
+                }
+            } else {
+                console.log('BasProtocol heart jump :  packet is null ! ');
+            }
         } else {
             console.log('BasProtocol timer auto heartbeat fail! channel.isOpen:', self.channel.isOpen());
         }
@@ -826,19 +838,28 @@ if (true) {
     rtAnsNextPacket.setCommand(1, BasDefine.RTDB_ANS_NEXT_RCD_SEG);
     BasPacket.rtAnsNextPacket = rtAnsNextPacket;
 
-    let rtReqUpdrcdPacket = new BasPacket();
-    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
-    rtReqUpdrcdPacket.add('Count');
-    rtReqUpdrcdPacket.add('Rt', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
-    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
-    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
+    let rtReqUpdlistPacket = new BasPacket();
+    rtReqUpdlistPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtReqUpdlistPacket.add('Count');
+    rtReqUpdlistPacket.add('MeasuresBuffer', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqUpdlistPacket.setCommand(1, BasDefine.RTDB_REQ_UPD_RCD_LIST);
+    BasPacket.rtReqUpdlistPacket = rtReqUpdlistPacket;
 
-    let rtReqUpdrcdPacket = new BasPacket();
-    rtReqUpdrcdPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
-    rtReqUpdrcdPacket.add('Count');
-    rtReqUpdrcdPacket.add('RtList', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
-    rtReqUpdrcdPacket.setCommand(1, BasDefine.RTDB_REQ_UPD_RCD_LIST);
-    BasPacket.rtReqUpdrcdPacket = rtReqUpdrcdPacket;
+    let rtReqUpdkeyPacket = new BasPacket();
+    rtReqUpdkeyPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
+    rtReqUpdkeyPacket.add('Key', 8, BasAttr.CI_Type_long);
+    rtReqUpdkeyPacket.add('KeyRes', BasDefine.RTDB_MAX_KEY-8);
+    rtReqUpdkeyPacket.add('MeasureBuffer', BasDefine.PACKAGE_SIMPLE_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqUpdkeyPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
+    BasPacket.rtReqUpdkeyPacket = rtReqUpdkeyPacket;
+
+    let rtReqHeartbeat = new BasPacket();
+    rtReqHeartbeat.add('user', BasDefine.OMC_NORMAL_INFO_LEN);
+    rtReqHeartbeat.add('password', BasDefine.OMC_NORMAL_INFO_LEN);
+    rtReqHeartbeat.add('physicalNo', BasDefine.OMC_PHYSICAL_NO_LEN);
+    rtReqHeartbeat.add('kind');
+    rtReqHeartbeat.setCommand(1, BasDefine.RTDB_REQ_HEARTBEAT);
+    BasPacket.rtReqHeartbeat = rtReqHeartbeat;
 
 
     // ### da

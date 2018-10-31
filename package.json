@@ -1,11 +1,17 @@
 {
-  "name": "WebServer",
+  "name": "ygct_web",
   "version": "0.0.1",
   "description": "Web Server",
   "main": "main.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "dev": "electron . --debug",
+    "test": "mocha && standard",
+    "package": "npm-run-all package:*",
+    "package:win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --out=out"
   },
+
   "keywords": [
     "OMC-WebServer"
   ],
@@ -18,9 +24,15 @@
     "mysql": "^2.15.0",
     "socket.io": "^2.0.3",
     "uws": "^9.147.0",
-    "ws": "^2.3.1"
+    "ws": "^2.3.1",
+    "electron": "~1.6.2",
+    "electron-packager": "^8.6.0",
+    "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
+    "electron": "~1.6.2",
+    "electron-packager": "^8.6.0",
+    "npm-run-all": "^4.0.2",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.11.0",
