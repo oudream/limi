@@ -1,3 +1,5 @@
+const CjLog = require('./../../common/cjs/cjlog.js');
+
 const url = require('url');
 
 const utils = require('./../../common/utils.js').utils;
@@ -64,7 +66,7 @@ function init() {
 
         sReturnData = JSON.stringify(returnData);
 
-        cjs.omc.log('一个' + terminalType + '终端来自' + remoteIp + ',获取初始化数据...');
+        cjs.log('一个' + terminalType + '终端来自' + remoteIp + ',获取初始化数据...');
     // log.writeLog('一个' + terminalType + '终端来自' + remoteIp + ',获取初始化数据...');
 
         res.writeHead(200, {
@@ -82,7 +84,7 @@ function init() {
                 body += chunk;
             });
             req.on('end', function() {
-                console.log(body);
+                CjLog.log('rtdata.cgi:',JSON.stringify(body));
                 let reqSession = null;
                 let reqStructtype = null;
                 let reqMeasures = null;
@@ -128,6 +130,53 @@ function init() {
             res.end();
         }
     });
+
+    global.httpServer.route.all(/\/(.){0,}\.app\.heartjump/, function(req, res) {
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', function(chunk) {
+                body += chunk;
+            });
+            req.on('end', function() {
+                CjLog.log('app.heartjump:',JSON.stringify(body));
+                let reqSession = null;
+                let reqStructtype = null;
+                let reqParams = null;
+                if (body) {
+                    try {
+                        let reqBody = JSON.parse(body);
+                        reqSession = reqBody.session;
+                        reqStructtype = reqBody.structtype;
+                        reqParams = reqBody.params;
+                    } catch (e) {
+                        r = null;
+                        console.log('error: JSON.parse(body)');
+                    }
+                }
+                if (reqSession && reqStructtype && reqParams) {
+                    let resContent = {
+                        session: reqSession,
+                        structtype: reqStructtype,
+                        data: {
+                            state: 0,
+                            serverInfo: {
+                                respTime: Date.now()
+                            }
+                        },
+                    };
+                    res.writeHead(200);
+                    res.end(JSON.stringify(resContent));
+                } else {
+                    res.writeHead(404);
+                    res.end();
+                }
+            });
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
 }
 
 init();

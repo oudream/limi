@@ -1,7 +1,8 @@
 function timer() {
-    let time;
+    let time = {};
     setInterval(function() {
-        time = new Date().toLocaleTimeString();
+        time['local'] = new Date().toLocaleTimeString();
+        time['utc'] = new Date();
         postMessage(time);
     }, 1000);
 }

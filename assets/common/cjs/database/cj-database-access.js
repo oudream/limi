@@ -3,6 +3,7 @@
  */
 
 'use strict';
+let gSession = {};
 
 class DatabaseSessionManager {
     constructor() {
@@ -10,16 +11,16 @@ class DatabaseSessionManager {
     }
 
     requestSession(prefix) {
-        let sessions = this.sessions[prefix];
+        let sessions = gSession[prefix];
         if (!sessions) {
-            this.sessions[prefix] = [];
+            gSession[prefix] = [];
         }
 
         let _index = null;
 
         let _i = 0;
         while (_i >= 0) {
-            if (this.sessions[prefix].indexOf(_i) == -1 || this.sessions[prefix].length == 0) {
+            if (gSession[prefix].indexOf(_i) === -1 || gSession[prefix].length === 0) {
                 _index = _i;
                 break;
             }
@@ -31,7 +32,7 @@ class DatabaseSessionManager {
             _index = 0;
         }
 
-        this.sessions[prefix].push(_index);
+        gSession[prefix].push(_index);
 
         return prefix + '_' + _index.toString();
     }
@@ -41,14 +42,14 @@ class DatabaseSessionManager {
         let _prefix = _session[0];
         let _index = parseInt(_session[1], 10);
 
-        let sessions = this.sessions[_prefix];
+        let sessions = gSession[_prefix];
 
         let index = sessions.indexOf(_index);
         if (index != -1) {
-            this.sessions[_prefix].splice(index, 1);
+            gSession[_prefix].splice(index, 1);
 
             if (sessions.length == 0) {
-                this.sessions[_prefix] = null;
+                gSession[_prefix] = null;
             }
 
             return 1;
@@ -60,7 +61,7 @@ class DatabaseSessionManager {
 }
 
 
-let requestPool = null;
+let requestPool = {};
 let dbSessionMgr = null;
 
 /**
@@ -75,8 +76,8 @@ class CjDatabaseAccess {
     constructor(dbParams) {
         this.id = dbParams.dsn;
         this.error = null;
-        this.requestPool = {};
-        requestPool = this.requestPool;
+        // this.requestPool = {};
+
         this.type = dbParams.type;
 
         if (dbParams.host) {
@@ -89,7 +90,7 @@ class CjDatabaseAccess {
             this.terminalSessionId = terminalSessionId;
         }
 
-        dbSessionMgr = this.dbSessionManager = new DatabaseSessionManager();
+        this.dbSessionManager = new DatabaseSessionManager(dbParams);
     }
 
     /**
@@ -102,13 +103,14 @@ class CjDatabaseAccess {
      * @memberof CjDatabaseAccess
      */
     load(sql, fn_callback, params) {
+        dbSessionMgr = this.dbSessionManager;
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
         }
 
-        this.requestPool[curSessionId] = fn_callback;
-
+        requestPool[curSessionId] = fn_callback;
+        // requestPool = this.requestPool;
         let reqParam = {
             sql: sql,
             fncode: 'req.sql.load',
@@ -125,14 +127,17 @@ class CjDatabaseAccess {
         httpRequest(reqParam);
     }
     loadT(sql, fn_callback, params) {
+        dbSessionMgr = this.dbSessionManager;
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
         }
 
         this.requestPool[curSessionId] = fn_callback;
+        requestPool = this.requestPool;
         let s = 'begin;' + sql + 'commit;';
         let reqParam = {
+            ctx: _this,
             sql: s,
             fncode: 'req.sql.transaction',
             type: this.type,
@@ -149,13 +154,14 @@ class CjDatabaseAccess {
     }
 
     exec(sql, fn_callback, params) {
+        dbSessionMgr = this.dbSessionManager;
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
         }
 
         this.requestPool[curSessionId] = fn_callback;
-
+        requestPool = this.requestPool;
         let reqParam = {
             sql: sql,
             fncode: 'req.sql.exec',
@@ -173,13 +179,14 @@ class CjDatabaseAccess {
     }
 
     execM(sql, values, fn_callback, params) {
+        dbSessionMgr = this.dbSessionManager;
         let curSessionId = this.dbSessionManager.requestSession(this.id);
         if (this.terminalSessionId) {
             curSessionId = this.terminalSessionId + '_' + curSessionId;
         }
 
         this.requestPool[curSessionId] = fn_callback;
-
+        requestPool = this.requestPool;
         let reqParam = {
             sql: sql,
             values: values,
@@ -268,7 +275,6 @@ function requestReturn(returnData) {
     let sessionId = dataObj['sessionId'];
     let data = dataObj['data'];
     let err = dataObj['error'];
-
     let fn = requestPool[sessionId];
 
     if (fn) {
@@ -287,6 +293,7 @@ function requestReturn(returnData) {
     }
 
     dbSessionMgr.releaseSession(sessionIdPart);
+    // dbSessionMgr.releaseSession.call(_this, sessionIdPart);
     requestPool[sessionId] = null;
     delete requestPool[sessionId];
 }

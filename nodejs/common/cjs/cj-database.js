@@ -2,11 +2,15 @@
 
 // const sqlite3 = require('sqlite3').verbose();
 let mysql = null;
+let oracle = null;
+let oraPool = null;
 if (typeof module !== 'undefined' && module.exports) {
     mysql = require('mysql');
+    oracle = null;
 } else {
     if (window.nodeRequire) {
         mysql = nodeRequire('mysql');
+        oracle = null;
     }
 }
 
@@ -23,14 +27,14 @@ if (typeof module !== 'undefined' && module.exports) {
  * }
  * @param fn_callback: 调用返回
  */
-
 class CjDatabase {
     constructor(type, dbParams, fn_callback) {
         this.db = null;
-        this.type = type;
+        this.type = type.toLowerCase();
         this.dbPool = null;
         this.id = dbParams.dsn;
         this.error = null;
+        this.oracleCfg = null;
         let _this = this;
 
         if (dbParams.host) {
@@ -73,6 +77,39 @@ class CjDatabase {
                 database: dsn,
                 multipleStatements: true,
             });
+        } else if (type === 'oracle') {
+            oracle = require('oracledb');
+            let connectString = `${dbParams.host}/${dbParams.dsn}`;
+            let user = dbParams.user;
+            let pwd = dbParams.pwd;
+            let connectionLimit = dbParams.connectionLimit || 10;
+
+            if (!connectString || !user || !pwd) {
+                console.log('Error : db params has error!');
+                console.log({
+                    'connectString': connectString,
+                    'user': user,
+                    'pwd': pwd,
+                });
+
+                let error = {'code': 'Error : db params has error!'};
+                this.error = error;
+                fn_callback(error);
+            }
+            this.oracleCfg = {
+                connectString: connectString,
+                user: user,
+                password: pwd,
+                poolMin: 1,
+                poolMax: connectionLimit,
+                poolIncrement: 1,
+                poolTimeout: 1,
+            };
+            oracle.createPool(this.oracleCfg, (err, pool) => {
+                if (!oraPool) {
+                    oraPool = pool;
+                }
+            });
         }
     }
 
@@ -107,6 +144,43 @@ class CjDatabase {
                     });
                 }
             });
+        } else if (this.type === 'oracle') {
+            let time = setInterval(function() {
+                if (oraPool) {
+                    clearInterval(time);
+                    oraPool.getConnection(function(err, conn) {
+                        if (err) {
+                            console.log(err);
+                            _this.error = err;
+                            fn_callback(err, null, null);
+                            return -2;
+                        } else {
+                            conn.execute(sql, function(err, result) {
+                                if (err) {
+                                    console.error(err.message);
+                                    conn.release();
+                                        // pool.close();
+                                    return;
+                                }
+                                let arr = [];
+                                let obj = {};
+                                for (let i = 0; i < result.rows.length; i++) {
+                                    for (let j = 0; j <result.metaData.length; j++) {
+                                        obj[result.metaData[j].name] = result.rows[i][j];
+                                    }
+                                    arr.push(obj);
+                                    obj = {};
+                                }
+                                fn_callback(err, arr, '', sessionId);
+                                conn.release();
+                                    // pool.close();
+                            });
+                        }
+                    });
+                } else {
+                    console.log('pool is not created');
+                }
+            }, 500);
         }
 
         return 1;
@@ -150,6 +224,37 @@ class CjDatabase {
                         }
                     });
                 }
+            });
+        } else if (this.type === 'oracle') {
+            oracle.createPool(this.oracleCfg, (err, pool) => {
+                pool.getConnection(function(err, conn) {
+                    if (err) {
+                        console.log(err);
+                        _this.error = err;
+                        fn_callback(err, null, null);
+                        return -2;
+                    } else {
+                        conn.execute(sql, function(err, result) {
+                            if (err) {
+                                console.error(err.message);
+                                // conn.release();
+                                pool.close();
+                                return;
+                            }
+                            let arr = [];
+                            let obj = {};
+                            for (let i = 0; i < result.rows.length; i++) {
+                                for (let j = 0; j <result.metaData.length; j++) {
+                                    obj[result.metaData[j].name] = result.rows[i][j];
+                                }
+                                arr.push(obj);
+                                obj = {};
+                            }
+                            // conn.release();
+                            pool.close();
+                        });
+                    }
+                });
             });
         }
 
@@ -226,13 +331,48 @@ class CjDatabase {
                     });
                 }
             });
+        } else if (this.type === 'oracle') {
+            oracle.createPool(this.oracleCfg, (err, pool) => {
+                pool.getConnection(function(err, conn) {
+                    if (err) {
+                        console.log(err);
+                        _this.error = err;
+                        fn_callback(err, null, null);
+                        return -2;
+                    } else {
+                        conn.execute(sql, function(err, result) {
+                            if (err) {
+                                console.error(err.message);
+                                // conn.release();
+                                pool.close();
+                                return;
+                            }
+                            let arr = [];
+                            let obj = {};
+                            for (let i = 0; i < result.rows.length; i++) {
+                                for (let j = 0; j <result.metaData.length; j++) {
+                                    obj[result.metaData[j].name] = result.rows[i][j];
+                                }
+                                arr.push(obj);
+                                obj = {};
+                            }
+                            // conn.release();
+                            pool.close();
+                        });
+                    }
+                });
+            });
         }
         return 1;
     }
 
     close() {
         if (this.dbPool) {
-            this.dbPool.end();
+            if (this.type === 'mysql') {
+                this.dbPool.end();
+            } else if (this.type === 'oracle') {
+                this.dbPool.close();
+            }
         }
     }
 
@@ -260,7 +400,6 @@ class DbManager {
     constructor(dbsParam) {
         this.databases = {};
         this.defaultDb = null;
-
         for (let db in dbsParam) {
             let _dbConfig = dbsParam[db];
 

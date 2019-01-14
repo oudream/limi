@@ -40,6 +40,7 @@ let dbsConfig = null;
 
 let _rtbusAppId = 0;
 
+let _startTime = Date.now();
 
 _alarmRecPlayLog.load = function() {
     let salarmRecPlayLogFilePath = path.join(path.join(process.cwd(), 'temp'), 'alarmrec_playlog.json');
@@ -825,7 +826,6 @@ function getOmcServerInfo() {
     let mysqlConfig = dbsConfig['db1'];
     let defaultDb = dbMgr.createDbConnect(mysqlConfig);
     let sServerID = getServerID();
-
     let sql1 = 'select * from omc_omcconfig where itemno = 3';
     let sql2 = 'select * from omc_omcconfig where itemno = 1';
     let sql3 = 'SELECT NeNo, SignalUrl, SignalNo FROM omc_signalurl;';
@@ -980,18 +980,20 @@ function getOmcServerInfo() {
         });
 
 
-        let loginRtbusTimeout = setTimeout(function() {
+        let fnTimeOutRtLogin = function() {
             if (_rtbusAppId === 0) {
-                console.log('warnning: _rtbus config[_rtbusAppId==0] invalid!!!');
+                console.log('warnning : _rtbus config[_rtbusAppId==0] invalid!!!');
                 return;
             }
-            clearTimeout(loginRtbusTimeout);
 
-            let packet = BasPacket.rtLoginPacket.toPacket(_rtbusAppId);
-            _rtbusProtocol.sendPacket(packet);
-
-            console.log(packet);
-        }, 1000);
+            let dtNow = Date.now();
+            if (dtNow - _startTime < 6000 || dtNow - _rtbusProtocol.lastReceivedDataTime > 60000) {
+                let packet = BasPacket.rtLoginPacket.toPacket(_rtbusAppId);
+                _rtbusProtocol.sendPacket(packet);
+                console.log(packet);
+            }
+        };
+        setInterval(fnTimeOutRtLogin, 3000);
     });
 }
 

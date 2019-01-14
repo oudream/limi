@@ -5,9 +5,12 @@ let http = require('http');
 let fs = require('fs');
 let url = require('url');
 
+process.kill()
 
 // 创建服务器
 http.createServer( function(request, response) {
+	debugger;
+	
     // 解析请求，包括文件名
     let pathname = url.parse(request.url).pathname;
 

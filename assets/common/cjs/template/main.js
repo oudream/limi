@@ -6,6 +6,7 @@
 
 define(['jquery', 'global', 'async', 'ifvisible', 'modal', 'action', 'cjcommon', 'cjstorage', 'cjdatabaseaccess', 'cjajax', 'utils', 'cache', 'templates', 'analysis'], function($, g, async, ifvisible) {
     let db;
+    let db1;
     let oAction = {
         init: function() {
             let serverInfo = cacheOpt.get('server-config');
@@ -65,6 +66,7 @@ define(['jquery', 'global', 'async', 'ifvisible', 'modal', 'action', 'cjcommon',
         /** 读取数据库配置信息 */
         let dbConfigs = serverInfo['database'];
         let _db1Config = dbConfigs['db1'];
+        let _db2Config = dbConfigs['oracle'];
 
         let dbParams = {
             'type': _db1Config.type,
@@ -74,21 +76,38 @@ define(['jquery', 'global', 'async', 'ifvisible', 'modal', 'action', 'cjcommon',
             'dsn': _db1Config.dsn,
             'connectionLimit': _db1Config.connectionLimit,
         };
-
+        let dbParams2 = {};
+        if (_db2Config) {
+            dbParams2 = {
+                'type': _db2Config.type,
+                'host': _db2Config.host,
+                'user': _db2Config.user,
+                'pwd': _db2Config.pwd,
+                'dsn': _db2Config.dsn,
+                'connectionLimit': _db2Config.connectionLimit,
+            };
+        }
         /** 创建数据库连接 */
         db = new CjDatabaseAccess(dbParams);
+        db1 = new CjDatabaseAccess(dbParams2);
         window.top.cjDb = db;
+        window.top.cjOracleDb = db1;
         initData();
 }
 
     function checkActive(time) {
+        let count = 0;
         ifvisible.setIdleDuration(time);
         ifvisible.on('statusChanged', function(e) {
+            count++
             if (e.status === 'idle' && ((sessionStorage.getItem('jsonName')!== 'home') && (sessionStorage.getItem('jsonName')!== 'make_start'))) {
                 clearCookie();
                 sessionStorage.setItem('s_user', '未登录');
                 sessionStorage.setItem('user', '');
                 window.location = '../../chtml/template/template.html?json=home';
+            } else if (e.status === 'idle' && ((count > 0) && (sessionStorage.getItem('jsonName')!== 'make_start'))) {
+                count = 0;
+                window.location.reload();
             }
         });
     }

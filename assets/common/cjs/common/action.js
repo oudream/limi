@@ -160,7 +160,7 @@ define(['jquery', 'async', 'MD5', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', '
         }
         propConfGrid.jqGrid('delRowData', selectedId);
 
-        let deleteSql = 'DELETE FROM ' + tableName + ' WHERE ID = ' + '\'' + del + '\'';
+        let deleteSql = 'DELETE FROM ' + tableName + ' WHERE ID = ' + '\'' + del + '\''+ ';';
         if (window.confirm('确认删除？')) {
             executeSql(deleteSql, log);
         }
@@ -467,7 +467,7 @@ define(['jquery', 'async', 'MD5', 'exportCSV', 'cjcommon', 'cjdatabaseaccess', '
         });
 
         obj['PassWord']  = MD5(obj.UserName + obj.Password);
-        let sql = `insert into omc_sys_user (UserName,Name,CardNo,PassWord) values('${obj.UserName}','${obj.Name}','${obj.CardNo}','${obj.PassWord}')`;
+        let sql = `insert into omc_sys_user (UserName,Name,CardNo,PassWord) values('${obj.UserName}','${obj.Name}','${obj.CardNo}','${obj.PassWord}');`;
         $('#modal-confirm', window.top.document).remove();
         $('#modal-mask', window.top.document).remove();
         executeSql(sql);

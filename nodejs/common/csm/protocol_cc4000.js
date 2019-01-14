@@ -663,6 +663,7 @@ function BasProtocol(bIsTcp = true, iProtocolModel = BasDefine.PROTOCOL_MODEL_OM
     this.channel = channelBase;
     this.parser = basParser;
     this.protocolModel = iProtocolModel;
+    this.lastReceivedDataTime = 0;
 }
 
 /**
@@ -688,17 +689,18 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
   // let pkStart = buf[iOffset];// BasDefine.PACKAGE_REQ_START;
     iOffset += 1;
 
-  // let pkCommandSeq = buf.readIntLE(iOffset, true);
+  // let pkCommandSeq = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-    let pkCommand = buf.readIntLE(iOffset, true);
+    let pkCommand = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-  // let pkRequest = buf.readIntLE(iOffset, true);
+  // let pkRequest = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     let packet = BasPacket.packets.get(pkCommand);
     if (packet) {
+        this.lastReceivedDataTime = Date.now();
         let msgObj = packet.fromBuffer(buf, iOffset, iEnd);
         this.dispatch(pkCommand, msgObj);
         console.log('BasPacket.dealPacket : pkCommand [', pkCommand, '] dispatch!');

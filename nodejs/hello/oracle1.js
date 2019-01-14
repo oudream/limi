@@ -38,5 +38,3 @@ function doRelease(connection) {
                 console.error(err.message);
         });
 }
-
-

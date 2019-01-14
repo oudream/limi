@@ -38,9 +38,26 @@ define && define(['jquery', 'jqGrid', 'jqGridConfig', 'panelConfig', 'action', '
                 if (typeof(w) === 'undefined') {
                     w = new Worker('/common/cjs/components/time/timer.js');
                 }
+                let now
                 w.onmessage = function(event) {
-                    $('#header-login-state .header-time').html(event.data);
+                    $('#header-login-state .header-time').html(event.data.local);
+                    now = event.data.utc;
                 };
+                // this is debug code
+                // let app = window.cc4k.app;
+                // let pre = '';
+                // setInterval(function () {
+                //     if (pre === now) {
+                //         app.sentHeartJumpEach(now, {"time":now,"state":"err"});
+                //     } else {
+                //         pre = now;
+                //         app.sentHeartJumpEach(now, {"time":now,"state":"ok"});
+                //     }
+                //     app.registerReqHeartJumpCallback(function (resSession, resData) {
+                //         console.info("ReqHeartJumpCallback.retrun - \n resSession: " + String(resSession) + "\nresData: " + JSON.stringify(resData));
+                //     });
+                // },5000)
+
             } else {
                 alert('浏览器版本太低，请升级');
             }
@@ -84,7 +101,7 @@ define && define(['jquery', 'jqGrid', 'jqGridConfig', 'panelConfig', 'action', '
         this.resize = function() {
             let height = $(window).height() - $('#header').height() - $('#footer').height();
             $('#content').height(height);
-            $(window).resize(this.throttle(function() {
+            $(window).resize(this.debounce(function() {
                 $('#content').height($(window).height() - $('#header').height() - $('#footer').height());
                 let index = document.querySelectorAll('.tabs-tab');
                 if (index) {
@@ -102,8 +119,8 @@ define && define(['jquery', 'jqGrid', 'jqGridConfig', 'panelConfig', 'action', '
                 }
             }, 100));
         };
-        // 函数节流/防抖
-        this.throttle = function(fn, delay) {
+        // 函数防抖
+        this.debounce = function(fn, delay) {
             let timer = null;
             return function() {
                 let context = this;
@@ -323,14 +340,16 @@ define && define(['jquery', 'jqGrid', 'jqGridConfig', 'panelConfig', 'action', '
                 }
                 if (count === 0) {
                     for (let j = 0; j < aDatas.length; j++) {  //200
-                        oTable['ID'] = j;
-                        let temp = aDatas[j].SignalNo;
-                        oTable['neNo'] = temp.toString(16);
-                        oTable['code'] = aDatas[j].SignalUrl;
-                        oTable['name'] = aDatas[j].SignalName;
-                        oTable['value'] = oRtData[aDatas[j].SignalUrl];
-                        aTable.push(oTable);
-                        oTable = {};
+                        if (oRtData[aDatas[j].SignalUrl]) {
+                            oTable['ID'] = j;
+                            let temp = aDatas[j].SignalNo;
+                            oTable['neNo'] = temp.toString(16);
+                            oTable['code'] = aDatas[j].SignalUrl;
+                            oTable['name'] = aDatas[j].SignalName;
+                            oTable['value'] = oRtData[aDatas[j].SignalUrl];
+                            aTable.push(oTable);
+                            oTable = {};
+                        }
                     }
                     oPreRtData = Object.assign({},oRtData);
                     $('#'+ data.tableProp.pagerID).text('共' + aTable.length + '条记录');

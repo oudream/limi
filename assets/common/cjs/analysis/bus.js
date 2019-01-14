@@ -6,14 +6,14 @@
 
 define(['jquery','cjstorage', 'cjdatabaseaccess', 'cjajax', 'cache'], function($,g) {
     let db;
-    const cc4k = window.cc4k;
+    // const cc4k = window.cc4k;
     let neNo = [];
     let scheme = {};
     let pretreatment = {};
     let oAction = {
         init: function() {
-            let serverInfo = cacheOpt.get('server-config');
-            dbConnectInit(serverInfo);
+            // let serverInfo = cacheOpt.get('server-config');
+            // dbConnectInit(serverInfo);
             getJsonData();
         },
     };
@@ -41,76 +41,53 @@ define(['jquery','cjstorage', 'cjdatabaseaccess', 'cjajax', 'cache'], function($
     }
 
     async function getSignal(data) {
-        let aSingal = JSON.parse(sessionStorage.getItem('signalUrl'));
-        if (!aSingal) {
-            await initData();
-            aSingal = JSON.parse(sessionStorage.getItem('signalUrl'));
-        }
-        for (let i = 0; i < aSingal.length; i++) {
-            if (aSingal[i].SignalUrl) {
-                cc4k.rtdb.appendMeasureByNenoCode(Number(aSingal[i].NeNo), aSingal[i].SignalUrl);
-            } else {
-                for (let i = 0; i < data.length; i++) {
-                    if (!data[i].signalUrl) {
-                        let arr = [];
-                        arr[0] = {
-                            value: 0,
-                            ui_scheme: data[i].ui_scheme,
-                        };
-                        emitData(arr);
-                    }
-                }
-            }
-        }
-        // for (let i = 0; i < data.length; i++) {
-        //     if (data[i].signalUrl) {
-        //         cc4k.rtdb.appendMeasureByNenoCode(Number(neNo[data[i].neNo]), data[i].signalUrl);
+        // let aSingal = JSON.parse(sessionStorage.getItem('signalUrl'));
+        // if (!aSingal) {
+        //     await initData();
+        //     aSingal = JSON.parse(sessionStorage.getItem('signalUrl'));
+        // }
+        // for (let i = 0; i < aSingal.length; i++) {
+        //     if (aSingal[i].SignalUrl) {
+        //         cc4k.rtdb.appendMeasureByNenoCode(Number(aSingal[i].NeNo), aSingal[i].SignalUrl);
         //     } else {
-        //         let arr = [];
-        //         arr[0] = {
-        //             value: 0,
-        //             ui_scheme: data[i].ui_scheme,
-        //         };
-        //         emitData(arr);
+        //         for (let i = 0; i < data.length; i++) {
+        //             if (!data[i].signalUrl) {
+        //                 let arr = [];
+        //                 arr[0] = {
+        //                     value: 0,
+        //                     ui_scheme: data[i].ui_scheme,
+        //                 };
+        //                 emitData(arr);
+        //             }
+        //         }
         //     }
         // }
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].signalUrl) {
+                cc4k.rtdb.appendMeasureByNenoCode(Number(neNo[data[i].neNo]), data[i].signalUrl);
+            } else {
+                let arr = [];
+                arr[0] = {
+                    value: 0,
+                    ui_scheme: data[i].ui_scheme,
+                };
+                emitData(arr);
+            }
+        }
         cc4k.rtdb.startSyncMeasures();
         cc4k.rtdb.registerMeasuresChangedCallback(function() {
             let aMeasure = [];
-            for (let i = 0; i < aSingal.length; i++) {
-                aMeasure.push(cc4k.rtdb.findMeasureByNenoCode(Number(aSingal[i].NeNo), aSingal[i].SignalUrl));
-            }
-            let arr = [];
-            let allRt = [];
-            let temp = 0;
-            for (let i = 0; i < aMeasure.length; i++) {
-                allRt[i] = {
-                    code: aMeasure[i].code,
-                    value: aMeasure[i].value,
-                };
-                for (let j = 0; j < data.length; j++) {
-                    if (!aMeasure[i]) {
-                        break;
-                    } else {
-                        if (aMeasure[i].code === data[j].signalUrl) {
-                            arr[temp] = {
-                                code: data[j].signalUrl,
-                                value: aMeasure[i].value,
-                                refreshTime: aMeasure[i].refreshTime,
-                                res: aMeasure[i].res,
-                                ui_scheme: data[j].ui_scheme,
-                            };
-                            temp ++;
-                        }
-                    }
-                }
-            }
-            // for (let i = 0; i < data.length; i++) {
-            //     aMeasure.push(cc4k.rtdb.findMeasureByNenoCode(Number(neNo[data[i].neNo]), data[i].signalUrl));
+            // for (let i = 0; i < aSingal.length; i++) {
+            //     aMeasure.push(cc4k.rtdb.findMeasureByNenoCode(Number(aSingal[i].NeNo), aSingal[i].SignalUrl));
             // }
             // let arr = [];
+            let allRt = [];
             // let temp = 0;
             // for (let i = 0; i < aMeasure.length; i++) {
+            //     allRt[i] = {
+            //         code: aMeasure[i].code,
+            //         value: aMeasure[i].value,
+            //     };
             //     for (let j = 0; j < data.length; j++) {
             //         if (!aMeasure[i]) {
             //             break;
@@ -128,6 +105,33 @@ define(['jquery','cjstorage', 'cjdatabaseaccess', 'cjajax', 'cache'], function($
             //         }
             //     }
             // }
+            for (let i = 0; i < data.length; i++) {
+                aMeasure.push(cc4k.rtdb.findMeasureByNenoCode(Number(neNo[data[i].neNo]), data[i].signalUrl));
+            }
+            let arr = [];
+            let temp = 0;
+            for (let i = 0; i < aMeasure.length; i++) {
+                allRt[i] = {
+                            code: aMeasure[i].code,
+                            value: aMeasure[i].value,
+                        };
+                for (let j = 0; j < data.length; j++) {
+                    if (!aMeasure[i]) {
+                        break;
+                    } else {
+                        if (aMeasure[i].code === data[j].signalUrl) {
+                            arr[temp] = {
+                                code: data[j].signalUrl,
+                                value: aMeasure[i].value,
+                                refreshTime: aMeasure[i].refreshTime,
+                                res: aMeasure[i].res,
+                                ui_scheme: data[j].ui_scheme,
+                            };
+                            temp ++;
+                        }
+                    }
+                }
+            }
             emitData(arr);
             window.rtData = allRt;
         });
@@ -316,65 +320,65 @@ define(['jquery','cjstorage', 'cjdatabaseaccess', 'cjajax', 'cache'], function($
         }
     }
 
-    function dbConnectInit(serverInfo) {
-        /** 读取数据库配置信息 */
-        let dbConfigs = serverInfo['database'];
-        let _db1Config = dbConfigs['db1'];
+    // function dbConnectInit(serverInfo) {
+    //     /** 读取数据库配置信息 */
+    //     let dbConfigs = serverInfo['database'];
+    //     let _db1Config = dbConfigs['db1'];
+    //
+    //     let dbParams = {
+    //         'type': _db1Config.type,
+    //         'host': _db1Config.host,
+    //         'user': _db1Config.user,
+    //         'pwd': _db1Config.pwd,
+    //         'dsn': _db1Config.dsn,
+    //         'connectionLimit': _db1Config.connectionLimit,
+    //     };
+    //
+    //     /** 创建数据库连接 */
+    //     db = new CjDatabaseAccess(dbParams);
+    //     window.top.cjDb = db;
+    //     // initData();
+    // }
 
-        let dbParams = {
-            'type': _db1Config.type,
-            'host': _db1Config.host,
-            'user': _db1Config.user,
-            'pwd': _db1Config.pwd,
-            'dsn': _db1Config.dsn,
-            'connectionLimit': _db1Config.connectionLimit,
-        };
+    // async function loadSql(sql) {
+    //     let serverInfo = cacheOpt.get('server-config');
+    //     let reqHost = serverInfo['server']['ipAddress'];
+    //     let reqPort = serverInfo['server']['httpPort'];
+    //     let reqParam = {
+    //         reqHost: reqHost,
+    //         reqPort: reqPort,
+    //     };
+    //     return new Promise(function(resolve, reject) {
+    //         db.load(sql, (e, v) => {
+    //             if (e) {
+    //                 reject(e);
+    //             } else {
+    //                 resolve(v);
+    //             }
+    //         }, reqParam);
+    //     });
+    // }
 
-        /** 创建数据库连接 */
-        db = new CjDatabaseAccess(dbParams);
-        window.top.cjDb = db;
-        initData();
-    }
-
-    async function loadSql(sql) {
-        let serverInfo = cacheOpt.get('server-config');
-        let reqHost = serverInfo['server']['ipAddress'];
-        let reqPort = serverInfo['server']['httpPort'];
-        let reqParam = {
-            reqHost: reqHost,
-            reqPort: reqPort,
-        };
-        return new Promise(function(resolve, reject) {
-            db.load(sql, (e, v) => {
-                if (e) {
-                    reject(e);
-                } else {
-                    resolve(v);
-                }
-            }, reqParam);
-        });
-    }
-
-    async function initData() {
-        let flag = sessionStorage.getItem('signalUrl');
-
-        if (!flag) {
-            let getSignalUrl = 'select * from omc_signalurl';
-            let aSignalUrl = await loadSql(getSignalUrl);
-
-            let signalUrl = [];
-
-            aSignalUrl.forEach((item,index) =>{
-                signalUrl[index] = {
-                    NeNo: item.NeNo,
-                    SignalUrl: item.SignalUrl,
-                    SignalNo: item.SignalNo,
-                    SignalName: item.SignalName,
-                };
-            });
-            sessionStorage.setItem('signalUrl', JSON.stringify(signalUrl));
-        }
-    }
+    // async function initData() {
+    //     let flag = sessionStorage.getItem('signalUrl');
+    //
+    //     if (!flag) {
+    //         let getSignalUrl = 'select * from omc_signalurl';
+    //         let aSignalUrl = await loadSql(getSignalUrl);
+    //
+    //         let signalUrl = [];
+    //
+    //         aSignalUrl.forEach((item,index) =>{
+    //             signalUrl[index] = {
+    //                 NeNo: item.NeNo,
+    //                 SignalUrl: item.SignalUrl,
+    //                 SignalNo: item.SignalNo,
+    //                 SignalName: item.SignalName,
+    //             };
+    //         });
+    //         sessionStorage.setItem('signalUrl', JSON.stringify(signalUrl));
+    //     }
+    // }
     /**
      * 模块返回调用接口
      */

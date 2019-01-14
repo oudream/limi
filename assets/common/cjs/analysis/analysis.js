@@ -214,6 +214,9 @@ define(['jquery', 'global', 'modal', 'action', 'cjcommon', 'cjstorage', 'cjdatab
                 case 'svg':
                     html += this.createSvg(aValue, aClass, additional, aController);
                     break;
+                case 'iframe':
+                    html += this.createIframe(aValue, aClass, additional, aController);
+                    break;
                 case 'menu':
                     html += this.createMenu(aValue, aClass, additional);
                     break;
@@ -235,6 +238,9 @@ define(['jquery', 'global', 'modal', 'action', 'cjcommon', 'cjstorage', 'cjdatab
                 case 'url':
                     html += this.createUrl(aValue);
                     break;
+                case 'js':
+                    this.createJs(aValue);
+                    break;
                 default:
                     break;
                 }
@@ -245,6 +251,12 @@ define(['jquery', 'global', 'modal', 'action', 'cjcommon', 'cjstorage', 'cjdatab
             let html='';
             // html =`<script> window.location = "${aValue}" </script>`;
             return html;
+        };
+        this.createJs = function(url){
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url;
+            document.getElementsByTagName('head')[0].appendChild(script);
         };
         this.analysisInputAttr = function(attr, value, cla, styles) {
             let label = '';
@@ -473,6 +485,25 @@ define(['jquery', 'global', 'modal', 'action', 'cjcommon', 'cjstorage', 'cjdatab
                 // this.aController.push(aController[i]);
             }
             return svg;
+        };
+        this.createIframe = function(aVal, aClass, additional, aController) {
+            let ifame = '';
+            for (let i = 0; i < aVal.length; i++) {
+                // let projectName = sessionStorage.getItem('projectName');
+                let url = `${aVal[i]}`;
+                // sessionStorage.setItem('tbName', aVal[i]);
+                if (aClass[i]) {
+                    if (additional[aClass[i]]) {
+                        let oAdditional = this.analysisAdditional(additional[aClass[i]]);
+                        let style = this.analysisStyle(oAdditional.style);
+                        ifame += `<iframe src="${url}" id="${aClass[i]}" class="${aClass[i]}" style="height: 100%;width: 100%;${style}"/>`;
+                    } else {
+                        ifame += `<iframe src="${url}" id="${aClass[i]}" class="${aClass[i]}" style="height: 100%;width: 100%" />`;
+                    }
+                }
+                // this.aController.push(aController[i]);
+            }
+            return ifame;
         };
         this.createMenu = function(aVal, aClass, additional) {
             let menu = '';

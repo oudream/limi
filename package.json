@@ -23,6 +23,7 @@
     "electron-packager": "^8.6.0",
     "glob": "^7.1.2",
     "mysql": "^2.15.0",
+    "node-inspect": "^1.11.5",
     "npm-run-all": "^4.0.2",
     "oracledb": "^3.0.0",
     "socket.io": "^2.0.3",
