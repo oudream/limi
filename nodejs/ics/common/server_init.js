@@ -84,12 +84,7 @@ function init() {
                 body += chunk;
             });
             req.on('end', function() {
-<<<<<<< .mine
-||||||| .r2094
-                CjLog.log('rtdata.cgi:',JSON.stringify(body));
-=======
                 // CjLog.log('rtdata.cgi:',JSON.stringify(body));
->>>>>>> .r2227
                 let reqSession = null;
                 let reqStructtype = null;
                 let reqMeasures = null;
