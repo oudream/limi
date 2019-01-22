@@ -1,4 +1,3 @@
-
 'use strict';
 
 let http = require('http');
@@ -9,7 +8,7 @@ exports = module.exports = Route;
 
 let toString = Object.prototype.toString;
 
-function Route( ) {
+function Route() {
     this.stack = [];
 }
 

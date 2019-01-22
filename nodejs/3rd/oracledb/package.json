@@ -1,0 +1,81 @@
+{
+  "_from": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+  "_id": "oracledb@3.0.0",
+  "_inBundle": false,
+  "_integrity": "sha512-oWoVcISnfXSyqLm9OI+0jfBqhldMATjEJNcyRs9NC4nwhwoCPyzBuqGvsHPO0NgKfE/Pg+eYAYU+e7+bpD4kfA==",
+  "_location": "/oracledb",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+    "rawSpec": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+    "saveSpec": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+    "fetchSpec": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+  "_shasum": "d4c5760a584729f7c43d49fc1b843844aba1015f",
+  "_spec": "https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz",
+  "_where": "D:\\tmp",
+  "bugs": {
+    "url": "https://github.com/oracle/node-oracledb/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "nan": "~2.10.0"
+  },
+  "deprecated": false,
+  "description": "A Node.js module for Oracle Database access",
+  "devDependencies": {
+    "async": "^1.5.0",
+    "mocha": "^2.4.5",
+    "should": "^8.3.1"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "gypfile": true,
+  "homepage": "http://oracle.github.io/node-oracledb/",
+  "keywords": [
+    "Oracle",
+    "Database",
+    "official",
+    "DB",
+    "SQL",
+    "JSON",
+    "PL/SQL",
+    "OCI",
+    "API",
+    "client",
+    "library",
+    "driver",
+    "add-on",
+    "extension",
+    "binding",
+    "interface",
+    "adapter",
+    "module"
+  ],
+  "license": "Apache-2.0",
+  "main": "./index.js",
+  "maintainers": [
+    {
+      "name": "Oracle Corp."
+    }
+  ],
+  "name": "oracledb",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/oracle/node-oracledb.git"
+  },
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "posttest": "node test/opts/version.js",
+    "test": "mocha --opts test/opts/mocha.opts",
+    "testv6": "mocha --opts test/opts/mochaNodeV6.opts"
+  },
+  "version": "3.0.0"
+}

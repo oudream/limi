@@ -1,8 +1,5 @@
 'use strict';
 
-const net = require('net');
-const fs = require('fs');
-
 exports = module.exports = CjTransferServerBase;
 
 /**

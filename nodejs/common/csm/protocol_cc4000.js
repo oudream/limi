@@ -12,6 +12,7 @@ exports = module.exports = BasProtocol;
  */
 function BasDefine() {
 }
+
 BasDefine.PROTOCOL_MODEL_OMC = 1001;
 BasDefine.PROTOCOL_MODEL_RT = 1002;
 
@@ -192,7 +193,7 @@ BasPacket.packets = new Map();
 BasPacket.prototype.toBuffer = function(...args) {
     let self = this;
     let commandAttrs = self.commandAttrs;
-  // :todo.best : compatible : arguments.length != commandAttrs.length
+    // :todo.best : compatible : arguments.length != commandAttrs.length
     if (args.length !== commandAttrs.length) {
         return Buffer.alloc(0);
     }
@@ -290,7 +291,7 @@ BasPacket.prototype.fromBuffer = function(buf, iStart, iEnd) {
             iOffset += attr.size;
             break;
         case BasAttr.CI_Type_buffer:
-            // do not increate ioffset
+                // do not increate ioffset
             break;
         default:
             iOffset += attr.size;
@@ -381,7 +382,7 @@ BasPacket.prototype.preparePacket = function(buf) {
     }
     r[j] = buf[iOldSize - 1];
     let iNewSize = j + 1;
-  // return r.slice(0, iNewSize);
+    // return r.slice(0, iNewSize);
     let iCrc = 0;
     for (let h = 1; h < iNewSize - 2; h++) {
         iCrc = (iCrc + r[h]) & 0xff;
@@ -395,7 +396,7 @@ BasPacket.prototype.encodePacket = function(buf, iTotalSize) {
         return Buffer.allocUnsafe(0);
     }
     let iOldSize = buf.length;
-  // total length : 1 + 3 + 3 + 3 + 1 + 1
+    // total length : 1 + 3 + 3 + 3 + 1 + 1
     let r = Buffer.allocUnsafe(iOldSize + 1 + 4 + 4 + 4 + 1 + 1);
 
     let iOffset = 0;
@@ -430,97 +431,97 @@ BasPacket.prototype.setCommand = function(iCommandSeq, iCommand) {
 };
 
 BasPacket.prototype.toPacket = function(...args) {
-  let self = this;
-  let commandAttrs = self.commandAttrs;
-  // :todo.best : compatible : arguments.length != commandAttrs.length
-  if (args.length !== commandAttrs.length) {
-    return Buffer.alloc(0);
-  }
-  let iTotalSize = self.getStaticTotalSize();
-  let idx = 0;
-  let attr;
-  let value;
-  // get attrs's buffer size
-  if (self.commandAttrBufferCount > 0) {
+    let self = this;
+    let commandAttrs = self.commandAttrs;
+    // :todo.best : compatible : arguments.length != commandAttrs.length
+    if (args.length !== commandAttrs.length) {
+        return Buffer.alloc(0);
+    }
+    let iTotalSize = self.getStaticTotalSize();
+    let idx = 0;
+    let attr;
+    let value;
+    // get attrs's buffer size
+    if (self.commandAttrBufferCount > 0) {
+        while (idx < commandAttrs.length) {
+            attr = commandAttrs[idx];
+            value = args[idx];
+            if (attr.type === BasAttr.CI_Type_buffer) {
+                iTotalSize += value.length;
+            }
+            ++idx;
+        }
+    }
+    if (iTotalSize <= 0) {
+        return Buffer.alloc(0);
+    }
+    let rBuf = Buffer.alloc(iTotalSize);
+    let iOffset = 0;
+    idx = 0;
     while (idx < commandAttrs.length) {
-      attr = commandAttrs[idx];
-      value = args[idx];
-      if (attr.type === BasAttr.CI_Type_buffer) {
-        iTotalSize += value.length;
-      }
-      ++idx;
-    }
-  }
-  if (iTotalSize <= 0) {
-    return Buffer.alloc(0);
-  }
-  let rBuf = Buffer.alloc(iTotalSize);
-  let iOffset = 0;
-  idx = 0;
-  while (idx < commandAttrs.length) {
-    attr = commandAttrs[idx];
-    value = args[idx];
-    switch (attr.type) {
-      case BasAttr.CI_Type_int:
-        rBuf.writeIntLE(value, iOffset, attr.size, true);
-        break;
-      case BasAttr.CI_Type_long:
-        rBuf.writeIntLE(value, iOffset, 6, true);
-        break;
-      case BasAttr.CI_Type_double:
-        rBuf.writeDoubleLE(value, iOffset, true);
-        break;
-      case BasAttr.CI_Type_string:
-        if (value.length > attr.size) {
-          throw new UserException('BasPacket: value.length > attr.size');
+        attr = commandAttrs[idx];
+        value = args[idx];
+        switch (attr.type) {
+        case BasAttr.CI_Type_int:
+            rBuf.writeIntLE(value, iOffset, attr.size, true);
+            break;
+        case BasAttr.CI_Type_long:
+            rBuf.writeIntLE(value, iOffset, 6, true);
+            break;
+        case BasAttr.CI_Type_double:
+            rBuf.writeDoubleLE(value, iOffset, true);
+            break;
+        case BasAttr.CI_Type_string:
+            if (value.length > attr.size) {
+                throw new UserException('BasPacket: value.length > attr.size');
+            }
+            rBuf.write(value, iOffset, attr.size);// Default: 'utf8'
+            rBuf[iOffset + value.length] = 0;
+            break;
+        case BasAttr.CI_Type_buffer:
+            if (value.length > attr.size) {
+                throw new UserException('BasPacket: value.length > attr.size');
+            }
+            value.copy(rBuf, iOffset);// Default: 'utf8'
+            break;
+        default:
+            break;
         }
-        rBuf.write(value, iOffset, attr.size);// Default: 'utf8'
-        rBuf[iOffset + value.length] = 0;
-        break;
-      case BasAttr.CI_Type_buffer:
-        if (value.length > attr.size) {
-          throw new UserException('BasPacket: value.length > attr.size');
-        }
-        value.copy(rBuf, iOffset);// Default: 'utf8'
-        break;
-      default:
-        break;
+        iOffset += attr.size;
+        ++idx;
     }
-    iOffset += attr.size;
-    ++idx;
-  }
 
-  let buf = rBuf;
-  if (!buf || buf.length === 0) {
-    return Buffer.allocUnsafe(0);
-  }
-  let iOldSize = buf.length;
-  // total length : 1 + 3 + 3 + 3 + 1 + 1
-  let r = Buffer.allocUnsafe(iOldSize + 1 + 4 + 4 + 4 + 1 + 1);
+    let buf = rBuf;
+    if (!buf || buf.length === 0) {
+        return Buffer.allocUnsafe(0);
+    }
+    let iOldSize = buf.length;
+    // total length : 1 + 3 + 3 + 3 + 1 + 1
+    let r = Buffer.allocUnsafe(iOldSize + 1 + 4 + 4 + 4 + 1 + 1);
 
-  iOffset = 0;
-  r[iOffset] = BasDefine.PACKAGE_REQ_START;
-  iOffset += 1;
+    iOffset = 0;
+    r[iOffset] = BasDefine.PACKAGE_REQ_START;
+    iOffset += 1;
 
-  r.writeIntLE(this.commandSeq, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
-  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+    r.writeIntLE(this.commandSeq, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+    iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-  r.writeIntLE(this.commandCode, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
-  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+    r.writeIntLE(this.commandCode, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+    iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-  r.writeIntLE(iTotalSize, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
-  iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
+    r.writeIntLE(iTotalSize, iOffset, BasDefine.PACKAGE_ITEM_REQ_LEN, true);
+    iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-  buf.copy(r, iOffset);
-  iOffset += buf.length;
+    buf.copy(r, iOffset);
+    iOffset += buf.length;
 
-  r[iOffset] = 0;// crc
-  iOffset += 1;
+    r[iOffset] = 0;// crc
+    iOffset += 1;
 
-  r[iOffset] = BasDefine.PACKAGE_REQ_END;
-  iOffset += 1; // r.length
+    r[iOffset] = BasDefine.PACKAGE_REQ_END;
+    iOffset += 1; // r.length
 
-  return this.preparePacket(r);
+    return this.preparePacket(r);
     //
     // return this.encodePacket(BasPacket.prototype.toBuffer.apply(this, args));
 };
@@ -530,11 +531,11 @@ BasPacket.prototype.toPacket = function(...args) {
  * @constructor
  */
 function BasParser() {
-  // recvCache : recv data -> push to recvCache
+    // recvCache : recv data -> push to recvCache
     this.recvCache = Buffer.allocUnsafeSlow(BasDefine.PACKAGE_MAX_BUF_SIZE);
     this.recvOffset = 0;
     this.dealOffset = 0;
-  // deal recvCache and take msg (one Complete Packet msgLength) to msgCache
+    // deal recvCache and take msg (one Complete Packet msgLength) to msgCache
     this.msgCache = Buffer.allocUnsafeSlow(BasDefine.PACKAGE_MAX_REQ_LEN);
     this.msgLength = 0;
     this.onReceivedMsg = 0;
@@ -583,7 +584,7 @@ BasParser.prototype.dealCache = function() {
             }
 
             if (iEndPos === 0) {
-        // nothing to do, wait to receive all bytes
+                // nothing to do, wait to receive all bytes
                 return;
             } else {
                 let iMsgLength = iEndPos - iStartPos + 1;
@@ -592,7 +593,7 @@ BasParser.prototype.dealCache = function() {
                     if (this.onReceivedMsg) {
                         this.onReceivedMsg(this.msgCache, iMsgEnd);
                     }
-          // BasPacket.dealPacket(this.msgCache, iMsgEnd);
+                    // BasPacket.dealPacket(this.msgCache, iMsgEnd);
                 }
                 index = iEndPos;
                 if (iEndPos > 0) {
@@ -627,7 +628,7 @@ BasParser.prototype.repairMsg = function(iStartPos, iEndPos) {
     }
     iCrc = BasDefine.PACKAGE_REQ_CRC - iCrc;
     if (iCrc !== msgBuf[j - 2]) {
-    // 校验失败
+        // 校验失败
         console.log('BasParser.prototype.repairMsg(iStartPos, iEndPos), crc invalid!');
     }
     return j;
@@ -686,16 +687,16 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
     }
 
     let iOffset = 0;
-  // let pkStart = buf[iOffset];// BasDefine.PACKAGE_REQ_START;
+    // let pkStart = buf[iOffset];// BasDefine.PACKAGE_REQ_START;
     iOffset += 1;
 
-  // let pkCommandSeq = buf.readIntLE(iOffset, 4, true);
+    // let pkCommandSeq = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     let pkCommand = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
-  // let pkRequest = buf.readIntLE(iOffset, 4, true);
+    // let pkRequest = buf.readIntLE(iOffset, 4, true);
     iOffset += BasDefine.PACKAGE_ITEM_REQ_LEN;
 
     let packet = BasPacket.packets.get(pkCommand);
@@ -708,9 +709,9 @@ BasProtocol.prototype.dealPacket = function(buf, iEnd) {
         console.log('BasPacket.dealPacket : pkCommand [', pkCommand, '] is undefined!');
     }
 
-  // let pkCrc = buf[iEnd - 2];// crc
+    // let pkCrc = buf[iEnd - 2];// crc
 
-  // let pkEnd = buf[iEnd - 1];// = BasDefine.PACKAGE_REQ_END;
+    // let pkEnd = buf[iEnd - 1];// = BasDefine.PACKAGE_REQ_END;
 };
 
 BasProtocol.prototype.onAllPacket = function(fn) {
@@ -749,7 +750,7 @@ BasProtocol.prototype.checkProtocol = function(interval) {
     }
 
     let timeOut = function() {
-    // *recycle heart jump
+        // *recycle heart jump
         if (self.channel.isOpen()) {
             let packet = self.protocolModel === BasDefine.PROTOCOL_MODEL_OMC ? BasPacket.userLoginPacket : BasPacket.rtReqHeartbeat;
             if (packet) {
@@ -843,15 +844,15 @@ if (true) {
     let rtReqUpdlistPacket = new BasPacket();
     rtReqUpdlistPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtReqUpdlistPacket.add('Count');
-    rtReqUpdlistPacket.add('MeasuresBuffer', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqUpdlistPacket.add('MeasuresBuffer', BasDefine.PACKAGE_MAX_REQ_LEN - 128, BasAttr.CI_Type_buffer);
     rtReqUpdlistPacket.setCommand(1, BasDefine.RTDB_REQ_UPD_RCD_LIST);
     BasPacket.rtReqUpdlistPacket = rtReqUpdlistPacket;
 
     let rtReqUpdkeyPacket = new BasPacket();
     rtReqUpdkeyPacket.add('TableName', BasDefine.RTDB_MAX_TABLE_NAME);
     rtReqUpdkeyPacket.add('Key', 8, BasAttr.CI_Type_long);
-    rtReqUpdkeyPacket.add('KeyRes', BasDefine.RTDB_MAX_KEY-8);
-    rtReqUpdkeyPacket.add('MeasureBuffer', BasDefine.PACKAGE_SIMPLE_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqUpdkeyPacket.add('KeyRes', BasDefine.RTDB_MAX_KEY - 8);
+    rtReqUpdkeyPacket.add('MeasureBuffer', BasDefine.PACKAGE_SIMPLE_REQ_LEN - 128, BasAttr.CI_Type_buffer);
     rtReqUpdkeyPacket.setCommand(1, BasDefine.RTDB_REQ_UPDRCD_BY_KEY);
     BasPacket.rtReqUpdkeyPacket = rtReqUpdkeyPacket;
 
@@ -887,7 +888,7 @@ if (true) {
     rtReqDaDetailPacket.add('Interval', 8, BasAttr.CI_Type_long);
     rtReqDaDetailPacket.add('Key', 8, BasAttr.CI_Type_long);
     rtReqDaDetailPacket.add('KeyLen', 8, BasAttr.CI_Type_long);
-    rtReqDaDetailPacket.add('KeyList', BasDefine.PACKAGE_MAX_REQ_LEN-128, BasAttr.CI_Type_buffer);
+    rtReqDaDetailPacket.add('KeyList', BasDefine.PACKAGE_MAX_REQ_LEN - 128, BasAttr.CI_Type_buffer);
     rtReqDaDetailPacket.setCommand(1, BasDefine.ICS_DA_REQ_DETAIL);
     BasPacket.rtReqDaDetailPacket = rtReqDaDetailPacket;
 
@@ -911,17 +912,17 @@ if (true) {
 BasProtocol.test1 = function() {
     let basProtocol = new BasProtocol();
     basProtocol.start({port: 5556, host: '127.0.0.1'});
-  // only commandCode
+    // only commandCode
     basProtocol.on(BasPacket.userLoginPacket.commandCode, function(msgObj) {
         console.log(msgObj); // msgObj = {user: 'user1', password: 'password1'}
     });
-  // all in
+    // all in
     basProtocol.onAllPacket(function(commandCode, msgObj) {
         console.log(commandCode, msgObj);
     });
 
     setTimeout(function() {
-    // send packet
+        // send packet
         let packet = BasPacket.userLoginPacket.toPacket('user1', 'password1', 'no1', 1001);
         basProtocol.sendPacket(packet);
 

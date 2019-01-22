@@ -5,26 +5,29 @@ const fs = require('fs');
 
 exports = module.exports = CjTransferTcpServer;
 
+let TCPSERVER_IP = '127.0.0.1';
+let TCPSERVER_PORT = 5555;
+
 function CjTransferTcpServer() {
     this.connectState = CjTransferTcpServer.CI_ConnectState_Null;
     this._tcpSocket = null;
     this.isAutoOpen = false;
     this.isAutoHeartbeat = false;
-    this.connectParams = {RemotePort: 5555, RemoteIpAddress: '127.0.0.1'};
+    this.connectParams = {RemotePort: TCPSERVER_PORT, RemoteIpAddress: TCPSERVER_IP};
     this.onReceived = null;
 }
 
 CjTransferTcpServer.prototype.receivedData = function(data) {
-    console.log('received data: ', data.length);
+    // console.log('received data: ', data.length);
     if (this.onReceived) {
         this.onReceived(data);
     }
-  // console.log(data.toString());
-  // fs.writeFile('f:/002.txt', data, function (err) {
-  //     if (err) {
-  //         console.log(err);
-  //     }
-  // });
+    // console.log(data.toString());
+    // fs.writeFile('f:/002.txt', data, function (err) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    // });
 };
 
 CjTransferTcpServer.prototype.sendData = function(data) {
@@ -49,7 +52,7 @@ CjTransferTcpServer.CS_EntryLocalPort = 'LocalPort';
  * @param option = {RemotePort:5555, RemoteIpAddress:'127.0.0.1'};
  */
 CjTransferTcpServer.prototype.open = function(option) {
-  // var option = {port:5555, ip:'127.0.0.1'};
+    // var option = {port:5555, ip:'127.0.0.1'};
     if (this._tcpSocket) {
         return;
     }
@@ -90,7 +93,7 @@ CjTransferTcpServer.prototype.open = function(option) {
 
             clearTimeout(timeout);
 
-      // 'connect' listener
+            // 'connect' listener
             console.log('connected to server!');
 
             self._tcpSocket = tcpSocket;
@@ -145,7 +148,7 @@ CjTransferTcpServer.prototype.checkChannel = function(interval) {
     }
 
     let timeOut = function() {
-    //* recycle connect
+        //* recycle connect
         if (self.isAutoOpen) {
             if (!self.isOpen()) {
                 self.open();
@@ -153,7 +156,7 @@ CjTransferTcpServer.prototype.checkChannel = function(interval) {
             }
         }
 
-    //* recycle heart jump
+        //* recycle heart jump
         if (self.isAutoHeartbeat) {
             if (self.isOpen()) {
                 self.sendData('heart jump!\r\n');

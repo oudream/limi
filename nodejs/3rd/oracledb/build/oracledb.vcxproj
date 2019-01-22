@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{25A34AC6-4217-5296-C265-26604592BE06}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>oracledb</RootNamespace>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Label="Locals">
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <ImportGroup Label="PropertySheets">
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <ExecutablePath>$(ExecutablePath);$(MSBuildProjectDirectory)\..\bin\;$(MSBuildProjectDirectory)\..\bin\</ExecutablePath>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <IntDir>$(Configuration)\obj\$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.node</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.node</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.node</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.node</TargetExt>
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetPath>$(OutDir)\$(ProjectName).node</TargetPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oudream\.node-gyp\10.13.0\include\node;C:\Users\oudream\.node-gyp\10.13.0\src;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\config;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\openssl\include;C:\Users\oudream\.node-gyp\10.13.0\deps\uv\include;C:\Users\oudream\.node-gyp\10.13.0\deps\zlib;C:\Users\oudream\.node-gyp\10.13.0\deps\v8\include;..\odpi\src;..\odpi\include;..\..\nan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /EHsc %(AdditionalOptions)</AdditionalOptions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <DisableSpecificWarnings>4351;4355;4800;4251;4275;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>false</ExceptionHandling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>false</OmitFramePointers>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NODE_GYP_MODULE_NAME=oracledb;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StringPooling>true</StringPooling>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Lib>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\oudream\.node-gyp\10.13.0\ia32\node.lib&quot;</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4199 %(AdditionalOptions)</AdditionalOptions>
+      <AllowIsolation>true</AllowIsolation>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <DelayLoadDLLs>iojs.exe;node.exe;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <MapExports>true</MapExports>
+      <OutputFile>$(OutDir)$(ProjectName).node</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetExt>.node</TargetExt>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\Users\oudream\.node-gyp\10.13.0\include\node;C:\Users\oudream\.node-gyp\10.13.0\src;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\config;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\openssl\include;C:\Users\oudream\.node-gyp\10.13.0\deps\uv\include;C:\Users\oudream\.node-gyp\10.13.0\deps\zlib;C:\Users\oudream\.node-gyp\10.13.0\deps\v8\include;..\odpi\src;..\odpi\include;..\..\nan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=oracledb;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oudream\.node-gyp\10.13.0\include\node;C:\Users\oudream\.node-gyp\10.13.0\src;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\config;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\openssl\include;C:\Users\oudream\.node-gyp\10.13.0\deps\uv\include;C:\Users\oudream\.node-gyp\10.13.0\deps\zlib;C:\Users\oudream\.node-gyp\10.13.0\deps\v8\include;..\odpi\src;..\odpi\include;..\..\nan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/EHsc %(AdditionalOptions)</AdditionalOptions>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <DisableSpecificWarnings>4351;4355;4800;4251;4275;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>false</ExceptionHandling>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <Optimization>Full</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NODE_GYP_MODULE_NAME=oracledb;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;BUILDING_NODE_EXTENSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <WarningLevel>Level3</WarningLevel>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+    </ClCompile>
+    <Lib>
+      <AdditionalOptions>/LTCG:INCREMENTAL /LTCG %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <Link>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\oudream\.node-gyp\10.13.0\ia32\node.lib&quot;</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4199 /LTCG:INCREMENTAL %(AdditionalOptions)</AdditionalOptions>
+      <AllowIsolation>true</AllowIsolation>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <DelayLoadDLLs>iojs.exe;node.exe;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <MapExports>true</MapExports>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)$(ProjectName).node</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetExt>.node</TargetExt>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>C:\Users\oudream\.node-gyp\10.13.0\include\node;C:\Users\oudream\.node-gyp\10.13.0\src;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\config;C:\Users\oudream\.node-gyp\10.13.0\deps\openssl\openssl\include;C:\Users\oudream\.node-gyp\10.13.0\deps\uv\include;C:\Users\oudream\.node-gyp\10.13.0\deps\zlib;C:\Users\oudream\.node-gyp\10.13.0\deps\v8\include;..\odpi\src;..\odpi\include;..\..\nan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=oracledb;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;BUILDING_NODE_EXTENSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\binding.gyp"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\njsCommon.cpp"/>
+    <ClCompile Include="..\src\njsOracle.cpp"/>
+    <ClCompile Include="..\src\njsPool.cpp"/>
+    <ClCompile Include="..\src\njsConnection.cpp"/>
+    <ClCompile Include="..\src\njsResultSet.cpp"/>
+    <ClCompile Include="..\src\njsSubscription.cpp"/>
+    <ClCompile Include="..\src\njsMessages.cpp"/>
+    <ClCompile Include="..\src\njsIntLob.cpp"/>
+    <ClCompile Include="..\src\njsSodaDatabase.cpp"/>
+    <ClCompile Include="..\src\njsSodaCollection.cpp"/>
+    <ClCompile Include="..\src\njsSodaDocument.cpp"/>
+    <ClCompile Include="..\src\njsSodaOperation.cpp"/>
+    <ClCompile Include="..\src\njsSodaDocCursor.cpp"/>
+    <ClCompile Include="..\src\njsUtils.cpp"/>
+    <ClCompile Include="..\odpi\src\dpiConn.c"/>
+    <ClCompile Include="..\odpi\src\dpiContext.c"/>
+    <ClCompile Include="..\odpi\src\dpiData.c"/>
+    <ClCompile Include="..\odpi\src\dpiDebug.c"/>
+    <ClCompile Include="..\odpi\src\dpiDeqOptions.c"/>
+    <ClCompile Include="..\odpi\src\dpiEnqOptions.c"/>
+    <ClCompile Include="..\odpi\src\dpiEnv.c"/>
+    <ClCompile Include="..\odpi\src\dpiError.c"/>
+    <ClCompile Include="..\odpi\src\dpiGen.c"/>
+    <ClCompile Include="..\odpi\src\dpiGlobal.c"/>
+    <ClCompile Include="..\odpi\src\dpiHandleList.c"/>
+    <ClCompile Include="..\odpi\src\dpiHandlePool.c"/>
+    <ClCompile Include="..\odpi\src\dpiLob.c"/>
+    <ClCompile Include="..\odpi\src\dpiMsgProps.c"/>
+    <ClCompile Include="..\odpi\src\dpiObjectAttr.c"/>
+    <ClCompile Include="..\odpi\src\dpiObject.c"/>
+    <ClCompile Include="..\odpi\src\dpiObjectType.c"/>
+    <ClCompile Include="..\odpi\src\dpiOci.c"/>
+    <ClCompile Include="..\odpi\src\dpiOracleType.c"/>
+    <ClCompile Include="..\odpi\src\dpiPool.c"/>
+    <ClCompile Include="..\odpi\src\dpiRowid.c"/>
+    <ClCompile Include="..\odpi\src\dpiSodaColl.c"/>
+    <ClCompile Include="..\odpi\src\dpiSodaCollCursor.c"/>
+    <ClCompile Include="..\odpi\src\dpiSodaDb.c"/>
+    <ClCompile Include="..\odpi\src\dpiSodaDoc.c"/>
+    <ClCompile Include="..\odpi\src\dpiSodaDocCursor.c"/>
+    <ClCompile Include="..\odpi\src\dpiStmt.c"/>
+    <ClCompile Include="..\odpi\src\dpiSubscr.c"/>
+    <ClCompile Include="..\odpi\src\dpiUtils.c"/>
+    <ClCompile Include="..\odpi\src\dpiVar.c"/>
+    <ClCompile Include="E:\nodejs\node_modules\npm\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
+</Project>

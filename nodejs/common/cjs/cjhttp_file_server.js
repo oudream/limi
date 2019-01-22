@@ -1,7 +1,3 @@
-/**
- * Created by oudream on 2017/1/5.
- */
-
 'use strict';
 
 let url = require('url');
@@ -61,16 +57,16 @@ FileServer.parseRange = function(str, size) {
         start = parseInt(range[0], 10),
         end = parseInt(range[1], 10);
 
-  // Case: -100
+    // Case: -100
     if (isNaN(start)) {
         start = size - end;
         end = size - 1;
-    // Case: 100-
+        // Case: 100-
     } else if (isNaN(end)) {
         end = size - 1;
     }
 
-  // Invalid
+    // Invalid
     if (isNaN(start) || isNaN(end) || start > end || end > size) {
         return;
     }
@@ -90,7 +86,7 @@ FileServer.prototype.dispatch = function(request, response) {
     }
     let realPath = path.join(config.assetsPath, path.normalize(pathname.replace(/\.\./g, '')));
 
-    var pathHandle = function(realPath) {
+    let pathHandle = function(realPath) {
         fs.stat(realPath, function(err, stats) {
             if (err) {
                 response.writeHead(404, 'Not Found', {'Content-Type': 'text/plain'});
@@ -105,7 +101,7 @@ FileServer.prototype.dispatch = function(request, response) {
                     ext = ext ? ext.slice(1) : 'unknown';
                     let contentType = FileServer.mime[ext] || 'text/plain';
                     response.setHeader('Content-Type', contentType);
-          // response.setHeader('Content-Length', stats.size);
+                    // response.setHeader('Content-Length', stats.size);
 
                     let lastModified = stats.mtime.toUTCString();
                     let ifModifiedSince = 'If-Modified-Since'.toLowerCase();
@@ -143,7 +139,7 @@ FileServer.prototype.dispatch = function(request, response) {
                             if (range) {
                                 response.setHeader('Content-Range', 'bytes ' + range.start + '-' + range.end + '/' + stats.size);
                                 response.setHeader('Content-Length', (range.end - range.start + 1));
-                                var raw = fs.createReadStream(realPath, {'start': range.start, 'end': range.end});
+                                let raw = fs.createReadStream(realPath, {'start': range.start, 'end': range.end});
                                 compressHandle(raw, 206);
                             } else {
                                 response.removeHeader('Content-Length');
@@ -151,9 +147,9 @@ FileServer.prototype.dispatch = function(request, response) {
                                 response.end();
                             }
                         } else {
-                            var raw = fs.createReadStream(realPath);
+                            let raw = fs.createReadStream(realPath);
                             compressHandle(raw, 200);
-              // console.log(realPath)
+                            // console.log(realPath)
                         }
                     }
                 }

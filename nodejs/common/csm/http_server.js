@@ -1,8 +1,7 @@
-
 'use strict';
 
-require('./../cjs/cjinterinfo');
-require('./../cjs/cjstring');
+require('./../../../assets/common/cjs/cjinterinfo.js');
+require('./../../../assets/common/cjs/cjstring.js');
 
 let Route = require('./../cjs/cjhttp_route');
 let FileServer = require('./../cjs/cjhttp_file_server');

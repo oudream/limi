@@ -43,11 +43,11 @@
         return base;
     };
 
-  /**
-   *
-   * @param sDir
-   * @returns {Array}
-   */
+    /**
+     *
+     * @param sDir
+     * @returns {Array}
+     */
     CjFs.scantDirSync = function(sDir) {
         let outList = [];
         try {
@@ -85,7 +85,7 @@
         return outPathList;
     };
 
-  // return outPathList, outStatList
+    // return outPathList, outStatList
     CjFs.scant2Sync = function(sDir) {
         let outPathList = [];
         let outStatList = [];
@@ -99,11 +99,11 @@
         return [outPathList, outStatList];
     };
 
-  /**
-   * * sample : fileList = []; walk('/temp' , fileList, true);
-   * @param sDir
-   * @param outList
-   */
+    /**
+     * * sample : fileList = []; walk('/temp' , fileList, true);
+     * @param sDir
+     * @param outList
+     */
     CjFs._walkDirSync = function(sDir, outList) {
         let dirList = fs.readdirSync(sDir);
 
@@ -176,8 +176,8 @@
         return r;
     };
 
-  // fs.writeFileSync(sTargetFilePath, fs.readFileSync(sSourceFilePath));
-  // fs.createReadStream(sSourceFilePath).pipe(fs.createWriteStream(sTargetFilePath));
+    // fs.writeFileSync(sTargetFilePath, fs.readFileSync(sSourceFilePath));
+    // fs.createReadStream(sSourceFilePath).pipe(fs.createWriteStream(sTargetFilePath));
     CjFs.copyFileSync = function(sSourceFilePath, sTargetFilePath) {
         let r = false;
         if (!path.isAbsolute(sTargetFilePath) || !path.isAbsolute(sSourceFilePath)) {
@@ -220,13 +220,13 @@
                                 if (err) {
                                     callback(err);
                                 } else {
-                  //  判断是文件还是目录
+                                    //  判断是文件还是目录
                                     if (stat.isFile()) {
-                                      fs.writeFileSync(_dist, fs.readFileSync(_src));
-                                  } else if (stat.isDirectory()) {
-                    //  当是目录是，递归复制
-                                    CjFs.copyDirSync(_src, _dist, callback);
-                                }
+                                        fs.writeFileSync(_dist, fs.readFileSync(_src));
+                                    } else if (stat.isDirectory()) {
+                                        //  当是目录是，递归复制
+                                        CjFs.copyDirSync(_src, _dist, callback);
+                                    }
                                 }
                             });
                         });
@@ -240,7 +240,7 @@
         fs.access(sDir, fs.constants.F_OK, (err) => {
             console.log(err ? 'no access!' : 'can read/write');
             if (err) {
-        // console.log(path.dirname(dirname));
+                // console.log(path.dirname(dirname));
                 CjFs.mkdirMultiLevel(path.dirname(sDir), function() {
                     fs.mkdir(sDir, callback);
                 });

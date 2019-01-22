@@ -697,7 +697,7 @@ PsmProtocol.prototype.dealPacket = function() {
         this.dealNack(body);
     } else {
         let bufData = Buffer.allocUnsafe(this.receivePacket._dataLength);
-        this.receivePacket.recvCache.copy(bufData, 0, this.receivePacket._dataOffset, this.receivePacket._dataOffset+this.receivePacket._dataLength);
+        this.receivePacket.recvCache.copy(bufData, 0, this.receivePacket._dataOffset, this.receivePacket._dataOffset + this.receivePacket._dataLength);
         let iDeal = 0;
         switch (body.command) {
             //* heart jump
@@ -1312,7 +1312,7 @@ PsmProtocol.test1 = function() {
         FileSavePath: 'f:/temp',
     });
 
-  // all in
+    // all in
     psmProtocol.onReceivedMessage = function(sCommand, sParam, attach) {
         console.log(sCommand, sParam);
     };
@@ -1320,8 +1320,8 @@ PsmProtocol.test1 = function() {
     let iTimes = 0;
     setInterval(function() {
         let yxes = [
-      {address: 0x01000001+iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
-      {address: 0x01000001+iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
+            {address: 0x01000001 + iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
+            {address: 0x01000001 + iTimes, value: iTimes++, quality: 1, datetime: Date.now()},
         ];
         let iResult = psmProtocol.postRealtimeDataStructsPost(PsmRealtimeDataStruct.yxStruct.paramType, yxes);
         let sLog = 'psmProtocol.postRealtimeDataStructsPost iResult=' + iResult.toString();
