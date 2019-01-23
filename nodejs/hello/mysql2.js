@@ -8,7 +8,7 @@ let pool = mysql.createPool({
     host: '127.0.0.1',
     user: 'root',
     password: '123456',
-    database: 'db1',
+    database: 'asm550h',
 });
 
 let query = function( sql, values ) {
@@ -32,7 +32,7 @@ let query = function( sql, values ) {
 }
 
 async function selectAllData( ) {
-    let sql = 'select * from table2'
+    let sql = 'select EthernetIP from omc_neconfig where NeNo = \'5308417\''
     let dataList = await query( sql )
     return dataList
 }
@@ -48,7 +48,19 @@ async function getData() {
     console.log( 'end.' )
 }
 
-getData()
+async function getData2() {
+    try {
+        let sql = 'select EthernetIP from omc_neconfig where NeNo = \'5308417\''
+        let dataList = await query( sql )
+        console.log( dataList )
+    }
+    catch (e) {
+        console.log( 'error' )
+    }
+    console.log( 'end.' )
+}
+
+getData2()
 
 
 

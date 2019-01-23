@@ -3,7 +3,6 @@
 exports = module.exports = CjDbMysql;
 
 let mysql = require('mysql');
-// require('./../../../assets/common/cjs/cjinterinfo.js');
 
 /**
  * Class CjDbMysql

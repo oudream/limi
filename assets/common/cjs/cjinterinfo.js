@@ -122,19 +122,19 @@
         this.output = function() {
             switch (self.level) {
             case CjInterinfo.LevelInfo:
-                console.info(self.getInfoParamString());
+                // console.info(self.getInfoParamString());
                 console.info.apply(null, arguments);
                 break;
             case CjInterinfo.LevelWarn:
-                console.info(self.getInfoParamString());
+                // console.info(self.getInfoParamString());
                 console.warn.apply(null, arguments);
                 break;
             case CjInterinfo.LevelError:
-                console.info(self.getInfoParamString());
+                // console.info(self.getInfoParamString());
                 console.error.apply(null, arguments);
                 break;
             default:
-                console.info(self.getInfoParamString());
+                // console.info(self.getInfoParamString());
                 console.log.apply(null, arguments);
                 break;
             }

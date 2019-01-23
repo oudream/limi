@@ -18,6 +18,7 @@
 
     let fs = require('fs');
     let path = require('path');
+    let os = require('os');
 
     require('./../../../assets/common/cjs/cjmeta.js');
     require('./../../../assets/common/cjs/cjstring.js');

@@ -426,7 +426,7 @@
     let strawManager = new StrawManager();
     rtdb.strawManager = strawManager;
 
-    // # rtdb's generic find - append
+    // rtdb's generic find - append
     let findMeasureById = function findMeasureById(measureId) {
         let iId = Number(measureId);
         let r = null;
@@ -536,7 +536,7 @@
     };
     rtdb.receivedMeasures = receivedMeasures;
 
-    // # rtdb's sync data
+    // rtdb's sync data
     let getReqMeasuresJson = function getReqMeasuresJson() {
         return JSON.stringify({
             session: '',

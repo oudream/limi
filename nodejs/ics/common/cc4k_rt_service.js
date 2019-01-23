@@ -1,5 +1,7 @@
 'use strict';
 
+let WebSocketServer = require('ws').Server;
+
 const rtdb = require('./../../../assets/common/cc4k/rtdb.js');
 
 const ProtocolCc4000 = require('./../../common/csm/protocol_cc4000.js');
@@ -13,16 +15,25 @@ let _rtbusAppId = 0;
 
 exports = module.exports = Cc4kRtService;
 
+/**
+ * Class Cc4kRtService
+ * @constructor
+ */
 function Cc4kRtService() {
 }
 
-Cc4kRtService.init = function(httpServer, option = {
+/**
+ * Cc4kRtService.init
+ * @param httpServer
+ * @param option = {
     LocalIpAddress: '127.0.0.1',
     LocalPort: 5687,
     RemotePort: 6687,
     RemoteIpAddress: '127.0.0.1',
     RtWebSocketPort: 9101,
-}) {
+}
+ */
+Cc4kRtService.init = function(httpServer, option) {
     _rtbusProtocol.on(BasPacket.rtAnsFirstPacket.commandCode, Cc4kRtService.dealRtbusData);
     _rtbusProtocol.on(BasPacket.rtAnsNextPacket.commandCode, Cc4kRtService.dealRtbusData);
     _rtbusProtocol.on(BasPacket.rtReqUpdlistPacket.commandCode, Cc4kRtService.dealRtbusData);
@@ -57,7 +68,7 @@ Cc4kRtService.init = function(httpServer, option = {
     };
     setInterval(fnTimeOutRtLogin, 3000);
 
-    initRtWebSocket(option.RtWebSocketPort);
+    Cc4kRtService.initRtWebSocket(option.RtWebSocketPort);
 
     httpServer.route.all(/\/(.){0,}\.rtdata\.cgi/, Cc4kRtService.dealRequestRtdata);
 
@@ -296,11 +307,30 @@ Cc4kRtService.dealRtbusData = function fnDealRt(msgObj) {
     }
 };
 
+
+Cc4kRtService.initRtWebSocket = function(ws, sendBody) {
+
+};
+
+
 Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
     let clientId = 0;
     let clientReceivedCount = 0;
     let serverSentBytes = 0;
     let wss = new WebSocketServer({port: rtWebSocketPort});
+
+    let sendRtBody = function(ws, sendBody) {
+        let data = sendBody.data;
+        let iBegin = 0;
+        while (iBegin < data.length) {
+            sendBody.data = data.slice(iBegin, iBegin + 20);
+            let sSendBody = JSON.stringify(sendBody);
+            ws.send(sSendBody);
+            serverSentBytes += sSendBody.length;
+            iBegin += 30;
+        }
+    };
+
     wss.on('connection', function(ws) {
         let thisId = ++clientId;
         console.log('Client #%d connected', thisId);
@@ -309,16 +339,29 @@ Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
 
         ws.on('message', function(data) {
             clientReceivedCount += data.length;
-            let rtObjects = null;
             try {
                 let reqBody = JSON.parse(data);
-                rtObjects = Cc4kRtService.getRtObjects(reqBody);
+                if (reqBody.structtype === 'rtlogin_v101') {
+                    let sendBody = {
+                        session: reqBody.session,
+                        structtype: reqBody.structtype,
+                        data: null,
+                    };
+                    // monsb
+                    sendBody.data = rtdb.monsbManager.measures.length > 512 ? rtdb.monsbManager.measures.slice(0, 512) : rtdb.monsbManager.measures;
+                    sendRtBody(ws, sendBody);
+                    // ycadd
+                    sendBody.data = rtdb.ycaddManager.measures.length > 256 ? rtdb.ycaddManager.measures.slice(0, 256) : rtdb.ycaddManager.measures;
+                    sendRtBody(ws, sendBody);
+                    // straw
+                    sendBody.data = rtdb.strawManager.measures.length > 128 ? rtdb.strawManager.measures.slice(0, 128) : rtdb.strawManager.measures;
+                    sendRtBody(ws, sendBody);
+                } else {
+                    sendRtBody(ws, Cc4kRtService.getRtObjects(reqBody));
+                }
             } catch (e) {
                 console.log('error: JSON.parse(data)');
             }
-            let sRtObjects = JSON.stringify(rtObjects);
-            ws.send(sRtObjects);
-            serverSentBytes += sRtObjects.length;
         });
 
         ws.on('close', function() {
@@ -329,7 +372,7 @@ Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
             console.log('Client #%d error: %s', thisId, e.message);
         });
     });
-    console.log('WebSocketServer running at http://127.0.0.1:#%d/', WEBSOCKET_PORT);
+    console.log('WebSocketServer running at http://127.0.0.1:%d/', rtWebSocketPort);
 
     setInterval(function() {
         console.log('Client clientReceivedCount: #%d Mb - serverSentBytes: #%d Mb', clientReceivedCount / 1024 / 1024, serverSentBytes / 1024 / 1024);

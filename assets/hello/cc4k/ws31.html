@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<br>
+<label id="labelInfo0"></label>
+<br>
+<label id="labelInfo1"></label>
+<br>
+<label id="labelInfo2"></label>
+<br>
+<label id="labelInfo3"></label>
+<br>
+<label id="labelInfo4"></label>
+<br>
+<br>
+<label id="labelStatu0"></label>
+<br>
+<label id="labelStatu1"></label>
+<br>
+<label id="labelStatu2"></label>
+<br>
+<label id="labelStatu3"></label>
+<br>
+<label id="labelStatu4"></label>
+<br>
+<br>
+<div id="measuresPn"></div>
+
+<script>
+    let testWebSocketStarted = false;
+
+    let sentCache = [];
+    let receivedCache = [];
+
+    let iLableInfoIndex = 0;
+    let outInfo = function (message) {
+        iLableInfoIndex++;
+        let name = "labelInfo" + String(iLableInfoIndex % 5);
+        let lable = document.getElementById(name);
+        if (lable) {
+            lable.innerHTML = (new Date()).toString() + '   ' +  message;
+        }
+    };
+
+    let iLableStatuIndex = 0;
+    let outStatu = function (message) {
+        iLableStatuIndex++;
+        let name = "labelStatu" + String(iLableStatuIndex % 5);
+        let lable = document.getElementById(name);
+        if (lable) {
+            lable.innerHTML = (new Date()).toString() + '   ' +  message;
+        }
+    };
+
+    let pushSentCache = function (message) {
+        if (sentCache.length > 1024) {
+            outStatu('warn : sentCache Server : sentCache.length > 1024 : clear!');
+            sentCache = [];
+        }
+        sentCache.push(message);
+    };
+
+    let pushReceivedCache = function (obj) {
+        if (receivedCache.length > 3056) {
+            outInfo('info : receivedCache Server : receivedCache.length > 1024 : clear!');
+            receivedCache = [];
+        }
+        if (obj.structtype) {
+            if (obj.structtype === 'rtlogin_v101') {
+                if (reqMeasures.length > 1024)
+                    reqMeasures = [];
+                for (let i = 0; i < obj.data.length; i++) {
+                    let measure = obj.data[i];
+                    reqMeasures.push(measure);
+                }
+            } else {
+                for (let i = 0; i < obj.data.length; i++) {
+                    let measure = obj.data[i];
+                    receivedCache.push(measure);
+                }
+            }
+        }
+    };
+
+    let sentBytes = 0;
+    let sentTime = Date.now();
+    let sentStageMaxBytes = 4096 * 200;
+    let sentStageTimeNext = Date.now() + 1000;
+    let sentStageBytes = 0;
+    let sentStageReturnTimes = 0;
+    let receivedTime = Date.now();
+
+    let reqMeasures = [];
+    let rtLoginObj = {
+        session: Date.now().toString(),
+        structtype: 'rtlogin_v101',
+        params: [{userId: 9}],
+    };
+
+    setInterval(function () {
+        if (reqMeasures.length>0) {
+            let iBegin = 0;
+            while (iBegin < reqMeasures.length) {
+                pushSentCache(JSON.stringify({
+                    session: Date.now().toString(),
+                    structtype: 'rtdata_v101',
+                    params: reqMeasures.slice(iBegin, iBegin+20),
+                }));
+                iBegin += 20;
+            }
+        } else {
+            pushSentCache(JSON.stringify(rtLoginObj));
+        }
+    }, 1000);
+
+    function testWebSocket() {
+        outStatu('testWebSocket begin:');
+
+        // Create WebSocket connection.
+        const socket = new WebSocket('ws://10.31.58.89:9211');
+
+        // Send TestData
+        let sendTestData = function () {
+            let sObj = sentCache.pop();
+            if (sObj) {
+                let dtNow = Date.now();
+                if (dtNow < sentStageTimeNext) {
+                    if (sentStageBytes > sentStageMaxBytes) {
+                        sentStageReturnTimes++;
+                        return;
+                    }
+                } else {
+                    sentStageTimeNext = dtNow + 1000;
+                    sentStageBytes = 0;
+                }
+                socket.send(sObj);
+                sentBytes += sObj.length;
+                sentStageBytes += sObj.length;
+                sentTime = Date.now();
+            }
+        };
+
+        let sendTimeOut = setInterval(function () {
+            if (sentCache.length > 0 && Date.now() - sentTime > 1000) {
+                if (testWebSocketStarted)
+                    sendTestData();
+            }
+        }, 1000);
+
+        // Connection opened
+        socket.addEventListener('open', function (event) {
+            sentBytes = 0;
+            testWebSocketStarted = true;
+            sentStageTimeNext = Date.now() + 1000;
+            outStatu('Open Server!');
+            sendTestData();
+        });
+
+        // Connection opened
+        socket.addEventListener('close', function (event) {
+            testWebSocketStarted = false;
+            clearInterval(sendTimeOut);
+            outStatu('Close Server!');
+        });
+
+        // Listen for messages
+        socket.addEventListener('message', function (event) {
+            receivedTime = Date.now();
+            try {
+                pushReceivedCache(JSON.parse(event.data));
+            }
+            catch (e) {
+                outStatu('error: JSON.parse(event.data)');
+            }
+            sendTestData();
+//        console.log('Message from server ', event.data);
+        });
+    }
+
+    setInterval(function () {
+        outInfo('Send Message: sentBytes= ' + String(sentBytes / 1024 / 1024) + ' Mb, sentStageReturnTimes= ' + String(sentStageReturnTimes) + ' Mb, receivedCache.size= ' + String(receivedCache.length));
+        refreshMeasuresPn(receivedCache);
+        receivedCache = [];
+        let topWindow = window.top;
+        topWindow.wsHeartJumpTime = Date.now();
+    }, 3000);
+
+    setInterval(function () {
+        if (! testWebSocketStarted || Date.now() - receivedTime > 1000 * 30) {
+            testWebSocket();
+        }
+    }, 10000);
+
+    testWebSocket();
+
+    // *** refresh ui
+    // *** refresh ui
+    // *** refresh ui
+    let rtTitles = {
+        'code': 'code',
+        'neno': 'neno',
+        'id': 'id',
+        'value': 'value',
+        'q': 'q',
+        'refreshTime': 'refreshTime',
+    };
+    let refreshMeasuresPn = function(data) {
+        let rows = data;
+        if (!rows || rows.length<1) {
+            document.getElementById('measuresPn').innerHTML = '<br><lable>没有数据</lable>';
+            return;
+        }
+        let row;
+        let i, j;
+        let sOut = '<table>';
+        let keys = Object.keys(rows[0]);
+        let key;
+        let value;
+        let descripts = rtTitles;
+        for (i = keys.length; i >= 0; i--) {
+            if (! descripts.hasOwnProperty(keys[i])) {
+                keys.splice(i, 1);
+            }
+        }
+        sOut += '<tr>';
+        for (i = 0; i < keys.length; i++) {
+            sOut += '<th>';
+            sOut += descripts[keys[i]];
+            sOut += '</th>';
+        }
+        sOut += '</tr>';
+        sOut += '<tr>';
+        for (i = 0; i < keys.length; i++) {
+            sOut += '<td>';
+            sOut += keys[i];
+            sOut += '</td>';
+        }
+        sOut += '</tr>';
+
+        for (i = 0; i < rows.length; i++) {
+            row = rows[i];
+            sOut += '<tr>';
+            for (j = 0; j < keys.length; j++) {
+                sOut += '<td>';
+                key = keys[j];
+                value = row[key];
+                sOut += value;
+                sOut += '</td>';
+            }
+            sOut += '</tr>';
+        }
+        sOut += '</table>';
+
+        document.getElementById('measuresPn').innerHTML = sOut;
+    };
+</script>
+</body>
+</html>

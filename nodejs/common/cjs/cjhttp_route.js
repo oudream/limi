@@ -1,8 +1,8 @@
 'use strict';
 
 let http = require('http');
-require('./cjinterinfo');
-require('./cjstring');
+require('./../../../assets/common/cjs/cjinterinfo.js');
+require('./../../../assets/common/cjs/cjstring.js');
 
 exports = module.exports = Route;
 
@@ -22,9 +22,9 @@ Route.methods.push('all');
 
 Route.methods.forEach(function(method) {
     Route.prototype[method] = function(path, handle) {
-        cjs.debug('Route %s %s', method, this.path);
+        // cjs.debug('Route %s %s', method, this.path);
         let layer = new Layer(method, path, handle);
-        cjs.debug('Layer.isValid=', layer.isValid);
+        // cjs.debug('Layer.isValid=', layer.isValid);
         // this.methods[method] = true;
         this.stack.push(layer);
         return layer.isValid;
@@ -32,8 +32,7 @@ Route.methods.forEach(function(method) {
 });
 
 Route.prototype.handle = function handle(req, res, out) {
-    cjs.debug('Route %s %s', req.method, req.url);
-
+    // cjs.debug('Route %s %s', req.method, req.url);
     let self = this;
     let stack = self.stack;
     let layer;
