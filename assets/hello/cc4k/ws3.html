@@ -34,9 +34,9 @@
     var outInfo = function (message) {
         iLableInfoIndex++;
         var name = "labelInfo" + String(iLableInfoIndex % 2);
-        var lable = document.getElementById(name);
-        if (lable) {
-            lable.innerHTML = (new Date()).toString() + '   ' +  message;
+        var label = document.getElementById(name);
+        if (label) {
+            label.innerHTML = (new Date()).toString() + '   ' +  message;
         }
     };
 
@@ -44,9 +44,9 @@
     var outStatu = function (message) {
         iLableStatuIndex++;
         var name = "labelStatu" + String(iLableStatuIndex % 2);
-        var lable = document.getElementById(name);
-        if (lable) {
-            lable.innerHTML = (new Date()).toString() + '   ' +  message;
+        var label = document.getElementById(name);
+        if (label) {
+            label.innerHTML = (new Date()).toString() + '   ' +  message;
         }
     };
 
@@ -62,7 +62,7 @@
             }
             outStatu('warn, Date.now() - wsHeartJumpTime >1000 * 30 , ws_iframe.src=ws_iframe.src(refresh)! refreshWsIframeTimes= ' + String(refreshWsIframeTimes));
         }
-        outInfo('refresh lable ');
+        outInfo('refresh label ');
     }, 5000);
 </script>
 </body>

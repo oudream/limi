@@ -4,75 +4,72 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<script src="./../../common/3rd/jquery-3.1.1.js"></script>
 <body>
 <br>
-<label id="labelInfo0"></label>
+<label id="labelStatus0"></label>
 <br>
-<label id="labelInfo1"></label>
+<label id="labelStatus1"></label>
 <br>
-<label id="labelInfo2"></label>
+<label id="labelStatus2"></label>
 <br>
-<label id="labelInfo3"></label>
+<label id="labelStatus3"></label>
 <br>
-<label id="labelInfo4"></label>
+<label id="labelStatus4"></label>
 <br>
+<label id="labelStatus5"></label>
 <br>
-<label id="labelStatu0"></label>
+<label id="labelStatus6"></label>
 <br>
-<label id="labelStatu1"></label>
+YX1: <img id="image-yx-73551319052" src="./../../common/cimg/img/add.png"/>
+YX2: <img id="image-yx-73551319053" src="./../../common/cimg/img/add.png"/>
+YX3: <img id="image-yx-73551319054" src="./../../common/cimg/img/add.png"/>
+YX4: <img id="image-yx-73551319055" src="./../../common/cimg/img/add.png"/>
+YX5: <img id="image-yx-73551319056" src="./../../common/cimg/img/add.png"/>
 <br>
-<label id="labelStatu2"></label>
+YC1: <label id="show-yc-184868147284"></label> YC2: <label id="show-yc-184868147285"></label> YC3: <label id="show-yc-184868147286"></label> YC4: <label id="show-yc-184868147287"></label> YC5: <label id="show-yc-184868147288"></label>
 <br>
-<label id="labelStatu3"></label>
+YW1: <label id="show-yw-210990272524"></label> YW3: <label id="show-yw-210990272525"></label> YW3: <label id="show-yw-210990272526"></label>
 <br>
-<label id="labelStatu4"></label>
-<br>
-<br>
-<div id="measuresPn"></div>
+<div id="measuresTable"></div>
 
 <script>
     let testWebSocketStarted = false;
 
     let sentCache = [];
-    let receivedCache = [];
+    let receivedCache = new Map();
 
-    let iLableInfoIndex = 0;
-    let outInfo = function (message) {
-        iLableInfoIndex++;
-        let name = "labelInfo" + String(iLableInfoIndex % 5);
-        let lable = document.getElementById(name);
-        if (lable) {
-            lable.innerHTML = (new Date()).toString() + '   ' +  message;
+    let outStatus = function (message, labelStatusIndex=0) {
+        let name = "labelStatus" + String(labelStatusIndex);
+        let label = document.getElementById(name);
+        if (label) {
+            label.innerHTML = (new Date()).toLocaleString() + '   ' +  message;
         }
     };
 
-    let iLableStatuIndex = 0;
-    let outStatu = function (message) {
-        iLableStatuIndex++;
-        let name = "labelStatu" + String(iLableStatuIndex % 5);
-        let lable = document.getElementById(name);
-        if (lable) {
-            lable.innerHTML = (new Date()).toString() + '   ' +  message;
-        }
-    };
-
+    let pushSentCacheFullTimes = 0;
     let pushSentCache = function (message) {
         if (sentCache.length > 1024) {
-            outStatu('warn : sentCache Server : sentCache.length > 1024 : clear!');
+            pushSentCacheFullTimes++;
+            outStatus(`warn : sentCache Server : sentCache.length > 1024 : Clear! Times=${pushSentCacheFullTimes}`, 2);
             sentCache = [];
         }
         sentCache.push(message);
     };
 
+    let pushReceivedCacheFullTimes = 0;
     let pushReceivedCache = function (obj) {
-        if (receivedCache.length > 3056) {
-            outInfo('info : receivedCache Server : receivedCache.length > 1024 : clear!');
-            receivedCache = [];
+        if (receivedCache.size > 3056) {
+            pushReceivedCacheFullTimes++;
+            outStatus(`warn : receivedCache Server : receivedCache.length > 1024 : Clear! Times=${pushReceivedCacheFullTimes}`, 3);
+            receivedCache =  new Map();
         }
         if (obj.structtype) {
             if (obj.structtype === 'rtlogin_v101') {
-                if (reqMeasures.length > 1024)
+                if (obj.reason === 'begin'||reqMeasures.length > 1024)
                     reqMeasures = [];
+                if (obj.reason === 'end')
+                    outStatus(`obj.structtype === \'rtlogin_v101\', end. reqMeasures.length=${reqMeasures.length}`);
                 for (let i = 0; i < obj.data.length; i++) {
                     let measure = obj.data[i];
                     reqMeasures.push(measure);
@@ -80,7 +77,7 @@
             } else {
                 for (let i = 0; i < obj.data.length; i++) {
                     let measure = obj.data[i];
-                    receivedCache.push(measure);
+                    receivedCache.set(measure.id, measure);
                 }
             }
         }
@@ -101,16 +98,18 @@
         params: [{userId: 9}],
     };
 
+    let timesForPushSentCache = 0;
     setInterval(function () {
-        if (reqMeasures.length>0) {
+        ++timesForPushSentCache;
+        if (reqMeasures.length>0 && timesForPushSentCache % 10 !== 0) {
             let iBegin = 0;
             while (iBegin < reqMeasures.length) {
                 pushSentCache(JSON.stringify({
                     session: Date.now().toString(),
                     structtype: 'rtdata_v101',
-                    params: reqMeasures.slice(iBegin, iBegin+20),
+                    params: reqMeasures.slice(iBegin, iBegin+50),
                 }));
-                iBegin += 20;
+                iBegin += 50;
             }
         } else {
             pushSentCache(JSON.stringify(rtLoginObj));
@@ -118,7 +117,7 @@
     }, 1000);
 
     function testWebSocket() {
-        outStatu('testWebSocket begin:');
+        outStatus('testWebSocket begin:');
 
         // Create WebSocket connection.
         const socket = new WebSocket('ws://10.31.58.89:9211');
@@ -144,27 +143,31 @@
             }
         };
 
-        let sendTimeOut = setInterval(function () {
+        let timeOutSend = function () {
             if (sentCache.length > 0 && Date.now() - sentTime > 1000) {
                 if (testWebSocketStarted)
                     sendTestData();
             }
-        }, 1000);
+        };
+        let sendTimeOut = null;
 
         // Connection opened
         socket.addEventListener('open', function (event) {
             sentBytes = 0;
             testWebSocketStarted = true;
             sentStageTimeNext = Date.now() + 1000;
-            outStatu('Open Server!');
+            sendTimeOut = setInterval(timeOutSend, 1000);
+            outStatus('Open Server!');
             sendTestData();
         });
 
         // Connection opened
         socket.addEventListener('close', function (event) {
             testWebSocketStarted = false;
-            clearInterval(sendTimeOut);
-            outStatu('Close Server!');
+            if (sendTimeOut !== null) {
+                clearInterval(sendTimeOut);
+            }
+            outStatus('Close Server!');
         });
 
         // Listen for messages
@@ -174,17 +177,23 @@
                 pushReceivedCache(JSON.parse(event.data));
             }
             catch (e) {
-                outStatu('error: JSON.parse(event.data)');
+                outStatus('error: JSON.parse(event.data)', 4);
             }
             sendTestData();
 //        console.log('Message from server ', event.data);
         });
+
+        socket.addEventListener('error', function(event) {
+            outStatus(`run begin on ${(new Date()).toLocaleString()}`, 4);
+        });
     }
 
     setInterval(function () {
-        outInfo('Send Message: sentBytes= ' + String(sentBytes / 1024 / 1024) + ' Mb, sentStageReturnTimes= ' + String(sentStageReturnTimes) + ' Mb, receivedCache.size= ' + String(receivedCache.length));
-        refreshMeasuresPn(receivedCache);
-        receivedCache = [];
+        outStatus('Send Message: sentBytes= ' + String(sentBytes / 1024 / 1024) + ' Mb, sentStageReturnTimes= ' + String(sentStageReturnTimes) + ' Mb, receivedCache.size= ' + String(receivedCache.size), 5);
+        refreshMeasuresImage();
+        refreshMeasuresText();
+        refreshMeasuresTable();
+        receivedCache = new Map();
         let topWindow = window.top;
         topWindow.wsHeartJumpTime = Date.now();
     }, 3000);
@@ -200,63 +209,79 @@
     // *** refresh ui
     // *** refresh ui
     // *** refresh ui
-    let rtTitles = {
-        'code': 'code',
-        'neno': 'neno',
-        'id': 'id',
-        'value': 'value',
-        'q': 'q',
-        'refreshTime': 'refreshTime',
-    };
-    let refreshMeasuresPn = function(data) {
-        let rows = data;
-        if (!rows || rows.length<1) {
-            document.getElementById('measuresPn').innerHTML = '<br><lable>没有数据</lable>';
-            return;
-        }
-        let row;
-        let i, j;
-        let sOut = '<table>';
-        let keys = Object.keys(rows[0]);
-        let key;
-        let value;
-        let descripts = rtTitles;
-        for (i = keys.length; i >= 0; i--) {
-            if (! descripts.hasOwnProperty(keys[i])) {
-                keys.splice(i, 1);
+    let imageSrcs = new Map([
+        [111, 'iconCancel.png'],
+        [112, 'iconConfirm.png'],
+        [113, 'left.png'],
+        [114, 'right.png'],
+        [115, 'user.png'],
+        [116, 'warning.png'],
+    ]);
+    let refreshMeasuresImage = function () {
+        for (let i = 73551319052; i <= 73551319056; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let imageSrc = imageSrcs.get(measure.value);
+                if (!imageSrc) imageSrc = 'del.png';
+                let imageEd = document.getElementById('image-yx-'+String(i));
+                if (imageEd) {
+                    imageEd.src = "./../../common/cimg/img/"+imageSrc;
+                }
             }
         }
+    };
+
+    let refreshMeasuresText = function () {
+        for (let i = 184868147284; i <= 184868147288; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let divEd = document.getElementById('show-yc-'+String(i));
+                if (divEd) {
+                    divEd.innerHTML = String(measure.value);
+                }
+            }
+        }
+        for (let i = 210990272524; i <= 210990272526; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let divEd = document.getElementById('show-yw-'+String(i));
+                if (divEd) {
+                    divEd.innerHTML = measure.value;
+                }
+            }
+        }
+    };
+
+    let refreshMeasuresTable = function() {
+        if (receivedCache.size<1) {
+//            document.getElementById('measuresTable').innerHTML = '<br><label>没有数据</label>';
+            return;
+        }
+        let i;
+        let sOut = '<table>';
+        let names = ['code','neno','id','value','q','refreshTime'];
+        let descripts = ['code','neno','id','value','q','refreshTime'];
         sOut += '<tr>';
-        for (i = 0; i < keys.length; i++) {
+        for (i = 0; i < names.length; i++) {
             sOut += '<th>';
-            sOut += descripts[keys[i]];
+            sOut += descripts[i];
             sOut += '</th>';
         }
         sOut += '</tr>';
-        sOut += '<tr>';
-        for (i = 0; i < keys.length; i++) {
-            sOut += '<td>';
-            sOut += keys[i];
-            sOut += '</td>';
-        }
-        sOut += '</tr>';
-
-        for (i = 0; i < rows.length; i++) {
-            row = rows[i];
+        receivedCache.forEach(function (value, key, map) {
             sOut += '<tr>';
-            for (j = 0; j < keys.length; j++) {
+            for (i = 0; i < names.length; i++) {
                 sOut += '<td>';
-                key = keys[j];
-                value = row[key];
-                sOut += value;
+                sOut += value[names[i]];
                 sOut += '</td>';
             }
             sOut += '</tr>';
-        }
+        });
         sOut += '</table>';
-
-        document.getElementById('measuresPn').innerHTML = sOut;
+        document.getElementById('measuresTable').innerHTML = sOut;
     };
+
+    outStatus(`run begin on ${(new Date()).toLocaleString()}`, 1);
 </script>
 </body>
 </html>

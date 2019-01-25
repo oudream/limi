@@ -10,7 +10,6 @@ const BasDefine = ProtocolCc4000.BasDefine;
 const BasPacket = ProtocolCc4000.BasPacket;
 
 let _rtbusProtocol = new BasProtocol(false, BasDefine.PROTOCOL_MODEL_RT);
-let _rtbusAppId = 0;
 
 
 exports = module.exports = Cc4kRtService;
@@ -24,8 +23,8 @@ function Cc4kRtService() {
 
 /**
  * Cc4kRtService.init
- * @param httpServer
- * @param option = {
+ * @param {HttpServer} httpServer
+ * @param {Object} option = {
     LocalIpAddress: '127.0.0.1',
     LocalPort: 5687,
     RemotePort: 6687,
@@ -51,17 +50,19 @@ Cc4kRtService.init = function(httpServer, option) {
         // }
     });
 
+    Cc4kRtService.option = option;
+    Cc4kRtService.startTime = Date.now();
     _rtbusProtocol.start(option);
 
     let fnTimeOutRtLogin = function() {
-        if (_rtbusAppId === 0) {
-            console.log('warnning : _rtbus config[_rtbusAppId==0] invalid!!!');
+        if (Cc4kRtService.option.RtbusAppId === 0) {
+            console.log('warnning : _rtbus config[Cc4kRtService.option.RtbusAppId==0] invalid!!!');
             return;
         }
 
         let dtNow = Date.now();
-        if (dtNow - _startTime < 6000 || dtNow - _rtbusProtocol.lastReceivedDataTime > 60000) {
-            let packet = BasPacket.rtLoginPacket.toPacket(_rtbusAppId);
+        if (dtNow - Cc4kRtService.startTime < 6000 || dtNow - _rtbusProtocol.lastReceivedDataTime > 60000) {
+            let packet = BasPacket.rtLoginPacket.toPacket(Cc4kRtService.option.RtbusAppId);
             _rtbusProtocol.sendPacket(packet);
             console.log(packet);
         }
@@ -73,6 +74,27 @@ Cc4kRtService.init = function(httpServer, option) {
     httpServer.route.all(/\/(.){0,}\.rtdata\.cgi/, Cc4kRtService.dealRequestRtdata);
 
     httpServer.route.all(/\/(.){0,}ics\.cgi/, Cc4kRtService.dealRequestYk);
+};
+
+/**
+ * utc2Locale
+ * @param {string} utcStr
+ * @return {string}
+ */
+Cc4kRtService.utc2Locale = function utc2Locale(utcStr) {
+    let date = new Date(utcStr);
+
+    let _month = date.getMonth() + 1;
+    let month = _month > 9 ? _month : ('0' + _month.toString());
+    let day = date.getDate() > 9 ? date.getDate() : ('0' + date.getDate().toString());
+
+    let _hour = date.getHours() > 9 ? date.getHours() : ('0' + date.getHours().toString());
+    let _min = date.getMinutes() > 9 ? date.getMinutes() : ('0' + date.getMinutes().toString());
+    let _sec = date.getSeconds() > 9 ? date.getSeconds() : ('0' + date.getSeconds().toString());
+
+    return date.getFullYear() + '/' + month + '/' + day + ' ' +
+        _hour + ':' + _min + ':' + _sec;
+    // console.log('aaaaa', localeString);
 };
 
 Cc4kRtService.getRtObjects = function(reqBody) {
@@ -87,11 +109,21 @@ Cc4kRtService.getRtObjects = function(reqBody) {
                 let data = [];
                 for (let i = 0; i < reqMeasures.length; i++) {
                     let reqMeasure = reqMeasures[i];
-                    let neno = reqMeasure.neno;
-                    let code = reqMeasure.code;
-                    let resMeasure = rtdb.findMeasureByNenoCode(neno, code);
-                    if (resMeasure) {
-                        data.push(resMeasure);
+                    if (reqMeasure.id > 0) {
+                        let resMeasure = rtdb.findMeasureById(reqMeasure.id);
+                        if (resMeasure) {
+                            data.push(resMeasure);
+                        }
+                    } else if (reqMeasure.url.length > 0) {
+                        let resMeasure = rtdb.findMeasureByUrl(reqMeasure.url);
+                        if (resMeasure) {
+                            data.push(resMeasure);
+                        }
+                    } else if (reqMeasure.neno.length > 0 && reqMeasure.code.length > 0) {
+                        let resMeasure = rtdb.findMeasureByNenoCode(reqMeasure.neno, reqMeasure.code);
+                        if (resMeasure) {
+                            data.push(resMeasure);
+                        }
                     }
                 }
                 return data;
@@ -254,9 +286,9 @@ Cc4kRtService.dealRtbusData = function fnDealRt(msgObj) {
             iOffset += 8;
             measure.value = buf.readIntLE(iOffset, 6, true);
             iOffset += 8;
-            measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true));
+            measure.refreshTime = Cc4kRtService.utc2Locale(buf.readIntLE(iOffset, 6, true));
             iOffset += 8;
-            // measure.refreshTime =utc2Locale(new Date().getTime()); iOffset += 8; // 测试
+            // measure.refreshTime =Cc4kRtService.utc2Locale(new Date().getTime()); iOffset += 8; // 测试
             measure.res = buf.readIntLE(iOffset, 6, true);
             iOffset += 8;
             inMeasures.push(measure);
@@ -275,9 +307,9 @@ Cc4kRtService.dealRtbusData = function fnDealRt(msgObj) {
             iOffset += 8;
             measure.value = (buf.readDoubleLE(iOffset, true)).toFixed(2);
             iOffset += 8;
-            measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true));
+            measure.refreshTime = Cc4kRtService.utc2Locale(buf.readIntLE(iOffset, 6, true));
             iOffset += 8;
-            // measure.refreshTime = utc2Locale(new Date().getTime()); iOffset += 8; // 测试
+            // measure.refreshTime = Cc4kRtService.utc2Locale(new Date().getTime()); iOffset += 8; // 测试
             measure.res = buf.readIntLE(iOffset, 6, true);
             iOffset += 8;
             inMeasures.push(measure);
@@ -296,9 +328,9 @@ Cc4kRtService.dealRtbusData = function fnDealRt(msgObj) {
             iOffset += 8;
             measure.value = buf.toString('utf8', iOffset, iOffset + 128);
             iOffset += 128;
-            measure.refreshTime = utc2Locale(buf.readIntLE(iOffset, 6, true));
+            measure.refreshTime = Cc4kRtService.utc2Locale(buf.readIntLE(iOffset, 6, true));
             iOffset += 8;
-            // measure.refreshTime = utc2Locale(new Date().getTime()); iOffset += 8; // 测试
+            // measure.refreshTime = Cc4kRtService.utc2Locale(new Date().getTime()); iOffset += 8; // 测试
             measure.res = buf.readIntLE(iOffset, 6, true);
             iOffset += 8;
             inMeasures.push(measure);
@@ -321,13 +353,19 @@ Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
 
     let sendRtBody = function(ws, sendBody) {
         let data = sendBody.data;
-        let iBegin = 0;
-        while (iBegin < data.length) {
-            sendBody.data = data.slice(iBegin, iBegin + 20);
+        if (data.length > 0) {
+            let iBegin = 0;
+            while (iBegin < data.length) {
+                sendBody.data = data.slice(iBegin, iBegin + 50);
+                let sSendBody = JSON.stringify(sendBody);
+                ws.send(sSendBody);
+                serverSentBytes += sSendBody.length;
+                iBegin += 50;
+            }
+        } else {
             let sSendBody = JSON.stringify(sendBody);
             ws.send(sSendBody);
             serverSentBytes += sSendBody.length;
-            iBegin += 30;
         }
     };
 
@@ -345,8 +383,12 @@ Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
                     let sendBody = {
                         session: reqBody.session,
                         structtype: reqBody.structtype,
-                        data: null,
+                        reason: '',
+                        data: [],
                     };
+                    sendBody.reason = 'begin';
+                    sendRtBody(ws, sendBody);
+                    sendBody.reason = 'data';
                     // monsb
                     sendBody.data = rtdb.monsbManager.measures.length > 512 ? rtdb.monsbManager.measures.slice(0, 512) : rtdb.monsbManager.measures;
                     sendRtBody(ws, sendBody);
@@ -355,6 +397,8 @@ Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
                     sendRtBody(ws, sendBody);
                     // straw
                     sendBody.data = rtdb.strawManager.measures.length > 128 ? rtdb.strawManager.measures.slice(0, 128) : rtdb.strawManager.measures;
+                    sendRtBody(ws, sendBody);
+                    sendBody.reason = 'end';
                     sendRtBody(ws, sendBody);
                 } else {
                     sendRtBody(ws, Cc4kRtService.getRtObjects(reqBody));

@@ -22,8 +22,5 @@ async function getData() {
 }
 
 getData()
-// getData()
-// getData()
-
-
-console.log('1111111')
+getData()
+getData()

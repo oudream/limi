@@ -65,7 +65,7 @@ WebServer.run = async function ( ) {
 
         try {
             let values = await WebServer._mysql.queryPromise(`select ItemValue from omc_omcconfig where ItemNo = '266'`);
-            WebServer.cc4kConfig.RtBusPort = values && values.length > 0 ? values[0].ItemValue : 6687;
+            WebServer.cc4kConfig.RtBusPort = values && values.length > 0 ? values[0].ItemValue : 6696;
         }
         catch (e) {
             WebServer.cc4kConfig.RtBusPort = 0;
@@ -140,11 +140,12 @@ WebServer.run = async function ( ) {
         // });
 
         Cc4kRtService.init(httpServer,{
-            LocalIpAddress: WebServer.cc4kConfig.EthernetIP,
-            LocalPort: WebServer.cc4kConfig.RtBusNodeIp,
+            LocalIpAddress: WebServer.cc4kConfig.RtBusNodeIp,
+            LocalPort: WebServer.cc4kConfig.RtBusNodePort,
             RemotePort: WebServer.cc4kConfig.RtBusPort,
             RemoteIpAddress: WebServer.cc4kConfig.EthernetIP,
-            RtWebSocketPort: 9211
+            RtWebSocketPort: 9211,
+            RtbusAppId: WebServer.cc4kConfig.AppID
         });
 
         cjs.info('WebServer.init: end.');
