@@ -135,7 +135,14 @@ Cc4kRtService.getRtObjects = function(reqBody) {
 };
 
 Cc4kRtService.dealRequestRtdata = function(req, res) {
-    if (req.method === 'POST') {
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'POWERED-BY-AID,Content-Type,Content-Length,Authorization,Accept,X-Requested-With');
+        res.setHeader('Access-Control-Max-Age', '30');
+        res.writeHead(200);
+        res.end();
+    } else if (req.method === 'POST') {
         let body = '';
         req.on('data', function(chunk) {
             body += chunk;
@@ -152,6 +159,10 @@ Cc4kRtService.dealRequestRtdata = function(req, res) {
                 }
             }
             if (rtObjects) {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+                res.setHeader('Access-Control-Allow-Headers', 'POWERED-BY-AID,Content-Type,Content-Length,Authorization,Accept,X-Requested-With');
+                res.setHeader('Access-Control-Max-Age', '30');
                 res.writeHead(200);
                 // res.write('HELLO');
                 res.end(JSON.stringify(rtObjects));
@@ -167,7 +178,14 @@ Cc4kRtService.dealRequestRtdata = function(req, res) {
 };
 
 Cc4kRtService.dealRequestYk = function(req, res) {
-    if (req.method === 'POST') {
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'POWERED-BY-AID,Content-Type,Content-Length,Authorization,Accept,X-Requested-With');
+        res.setHeader('Access-Control-Max-Age', '30');
+        res.writeHead(200);
+        res.end();
+    } else if (req.method === 'POST') {
         let body = '';
         req.on('data', function(chunk) {
             body += chunk;
@@ -240,6 +258,10 @@ Cc4kRtService.dealRequestYk = function(req, res) {
                         return reqMeasures;
                     }(),
                 };
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+                res.setHeader('Access-Control-Allow-Headers', 'POWERED-BY-AID,Content-Type,Content-Length,Authorization,Accept,X-Requested-With');
+                res.setHeader('Access-Control-Max-Age', '30');
                 res.writeHead(200);
                 // res.write('HELLO');
                 res.end(JSON.stringify(resMeasures));
@@ -338,12 +360,6 @@ Cc4kRtService.dealRtbusData = function fnDealRt(msgObj) {
         rtdb.receivedMeasures(inMeasures);
     }
 };
-
-
-Cc4kRtService.initRtWebSocket = function(ws, sendBody) {
-
-};
-
 
 Cc4kRtService.initRtWebSocket = function(rtWebSocketPort) {
     let clientId = 0;
