@@ -1,81 +1,106 @@
 {
-  "dbname": "ics4000",
-  "tables": [
-    {
-      "tbname": "web_signal",
-      "rows": [
-        {
-          "desc":"设备状态",
-          "neNo":1929838593,
-          "signalUrl":"YG550H01_YC_0032",
-          "web_id":"rt-making-state",
-          "scheme":"st_01",
-        },
-        {
-          "desc":"心跳",
-          "neNo":0,
-          "signalUrl":"YG550H01_YC_0034",
-          "web_id":"icon-alert",
-          "pretreatment":"remainder?2",
-          "scheme":"color_r0g1"
-        },
-      ]
-    }
-  ]
-}
-{
 
   "neno":[1929838593,1929838594],
   "signal":[
-    
-    
+    {
+      "desc":"设备状态",
+      "neNo":0,
+      "signalUrl":"YG550H01_YC_0032",
+      "ui_scheme":[
+        {
+          "id":"rt-making-state",
+          "scheme":"st_01"
+        }
+      ]
+    },
+    {
+      "desc":"心跳",
+      "neNo":0,
+      "signalUrl":"YG550H01_YC_0034",
+      "ui_scheme":[
+        {
+          "id":"icon-alert",
+          "pretreatment":"remainder?2",
+          "scheme":"color_r0g1"
+        }
+      ]
+    },
     {
       "desc":"通信故障",
       "neNo":0,
       "signalUrl":"YG550H01_YX_0224",
-      "scheme":"alert"
+      "ui_scheme":[
+        {
+          "scheme":"alert"
+        }
+      ]
     },
     {
       "desc":"进料许可",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0035",
-      "web_id":"making-state-num",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"making-state-num",
+          "scheme":"txt_01"
+        }
+      ]
     },
+
     {
       "desc":"累计制样数",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0070",
-      "web_id":"rt-finish-count",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"rt-finish-count",
+          "scheme":"txt_01"
+        }
+      ]
     },
     {
       "desc":"今日制样数",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0069",
-      "web_id":"rt-finish-today",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"rt-finish-today",
+          "scheme":"txt_01"
+        }
+      ]
     },
     {
       "desc":"执行票数量",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0192",
-      "web_id":"t-badge1",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"t-badge1",
+          "scheme":"txt_01"
+        }
+      ]
     },
     {
       "desc":"待执行票数量",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0193",
-      "web_id":"t-badge2",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"t-badge2",
+          "scheme":"txt_01"
+        }
+      ]
     },
     {
       "desc":"报警数目",
       "neNo":0,
       "signalUrl":"YG550H01_YC_0194",
-      "web_id":"t-badge3",
-      "scheme":"txt_01"
+      "ui_scheme":[
+        {
+          "id":"t-badge3",
+          "scheme":"txt_01"
+        }
+      ]
     },
     {
       "desc":"初级破碎状态",
@@ -83,17 +108,17 @@
       "signalUrl":"YG550H01_YC_0036",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0042",
+          "id":"URI-YG550H01_YC_0042",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0042-1",
+          "id":"SUB-YG550H01_YC_0042-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         },
         {
-          "web_id": "SUB-YG550H01_YC_0042-2",
+          "id": "SUB-YG550H01_YC_0042-2",
           "iframe":"svg_main",
           "scheme": "color_01"
         }
@@ -106,12 +131,12 @@
 
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0043",
+          "id":"URI-YG550H01_YC_0043",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0043-1",
+          "id":"SUB-YG550H01_YC_0043-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         }
@@ -124,17 +149,17 @@
 
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0046",
+          "id":"URI-YG550H01_YC_0046",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0046-1",
+          "id":"SUB-YG550H01_YC_0046-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         },
         {
-          "web_id": "SUB-YG550H01_YC_0046-2",
+          "id": "SUB-YG550H01_YC_0046-2",
           "iframe":"svg_main",
           "scheme": "color_01"
         }
@@ -147,12 +172,12 @@
 
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0048",
+          "id":"URI-YG550H01_YC_0048",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0048-1",
+          "id":"SUB-YG550H01_YC_0048-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         }
@@ -165,12 +190,12 @@
 
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0050",
+          "id":"URI-YG550H01_YC_0050",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0050-1",
+          "id":"SUB-YG550H01_YC_0050-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         }
@@ -182,12 +207,12 @@
       "signalUrl":"YG550H01_YC_0045",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YC_0051",
+          "id":"URI-YG550H01_YC_0051",
           "iframe":"svg_main",
           "scheme":"st_02"
         },
         {
-          "web_id":"SUB-YG550H01_YC_0051-1",
+          "id":"SUB-YG550H01_YC_0051-1",
           "iframe":"svg_main",
           "scheme":"color_01"
         }
@@ -199,7 +224,7 @@
       "signalUrl":"YG550H01_YW_0049",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0049",
+          "id":"URI-YG550H01_YW_0049",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -211,7 +236,7 @@
       "signalUrl":"YG550H01_YW_0050",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0050",
+          "id":"URI-YG550H01_YW_0050",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -223,7 +248,7 @@
       "signalUrl":"YG550H01_YW_0053",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0053",
+          "id":"URI-YG550H01_YW_0053",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -235,7 +260,7 @@
       "signalUrl":"YG550H01_YW_0055",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0055",
+          "id":"URI-YG550H01_YW_0055",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -247,7 +272,7 @@
       "signalUrl":"YG550H01_YW_0057",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0057",
+          "id":"URI-YG550H01_YW_0057",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -259,7 +284,7 @@
       "signalUrl":"YG550H01_YW_0058",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0058",
+          "id":"URI-YG550H01_YW_0058",
           "iframe":"svg_main",
           "scheme":"txt_01"
         }
@@ -271,7 +296,7 @@
       "signalUrl":"YG550H01_YW_0128",
       "ui_scheme":[
         {
-          "web_id":"YG550H01_YW_0128",
+          "id":"YG550H01_YW_0128",
           "iframe":"svg_making",
           "scheme":"txt_01"
         }
@@ -283,17 +308,17 @@
       "signalUrl":"YG550H01_YX_0136",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0136-3",
+          "id":"URL-YG550H01_YX_0136-3",
           "iframe":"svg_making",
           "scheme":"color_02_3"
         },
         {
-          "web_id":"URL-YG550H01_YX_0136-2",
+          "id":"URL-YG550H01_YX_0136-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0136-1",
+          "id":"URL-YG550H01_YX_0136-1",
           "iframe":"svg_making",
           "scheme":"color_02_1"
         }
@@ -305,17 +330,17 @@
       "signalUrl":"YG550H01_YX_0137",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0137-3",
+          "id":"URL-YG550H01_YX_0137-3",
           "iframe":"svg_making",
           "scheme":"color_02_3"
         },
         {
-          "web_id":"URL-YG550H01_YX_0137-2",
+          "id":"URL-YG550H01_YX_0137-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0137-1",
+          "id":"URL-YG550H01_YX_0137-1",
           "iframe":"svg_making",
           "scheme":"color_02_1"
         }
@@ -327,17 +352,17 @@
       "signalUrl":"YG550H01_YX_0138",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0138-3",
+          "id":"URL-YG550H01_YX_0138-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0138-2",
+          "id":"URL-YG550H01_YX_0138-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0138-1",
+          "id":"URL-YG550H01_YX_0138-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -349,17 +374,17 @@
       "signalUrl":"YG550H01_YX_0139",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0139-3",
+          "id":"URL-YG550H01_YX_0139-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0139-2",
+          "id":"URL-YG550H01_YX_0139-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0139-1",
+          "id":"URL-YG550H01_YX_0139-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -371,17 +396,17 @@
       "signalUrl":"YG550H01_YX_0140",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0140-3",
+          "id":"URL-YG550H01_YX_0140-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0140-2",
+          "id":"URL-YG550H01_YX_0140-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0140-1",
+          "id":"URL-YG550H01_YX_0140-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -393,17 +418,17 @@
       "signalUrl":"YG550H01_YX_0141",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0141-3",
+          "id":"URL-YG550H01_YX_0141-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0141-2",
+          "id":"URL-YG550H01_YX_0141-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0141-1",
+          "id":"URL-YG550H01_YX_0141-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -415,17 +440,17 @@
       "signalUrl":"YG550H01_YX_0142",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0142-3",
+          "id":"URL-YG550H01_YX_0142-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0142-2",
+          "id":"URL-YG550H01_YX_0142-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0142-1",
+          "id":"URL-YG550H01_YX_0142-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -437,27 +462,27 @@
       "signalUrl":"YG550H01_YX_0143",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0143-5",
+          "id":"URL-YG550H01_YX_0143-5",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0143-4",
+          "id":"URL-YG550H01_YX_0143-4",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0143-3",
+          "id":"URL-YG550H01_YX_0143-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0143-2",
+          "id":"URL-YG550H01_YX_0143-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0143-1",
+          "id":"URL-YG550H01_YX_0143-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -469,7 +494,7 @@
       "signalUrl":"YG550H01_YW_0160",
       "ui_scheme":[
         {
-          "web_id":"YG550H01_YW_0160",
+          "id":"YG550H01_YW_0160",
           "iframe":"svg_making",
           "scheme":"txt_01"
         }
@@ -481,17 +506,17 @@
       "signalUrl":"YG550H01_YX_0168",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0168-3",
+          "id":"URL-YG550H01_YX_0168-3",
           "iframe":"svg_making",
           "scheme":"color_02_3"
         },
         {
-          "web_id":"URL-YG550H01_YX_0168-2",
+          "id":"URL-YG550H01_YX_0168-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0168-1",
+          "id":"URL-YG550H01_YX_0168-1",
           "iframe":"svg_making",
           "scheme":"color_02_1"
         }
@@ -503,17 +528,17 @@
       "signalUrl":"YG550H01_YX_0169",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0169-3",
+          "id":"URL-YG550H01_YX_0169-3",
           "iframe":"svg_making",
           "scheme":"color_02_3"
         },
         {
-          "web_id":"URL-YG550H01_YX_0169-2",
+          "id":"URL-YG550H01_YX_0169-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0169-1",
+          "id":"URL-YG550H01_YX_0169-1",
           "iframe":"svg_making",
           "scheme":"color_02_1"
         }
@@ -525,17 +550,17 @@
       "signalUrl":"YG550H01_YX_0170",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0170-3",
+          "id":"URL-YG550H01_YX_0170-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0170-2",
+          "id":"URL-YG550H01_YX_0170-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0170-1",
+          "id":"URL-YG550H01_YX_0170-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -547,17 +572,17 @@
       "signalUrl":"YG550H01_YX_0171",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0171-3",
+          "id":"URL-YG550H01_YX_0171-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0171-2",
+          "id":"URL-YG550H01_YX_0171-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0171-1",
+          "id":"URL-YG550H01_YX_0171-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -569,17 +594,17 @@
       "signalUrl":"YG550H01_YX_0172",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0172-3",
+          "id":"URL-YG550H01_YX_0172-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0172-2",
+          "id":"URL-YG550H01_YX_0172-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0172-1",
+          "id":"URL-YG550H01_YX_0172-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -591,17 +616,17 @@
       "signalUrl":"YG550H01_YX_0173",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0173-3",
+          "id":"URL-YG550H01_YX_0173-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0173-2",
+          "id":"URL-YG550H01_YX_0173-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0173-1",
+          "id":"URL-YG550H01_YX_0173-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -613,17 +638,17 @@
       "signalUrl":"YG550H01_YX_0174",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0174-3",
+          "id":"URL-YG550H01_YX_0174-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0174-2",
+          "id":"URL-YG550H01_YX_0174-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0174-1",
+          "id":"URL-YG550H01_YX_0174-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -635,27 +660,27 @@
       "signalUrl":"YG550H01_YX_0175",
       "ui_scheme":[
         {
-          "web_id":"URL-YG550H01_YX_0175-5",
+          "id":"URL-YG550H01_YX_0175-5",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0175-4",
+          "id":"URL-YG550H01_YX_0175-4",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0175-3",
+          "id":"URL-YG550H01_YX_0175-3",
           "iframe":"svg_making",
           "scheme":"color_02_4"
         },
         {
-          "web_id":"URL-YG550H01_YX_0175-2",
+          "id":"URL-YG550H01_YX_0175-2",
           "iframe":"svg_making",
           "scheme":"color_02_2"
         },
         {
-          "web_id":"URL-YG550H01_YX_0175-1",
+          "id":"URL-YG550H01_YX_0175-1",
           "iframe":"svg_making",
           "scheme":"color_02_0"
         }
@@ -667,22 +692,22 @@
       "signalUrl":"YG550H01_YW_0096",
       "ui_scheme":[
         {
-          "web_id":"URI-YG550H01_YW_0096-1",
+          "id":"URI-YG550H01_YW_0096-1",
           "iframe":"svg_pre_make",
           "scheme":"txt_01"
         },
         {
-          "web_id":"URI-YG550H01_YW_0096-2",
+          "id":"URI-YG550H01_YW_0096-2",
           "iframe":"svg_pre_make",
           "scheme":"txt_01"
         },
         {
-          "web_id":"URI-YG550H01_YW_0096-3",
+          "id":"URI-YG550H01_YW_0096-3",
           "iframe":"svg_pre_make",
           "scheme":"txt_01"
         },
         {
-          "web_id":"URI-YG550H01_YW_0096-4",
+          "id":"URI-YG550H01_YW_0096-4",
           "iframe":"svg_pre_make",
           "scheme":"txt_01"
         }
@@ -829,61 +854,61 @@
             "style":{
               "background-color":"red"
             }
-           }
           }
-          ]
+        }
+      ]
     },
     "st_02":{
-       "desc":"状态变化",
-       "conditions":[
-         {
+      "desc":"状态变化",
+      "conditions":[
+        {
           "condition":"=",
           "value":0,
           "action":{
             "attr":"fill:yellow"
           }
         },
-         {
+        {
           "condition":"=",
           "value":1,
           "action":{
             "attr":"fill:green"
           }
         },
-         {
-           "condition":"=",
-           "value":2,
-           "action":{
-             "attr":"fill:red"
-           }
-         },
-         {
-           "condition":"=",
-           "value":3,
-           "action":{
-             "attr":"fill:red"
-           }
-         },
-         {
-           "condition":"=",
-           "value":4,
-           "action":{
-             "attr":"fill:red"
-           }
-         },
-         {
-           "condition":"=",
-           "value":5,
-           "action":{
-             "attr":"fill:yellow"
-           }
-         },
-         {
-           "condition":"def",
-           "action":{
-             "attr":"fill:blue"
-           }
-         }
+        {
+          "condition":"=",
+          "value":2,
+          "action":{
+            "attr":"fill:red"
+          }
+        },
+        {
+          "condition":"=",
+          "value":3,
+          "action":{
+            "attr":"fill:red"
+          }
+        },
+        {
+          "condition":"=",
+          "value":4,
+          "action":{
+            "attr":"fill:red"
+          }
+        },
+        {
+          "condition":"=",
+          "value":5,
+          "action":{
+            "attr":"fill:yellow"
+          }
+        },
+        {
+          "condition":"def",
+          "action":{
+            "attr":"fill:blue"
+          }
+        }
       ]
     },
     "act_01":{

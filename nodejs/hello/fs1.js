@@ -4,8 +4,6 @@ let buf = new Buffer(1024);
 
 let testFs1 = function() {
     console.log('准备打开已存在的文件！');
-    let fd = null;
-    
     fs.open('f:/000.txt', 'r+', function(err, fd) {
         if (err) {
             return console.error(err);
