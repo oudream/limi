@@ -1,10 +1,10 @@
 
 const CjLog = require('./../common/cjs/cjlog.js');
 
-let fs = require('fs');
+const fs = require('fs');
+const path = require('path');
 
-
-let mainCvBus1 = function (fp1, fp2) {
+let mainCvBus1 = function(fp1, fp2) {
     if (!(fp1 && fp2)) {
         cjs.error('mainCvBus1 param invalid!');
         return;
@@ -54,17 +54,16 @@ let mainCvBus1 = function (fp1, fp2) {
         }
 
         let schemes = objBus.scheme;
-    }
-    catch (err) {
+    } catch (err) {
         /* Handle the error */
         cjs.error(err);
-    }
-    finally {
-        if (fd !== undefined)
+    } finally {
+        if (fd !== undefined) {
             fs.closeSync(fd);
+        }
     }
 };
 
-let fp1 = 'C:\\ddd\\ygct\\ics_nodejs_v2_alpha\\assets\\hello\\cc4k\\bus.json';
-let fp2 = 'C:\\ddd\\ygct\\ics_nodejs_v2_alpha\\assets\\hello\\cc4k\\gis_bus1.json';
+let fp1 = path.join(__dirname, './../../assets/hello/cc4k/bus.json');
+let fp2 = path.join(__dirname, './../../assets/hello/cc4k/gis_bus1.json');
 mainCvBus1(fp1, fp2);
