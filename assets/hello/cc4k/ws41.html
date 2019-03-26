@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<<<<<<< HEAD
 
 <script src="./../../common/3rd/jquery-3.1.1.js"></script>
 
+=======
+<script src="./../../common/3rd/jquery-3.1.1.js"></script>
+<script src="./../../common/3rd/d3-4.4.1.js"></script>
+>>>>>>> 9f77014e06f9080ecddc8cd20e015127fb73fac0
 <body>
 
 <div id="div-rtdata-11">
@@ -192,9 +197,14 @@
 
     setInterval(function () {
         outStatus('Send Message: sentBytes= ' + String(sentBytes / 1024 / 1024) + ' Mb, sentStageReturnTimes= ' + String(sentStageReturnTimes) + ' Mb, receivedCache.size= ' + String(receivedCache.size), 5);
+<<<<<<< HEAD
         receivedCache.forEach(function (value, key, map) {
             gis_bus.refreshMeasuresSvg(value);
         });
+=======
+        refreshMeasuresImage();
+        refreshMeasuresText();
+>>>>>>> 9f77014e06f9080ecddc8cd20e015127fb73fac0
         receivedCache = new Map();
         let topWindow = window.top;
         topWindow.wsHeartJumpTime = Date.now();
@@ -208,11 +218,62 @@
 
     testWebSocket();
 
+<<<<<<< HEAD
     outStatus(`run begin on ${(new Date()).toLocaleString()}`, 1);
 </script>
 
 <script src="./gis_bus.js"></script>
 
 
+=======
+    // *** refresh ui
+    // *** refresh ui
+    // *** refresh ui
+    let imageSrcs = new Map([
+        [111, 'iconCancel.png'],
+        [112, 'iconConfirm.png'],
+        [113, 'left.png'],
+        [114, 'right.png'],
+        [115, 'user.png'],
+        [116, 'warning.png'],
+    ]);
+    let refreshMeasuresImage = function () {
+        for (let i = 73551319052; i <= 73551319056; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let imageSrc = imageSrcs.get(measure.value);
+                if (!imageSrc) imageSrc = 'del.png';
+                let imageEd = document.getElementById('image-yx-' + String(i));
+                if (imageEd) {
+                    imageEd.src = "./../../common/cimg/img/" + imageSrc;
+                }
+            }
+        }
+    };
+
+    let refreshMeasuresText = function () {
+        for (let i = 184868147284; i <= 184868147288; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let divEd = document.getElementById('show-yc-' + String(i));
+                if (divEd) {
+                    divEd.innerHTML = String(measure.value);
+                }
+            }
+        }
+        for (let i = 210990272524; i <= 210990272526; i++) {
+            let measure = receivedCache.get(i);
+            if (measure) {
+                let divEd = document.getElementById('show-yw-' + String(i));
+                if (divEd) {
+                    divEd.innerHTML = measure.value;
+                }
+            }
+        }
+    };
+
+    outStatus(`run begin on ${(new Date()).toLocaleString()}`, 1);
+</script>
+>>>>>>> 9f77014e06f9080ecddc8cd20e015127fb73fac0
 </body>
 </html>
