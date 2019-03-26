@@ -2,7 +2,7 @@
   "database": {
     "db1": {
       "connectionLimit": 10,
-      "dsn": "ics4000",
+      "dsn": "asm550h",
       "host": "127.0.0.1",
       "pwd": "123456",
       "type": "mysql",

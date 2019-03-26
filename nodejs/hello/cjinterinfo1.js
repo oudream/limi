@@ -1,5 +1,5 @@
 
-require('./../cjs/cjinterinfo.js');
+require('./../common/cjs/cjlog.js');
 
 cjs.debug('xxxxxxxxxxxx-debug');
 cjs.info('xxxxxxxxxxxx-info');

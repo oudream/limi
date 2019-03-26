@@ -29,7 +29,6 @@
     "socket.io": "^2.0.3",
     "uws": "^9.147.0",
     "ws": "^2.3.1",
-	"node-inspect": "^1.11.5"
   },
   "devDependencies": {
     "electron": "~1.6.2",
